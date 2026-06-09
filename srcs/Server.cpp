@@ -6,14 +6,14 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 11:06:35 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 12:53:22 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/09 13:11:22 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include <unistd.h>
-//#include <sys/socket.h> //socket
 #include <netinet/in.h> //maybe needeed for socket
+#include <cstdlib> //atoi
 
 /**
  * @brief all getter / setter
@@ -25,7 +25,7 @@ void Server::SetPort (int port) {
 }
 
 std::string Server::GetPwd() const {return _pwd;};
-void Server::SetPwd (int pwd) {
+void Server::SetPwd (std::string pwd) {
     _pwd = pwd;
 }
 
@@ -82,5 +82,23 @@ int Server::init_server()
     return 0;
 }
 
-int Server::is_port_valid() {return 1;};
-int Server::is_pwd_valid() {return 1;};
+/**
+ * @brief get User input and handle/parse them
+ */
+bool Server::parse_data(char **av) {
+    //port parsing
+    char *end = NULL;
+    this->SetPort(std::strtol(av[1], &end, 10));
+    if (GetPort() == 0 || end == av[1] || !(*end == '\0' || *end == '\n' || *end == '\r'))
+    {
+        std::cerr << "Error\n -> port parsing : " << av[1] << std::endl;
+        return false;  
+    }
+    std::cout << "Debug _port : " << GetPort() << std::endl;
+
+    //pwd parsing
+    this->SetPwd((std::string)av[2]);
+    //if (! valid pwd) {return0 false;};
+    std::cout << "Debug _port : " << GetPwd() << std::endl;
+    return true;
+};

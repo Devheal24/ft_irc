@@ -6,12 +6,11 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 10:49:01 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 12:54:00 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/09 13:09:08 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
-#include <cstdlib> //atoi
 
 int main (int ac, char **av)
 {
@@ -19,11 +18,7 @@ int main (int ac, char **av)
     
     //parsing todo
     Server serv;
-    serv.SetPort(atoi(av[1]));
-    if (!serv.is_port_valid()) {return 1;};
-    serv.SetPwd(atoi(av[2]));
-    if (!serv.is_pwd_valid()) {return 1;};
-
-    serv.init_server();
+    if (!serv.parse_data(av)) {return 1;};
+    if (serv.init_server() == 1) {return 1;};
     return 0;
 }
