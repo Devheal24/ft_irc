@@ -6,6 +6,7 @@ SRCS_DIR	:= srcs/
 OBJS_DIR	:= objs/
 
 SRCS		:= \
+	srcs/main.cpp
 
 OBJS		:= $(SRCS:$(SRCS_DIR)%.cpp=$(OBJS_DIR)%.o)
 
