@@ -6,7 +6,7 @@
 /*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 10:46:29 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 18:17:11 by mgarnier         ###   ########.fr       */
+/*   Updated: 2026/06/09 22:59:40 by mgarnier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,16 @@
 
 #include "Channel.hpp"
 #include "../includes/Client.hpp"
+#include <vector>
 #include <map>
 
 class Server {
 private:
     int         _port;
     std::string _pwd;
-    std::map<std::string, Channel> _channels;
-    Client      _clients;
-    int         _listen_fd;
+    std::map<std::string, Channel>  _channels;
+    std::vector< Client >           _clients;
+    int                             _listen_fd;
 public:
 
     Server() {};

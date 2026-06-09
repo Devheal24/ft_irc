@@ -11,6 +11,8 @@
 #include <arpa/inet.h>
 #include <sstream>
 
+extern int g_sig;
+
 static int set_nonblocking(int fd)
 {
     int flags = fcntl(fd, F_GETFL, 0);
@@ -85,8 +87,9 @@ void Server::run_event_loop()
     std::cout << "Server listening (event loop)" << std::endl;
 
     char tmp_buf[1024];
+	memset(tmp_buf, 0, sizeof(tmp_buf));
 
-    while (1)
+    while (!g_sig)
     {
         int ready = poll(&fds[0], fds.size(), -1);
         if (ready < 0)
@@ -99,13 +102,11 @@ void Server::run_event_loop()
 
         if (fds[0].revents & POLLIN)
         {
-            while (1)
+            while (!g_sig)
             {
                 sockaddr_in client_addr;
                 socklen_t client_len = sizeof(client_addr);
                 int client_fd = accept(_listen_fd, (sockaddr *)&client_addr, &client_len);
-                std::cout << inet_ntoa(client_addr.sin_addr) << std::endl;
-                std::cout << client_addr.sin_zero << std::endl;
                 if (client_fd < 0)
                 {
                     if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -128,15 +129,6 @@ void Server::run_event_loop()
                 client_pollfd.revents = 0;
                 fds.push_back(client_pollfd);
                 send(client_fd, "welcome to irc\n", 15, 0);
-
-                // here i catch the nickname
-                recv(fds[client_fd].fd, tmp_buf, sizeof(tmp_buf), 0);
-                std::istringstream iss(tmp_buf);
-                std::string name;
-                for (int i = 0; i < 5; i++)
-                    iss >> name;
-                _clients.addClient(name, client_fd);
-                std::cout << "client " << name << " connected fd " << client_fd << std::endl;
             }
         }
 
@@ -148,7 +140,7 @@ void Server::run_event_loop()
 
             if (revents & (POLLHUP | POLLERR | POLLNVAL))
             {
-                std::cout << "client disconnected fd " << fds[i].fd << std::endl;
+                std::cout << "client " << _clients[i].getName() << " disconnected fd " << fds[i].fd << std::endl;
                 close(fds[i].fd);
                 fds.erase(fds.begin() + i);
                 --i;
@@ -166,6 +158,20 @@ void Server::run_event_loop()
                     --i;
                     continue;
                 }
+
+				// here i catch the nickname #############
+				// some work to do
+                std::istringstream iss(tmp_buf);
+                std::string name;
+                iss >> name; // not good for now
+				size_t j = 0;
+				while (j < _clients.size())
+					if (static_cast<int>(i) == _clients[j++].getFD())
+						break;
+				if (j == _clients.size())
+                	_clients.push_back(Client(name, i));
+				// ########################################
+
                 std::string data(tmp_buf, (size_t)n);
                 ssize_t sent = 0;
                 for (size_t ind = 1; ind < fds.size(); ++ind)
@@ -179,12 +185,12 @@ void Server::run_event_loop()
                         sent += s;
                     }
                 }
-            }
-        }
-    }
-
+			}
+		}
+	}
     for (size_t i = 0; i < fds.size(); ++i)
-        close(fds[i].fd);
+		close(fds[i].fd);
+	fds.clear();
 }
 
 /**
