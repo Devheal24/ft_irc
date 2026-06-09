@@ -6,7 +6,7 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 10:46:29 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 16:21:27 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/09 16:35:49 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,11 @@ public:
     
     //client join
     void joinChannel(int clientFd, const std::string& name);
+
+    //operator actions
+    void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
+    void invite(int clientFd, const std::string& targetNick, const std::string& channelName);
+    void topic(int clientFd, const std::string& channelName, const std::string& newTopic);
 };
 
 # endif
