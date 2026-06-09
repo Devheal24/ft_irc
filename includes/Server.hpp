@@ -6,7 +6,7 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 10:46:29 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 16:35:49 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/09 16:59:22 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 # define SERV
 
 #include "Channel.hpp"
+#include "../includes/Client.hpp"
 #include <map>
 
 class Server {
@@ -22,6 +23,7 @@ private:
     int         _port;
     std::string _pwd;
     std::map<std::string, Channel> _channels;
+    //Client      _clients;
     int         _listen_fd;
 public:
     //get x Set
@@ -39,9 +41,9 @@ public:
     void joinChannel(int clientFd, const std::string& name);
 
     //operator actions
-    void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
+    /*void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
     void invite(int clientFd, const std::string& targetNick, const std::string& channelName);
-    void topic(int clientFd, const std::string& channelName, const std::string& newTopic);
+    void topic(int clientFd, const std::string& channelName, const std::string& newTopic);*/
 };
 
 # endif

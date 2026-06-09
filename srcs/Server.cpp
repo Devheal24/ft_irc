@@ -80,6 +80,8 @@ void Server::run_event_loop()
     listen_pollfd.revents = 0;
     fds.push_back(listen_pollfd);
 
+    //Client fzf();
+
     std::cout << "Server listening (event loop)" << std::endl;
 
     char tmp_buf[1024];
@@ -102,6 +104,7 @@ void Server::run_event_loop()
                 sockaddr_in client_addr;
                 socklen_t client_len = sizeof(client_addr);
                 int client_fd = accept(_listen_fd, (sockaddr *)&client_addr, &client_len);
+                std::cout << client_addr.sin_addr.s_addr << std::endl;
                 if (client_fd < 0)
                 {
                     if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -123,7 +126,9 @@ void Server::run_event_loop()
                 client_pollfd.events = POLLIN;
                 client_pollfd.revents = 0;
                 fds.push_back(client_pollfd);
-                send(client_fd, "welcome to irc", 14, 0);
+                send(client_fd, "welcome to irc\n", 15, 0);
+
+                //clients.append("teto", "17.0.0.2")
 
                 std::cout << "client connected fd " << client_fd << std::endl;
             }
@@ -211,7 +216,7 @@ bool Server::parse_data(char **av) {
     return true;
 };
 
-
+/*
 void Server::joinChannel(int clientFd, const std::string& name)
 {
     std::map<std::string, Channel>::iterator it;
@@ -386,4 +391,4 @@ void Server::topic(int clientFd, const std::string& channelName, const std::stri
     // ch.setTopic(newTopic);
     // std::string msg = ":" + getClientPrefix(clientFd) + " TOPIC " + channelName + " :" + newTopic + "\r\n";
     // ch.broadcast(msg);
-}
+}*/
