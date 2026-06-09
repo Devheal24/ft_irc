@@ -6,7 +6,7 @@
 /*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 13:41:32 by jimbow            #+#    #+#             */
-/*   Updated: 2026/06/09 15:35:40 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/06/09 16:03:10 by jimbow           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,10 @@ private:
 	std::set<int>	_operators;
 	std::set<int>	_invited;
 
+	std::string		_topic;
+	bool			_topicRestricted; // +t mode
+
 	// bool			_inviteOnly;
-	// bool			_topicRestricted;
 	// bool			_hasKey;
 	// std::string		_key;
 
@@ -51,6 +53,12 @@ public:
 	void addOperator(int fd);
 	void removeOperator(int fd);
 	bool isOperator(int fd) const;
+
+	//topic
+	const std::string& getTopic() const;
+	void setTopic(const std::string& topic);
+	bool isTopicRestricted() const;
+	void setTopicRestricted(bool restricted);
 
 	//member function
 	void broadcast(const std::string& msg);

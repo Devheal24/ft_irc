@@ -6,14 +6,14 @@
 /*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 13:45:06 by jimbow            #+#    #+#             */
-/*   Updated: 2026/06/09 15:36:12 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/06/09 16:07:33 by jimbow           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Channel.hpp"
 #include <sys/socket.h>
 
-Channel::Channel(const std::string& name) : _name(name)
+Channel::Channel(const std::string& name) : _name(name), _topicRestricted(false)
 {
 	
 }
@@ -76,6 +76,28 @@ void Channel::removeOperator(int fd)
 bool Channel::isOperator(int fd) const
 {
 	return _operators.find(fd) != _operators.end();
+}
+
+// TOPIC
+
+const std::string& Channel::getTopic() const
+{
+	return _topic;
+}
+
+void Channel::setTopic(const std::string& topic)
+{
+	_topic = topic;
+}
+
+bool Channel::isTopicRestricted() const
+{
+	return _topicRestricted;
+}
+
+void Channel::setTopicRestricted(bool restricted)
+{
+	_topicRestricted = restricted;
 }
 
 void Channel::broadcast(const std::string& msg)

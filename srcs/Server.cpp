@@ -6,7 +6,7 @@
 /*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 11:06:35 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 15:36:37 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/06/09 16:23:55 by jimbow           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -271,6 +271,15 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
 
     //verify if client is operator
     Channel& ch = it->second;
+
+    //verify if client is in channel
+    if (!ch.hasMember(clientFd))
+    {
+        std::string msg = ":server 442 " + channelName + " :You're not in that channel\r\n";
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+
     if (!ch.isOperator(clientFd))
     {
         std::string msg = ":server 482 " + channelName + " :You're not channel operator\r\n";
@@ -278,8 +287,8 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
         return ;
     }
 
-    ////// a decommenter lorsque la classe Client sera cree
-    //// Verify if target exist and is in channel
+    // // // a decommenter lorsque la classe Client sera cree
+    // // Verify if target exist and is in channel
     // std::map<int, Client> _clients;
 
     // int targetFd = findClientFdByNick(targetName);
@@ -298,7 +307,7 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
     // ch.removeMember(targetFd);
     // ch.removeOperator(targetFd);
 
-    // std::string msg = ":" + getClientName(clientFd) + " KICK " + channelName + " " + targetName + " :" + reason + "\r\n";
+    // std::string msg = ":" + getClientPrefix(clientFd) + " KICK " + channelName + " " + targetName + " :" + reason + "\r\n";
     // ch.broadcast(msg);
 }
 
@@ -316,6 +325,14 @@ void Server::invite(int clientFd, const std::string& targetNick, const std::stri
 
     Channel& ch = it->second;
 
+    //verify if client is in channel
+    if (!ch.hasMember(clientFd))
+    {
+        std::string msg = ":server 442 " + channelName + " :You're not in that channel\r\n";
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+
     //verify if client is operator
     if (!ch.isOperator(clientFd))
     {
@@ -324,6 +341,7 @@ void Server::invite(int clientFd, const std::string& targetNick, const std::stri
         return ;
     }
 
+    // // // a decommenter lorsque la classe Client sera cree
     // // Verify if target exist
     // int targetFd = findClientByNick(targetNick);
     // if (targetFd == -1)
@@ -332,4 +350,62 @@ void Server::invite(int clientFd, const std::string& targetNick, const std::stri
     //     send(clientFd, msg.c_str(), msg.size(), 0);
     //     return ;
     // }
+
+    // ch.addInvite(targetFd);
+    // std::string msg = ":server 341 " + getClientNickname(clientFd) + " " + targetNick + " " + channelName + "\r\n";
+    // send(clientFd, msg.c_str(), msg.size(), 0);
+    // msg = ":" + getClientPrefix(clientFd) + " INVITE " + targetNick + " :" + channelName + "\r\n";
+    // send(targetFd, msg.c_str(), msg.size(), 0);
+}
+
+void Server::topic(int clientFd, const std::string& channelName, const std::string& newTopic)
+{
+    std::map<std::string, Channel>::iterator it = _channels.find(channelName);
+
+    //verify if channel exist
+    if (it == _channels.end())
+    {
+        std::string msg = ":server 403 " + channelName + " does not exist\r\n";
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+
+    Channel& ch = it->second;
+
+    //verify if client is in channel
+    if (!ch.hasMember(clientFd))
+    {
+        std::string msg = ":server 442 " + channelName + " :You're not in that channel\r\n";
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+
+    // // // a decommenter une fois la class client prete
+    // //if newTopic empty, display actual topic if there is one
+    // if (newTopic.empty())
+    // {
+    //     if (ch.getTopic().empty())
+    //     {
+    //         std::string msg = ":server 331 " + getClientNickname(clientFd) + " " + channelName + " :No topic is set\r\n";
+    //         send(clientFd, msg.c_str(), msg.size(), 0);
+    //     }
+    //     else
+    //     {
+    //         std::string msg = ":server 332 " + getClientNickname(clientFd) + " " + channelName + ":" + ch.getTopic() + "\r\n";
+    //         send(clientFd, msg.c_str(), msg.size(), 0);
+    //     }
+    //     return ;
+    // }
+
+    // //verify if client is operator and topic restricted
+    // if (ch.isTopicRestricted() && !ch.isOperator(clientFd))
+    // {
+    //     std::string msg = ":server 482 " + channelName + " :You're not channel operator\r\n";
+    //     send(clientFd, msg.c_str(), msg.size(), 0);
+    //     return ;
+    // }
+
+    // ch.setTopic(newTopic);
+    // std::string msg = ":" + getClientPrefix(clientFd) + " TOPIC " + channelName + " :" + newTopic + "\r\n";
+    // ch.broadcast(msg);
 }
