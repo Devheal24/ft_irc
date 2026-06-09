@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 11:06:35 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 15:22:32 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/09 15:25:21 by mgarnier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#include "../includes/Server.hpp"
+#include <iostream>
 #include <unistd.h>
 #include <netinet/in.h>
 #include <cstdlib>

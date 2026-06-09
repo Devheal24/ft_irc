@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 10:46:29 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 14:00:40 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/06/09 14:36:27 by mgarnier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #ifndef SERV
 # define SERV
 
-#include <iostream>
 #include "Channel.hpp"
 #include <map>
 
