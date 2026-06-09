@@ -6,11 +6,12 @@
 /*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 11:06:35 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 14:13:37 by mgarnier         ###   ########.fr       */
+/*   Updated: 2026/06/09 14:36:46 by mgarnier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
+#include <iostream>
 #include <unistd.h>
 #include <netinet/in.h> //maybe needeed for socket
 #include <cstdlib> //atoi
