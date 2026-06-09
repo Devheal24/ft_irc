@@ -6,7 +6,7 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 11:06:35 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 14:53:15 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/09 15:22:32 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,8 @@ int Server::init_server()
 
     std::cout << "Server listening on port " << this->GetPort() << std::endl;
 
-    char buffer[1024];
+    // temporary read buffer; data for each client will be copied into a std::string
+    char tmp_buf[1024];
 
     while (1)
     {
@@ -144,7 +145,6 @@ int Server::init_server()
                     std::cerr << "accept fail" << std::endl;
                     break;
                 }
-
                 //when client "load" set to non-block
                 if (set_nonblocking(client_fd) < 0)
                 {
@@ -158,6 +158,7 @@ int Server::init_server()
                 client_pollfd.events = POLLIN;
                 client_pollfd.revents = 0;
                 fds.push_back(client_pollfd);
+                send(client_fd, "welcome to irc", 7, 0);
 
                 std::cout << "client connected fd " << client_fd << std::endl;
             }
@@ -166,6 +167,7 @@ int Server::init_server()
         //check all curr login client for any action
         for (size_t i = 1; i < fds.size(); ++i)
         {
+
             short revents = fds[i].revents;
             if (revents == 0)
                 continue;
@@ -179,11 +181,10 @@ int Server::init_server()
                 --i;
                 continue;
             }
-
             //new data client
             if (revents & POLLIN)
             {
-                ssize_t n = recv(fds[i].fd, buffer, sizeof(buffer), 0);
+                ssize_t n = recv(fds[i].fd, tmp_buf, sizeof(tmp_buf), 0);
                 if (n <= 0)
                 {
                     std::cout << "client disconnected fd " << fds[i].fd << std::endl;
@@ -191,6 +192,14 @@ int Server::init_server()
                     fds.erase(fds.begin() + i);
                     --i;
                     continue;
+                }
+                // copy exactly n bytes into a std::string to avoid sending garbage
+                std::string data(tmp_buf, (size_t)n);
+                ssize_t sent = 0;
+                while (sent < (ssize_t)data.size()) {
+                    ssize_t s = send(fds[i].fd, data.c_str() + sent, data.size() - sent, 0);
+                    if (s <= 0) break;
+                    sent += s;
                 }
             }
         }
