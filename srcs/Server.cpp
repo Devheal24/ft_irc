@@ -6,14 +6,28 @@
 /*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 11:06:35 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 15:30:00 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/06/09 15:36:37 by jimbow           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Server.hpp"
+#include <iostream>
 #include <unistd.h>
-#include <netinet/in.h> //maybe needeed for socket
-#include <cstdlib> //atoi
+#include <netinet/in.h>
+#include <cstdlib>
+#include <fcntl.h>
+#include <poll.h>
+#include <vector>
+#include <cerrno>
+#include <cstring>
+
+static int set_nonblocking(int fd)
+{
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1)
+        return -1;
+    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+}
 #include <sys/socket.h> //pour send();
 
 /**
@@ -30,7 +44,7 @@ void Server::SetPwd (std::string pwd) {
     _pwd = pwd;
 }
 
-//todo
+
 /*static int set_nonblocking(int listen_fd)
 {
     int flags = fcntl(listen_fd, F_GETFL, 0);      
@@ -45,45 +59,156 @@ void Server::SetPwd (std::string pwd) {
  */
 int Server::init_server()
 {
-    //"create" / "open" socket
+    //set first listen fd
     int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (listen_fd <= -1)
+    if (listen_fd < 0)
         return 1;
 
-    //set socket _port as instant reusable when closed
+    //set reuse for first fd
     int is_reuse = 1;
     if (setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &is_reuse, sizeof(is_reuse)) < 0)
-        {std::cerr << "setsockpt fail" << std::endl; close(listen_fd); return 1;}
+    {
+        std::cerr << "setsockopt fail" << std::endl;
+        close(listen_fd);
+        return 1;
+    }
 
-    //associate ip/port to the socket
+    //set server ip/port
     sockaddr_in serv_addr;
+    std::memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port = htons(this->GetPort());
     if (bind(listen_fd, (sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    {
         std::cerr << "bind fail" << std::endl;
-    std::cerr << "bind succed" << std::endl;
-    
-    //wait for connection
-    listen(listen_fd, SOMAXCONN);
-    
-    //handle client connection request
-    sockaddr_in client_handler;
-    socklen_t clientLen = sizeof(client_handler);
-    int clientSocket = accept(listen_fd, (sockaddr *)&serv_addr, &clientLen);
-    if (clientSocket < 0)
-        std::cerr << "accept fail" << std::endl;
-    std::cerr << "client connected" << std::endl;
-    
-    //will set all socket as nonblocking
-    /*if (set_nonblocking(listen_fd) < 0) {
+        close(listen_fd);
+        return 1;
+    }
+
+    //listen for connexion
+    if (listen(listen_fd, SOMAXCONN) < 0)
+    {
+        std::cerr << "listen fail" << std::endl;
+        close(listen_fd);
+        return 1;
+    }
+
+    //set first listen socket non-block
+    if (set_nonblocking(listen_fd) < 0)
+    {
         std::cerr << "failed to set non-blocking" << std::endl;
         close(listen_fd);
         return 1;
-    }*/
+    }
 
-    close (listen_fd);
-    close (clientSocket);
+    //keep track of all connexion
+    std::vector<struct pollfd> fds;
+    struct pollfd listen_pollfd;
+    listen_pollfd.fd = listen_fd;
+    listen_pollfd.events = POLLIN;
+    listen_pollfd.revents = 0;
+    fds.push_back(listen_pollfd);
+
+    std::cout << "Server listening on port " << this->GetPort() << std::endl;
+
+    // temporary read buffer; data for each client will be copied into a std::string
+    char tmp_buf[1024];
+
+    while (1)
+    {
+        //attend une demande de co
+        int ready = poll(&fds[0], fds.size(), -1);
+        if (ready < 0)
+        {
+            if (errno == EINTR)
+                continue;
+            std::cerr << "poll fail" << std::endl;
+            break;
+        }
+
+        //quand signal POLLIN start accept loop
+        if (fds[0].revents & POLLIN)
+        {
+            //loop to deal with each connectiion fast enought
+            while (1)
+            {
+                sockaddr_in client_addr;
+                socklen_t client_len = sizeof(client_addr);
+                int client_fd = accept(listen_fd, (sockaddr *)&client_addr, &client_len);
+                if (client_fd < 0)
+                {
+                    //non block with no connection needed
+                    if (errno == EAGAIN || errno == EWOULDBLOCK)
+                        break;
+                    // sys call that interupt
+                    if (errno == EINTR)
+                        continue;
+                    std::cerr << "accept fail" << std::endl;
+                    break;
+                }
+                //when client "load" set to non-block
+                if (set_nonblocking(client_fd) < 0)
+                {
+                    close(client_fd);
+                    continue;
+                }
+
+                //add to vector
+                struct pollfd client_pollfd;
+                client_pollfd.fd = client_fd;
+                client_pollfd.events = POLLIN;
+                client_pollfd.revents = 0;
+                fds.push_back(client_pollfd);
+                send(client_fd, "welcome to irc", 7, 0);
+
+                std::cout << "client connected fd " << client_fd << std::endl;
+            }
+        }
+
+        //check all curr login client for any action
+        for (size_t i = 1; i < fds.size(); ++i)
+        {
+
+            short revents = fds[i].revents;
+            if (revents == 0)
+                continue;
+
+            //dead client
+            if (revents & (POLLHUP | POLLERR | POLLNVAL))
+            {
+                std::cout << "client disconnected fd " << fds[i].fd << std::endl;
+                close(fds[i].fd);
+                fds.erase(fds.begin() + i);
+                --i;
+                continue;
+            }
+            //new data client
+            if (revents & POLLIN)
+            {
+                ssize_t n = recv(fds[i].fd, tmp_buf, sizeof(tmp_buf), 0);
+                if (n <= 0)
+                {
+                    std::cout << "client disconnected fd " << fds[i].fd << std::endl;
+                    close(fds[i].fd);
+                    fds.erase(fds.begin() + i);
+                    --i;
+                    continue;
+                }
+                // copy exactly n bytes into a std::string to avoid sending garbage
+                std::string data(tmp_buf, (size_t)n);
+                ssize_t sent = 0;
+                while (sent < (ssize_t)data.size()) {
+                    ssize_t s = send(fds[i].fd, data.c_str() + sent, data.size() - sent, 0);
+                    if (s <= 0) break;
+                    sent += s;
+                }
+            }
+        }
+    }
+
+    for (size_t i = 0; i < fds.size(); ++i)
+        close(fds[i].fd);
     return 0;
 }
 
@@ -94,7 +219,7 @@ bool Server::parse_data(char **av) {
     //port parsing
     char *end = NULL;
     this->SetPort(std::strtol(av[1], &end, 10));
-    if (GetPort() == 0 || end == av[1] || !(*end == '\0' || *end == '\n' || *end == '\r'))
+    if (GetPort() == 0 || end == av[1] || *end != '\0' || GetPort() < 6665 || GetPort() > 6669)
     {
         std::cerr << "Error\n -> port parsing : " << av[1] << std::endl;
         return false;  

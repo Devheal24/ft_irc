@@ -6,7 +6,7 @@
 /*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 10:46:29 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 15:10:49 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/06/09 15:35:53 by jimbow           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #ifndef SERV
 # define SERV
 
-#include <iostream>
 #include "Channel.hpp"
 #include <map>
 
