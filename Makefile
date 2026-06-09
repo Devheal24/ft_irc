@@ -4,7 +4,7 @@ RESET   	:= \033[0m
 
 NAME		:= ircserv
 CPP			:= c++
-CPP_FLAGS	:= -Wall -Werror -Wextra -std=c++98 -g
+CPP_FLAGS	:= #-Wall -Werror -Wextra -std=c++98 -g
 INCLUDES	:= -Iincludes
 
 # DIR

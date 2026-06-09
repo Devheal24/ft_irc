@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 10:49:01 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 15:26:09 by mgarnier         ###   ########.fr       */
+/*   Updated: 2026/06/09 16:20:10 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ int main (int ac, char **av)
     Server serv;
     if (!serv.parse_data(av)) {return 1;};
     if (serv.init_server() == 1) {return 1;};
+    serv.run_event_loop();
     //test client joining channel
     serv.joinChannel(4, "#general");
     serv.joinChannel(5, "#general");

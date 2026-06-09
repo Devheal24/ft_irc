@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 10:46:29 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 14:36:27 by mgarnier         ###   ########.fr       */
+/*   Updated: 2026/06/09 16:21:27 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ private:
     int         _port;
     std::string _pwd;
     std::map<std::string, Channel> _channels;
+    int         _listen_fd;
 public:
     //get x Set
     void SetPort (int port);
@@ -32,6 +33,7 @@ public:
     //member-func
     bool parse_data(char **av);
     int init_server();
+    void run_event_loop();
     
     //client join
     void joinChannel(int clientFd, const std::string& name);
