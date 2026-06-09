@@ -3,25 +3,31 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:37:27 by mgarnier          #+#    #+#             */
-/*   Updated: 2026/06/09 16:53:47 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/09 18:17:56 by mgarnier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <map>
-#include <netinet/in.h>
 #include <string>
+#include <vector>
 
 class Client
 {
     private:
-        std::map< std::string, in_addr_t > _info;
+        std::vector< std::string > _name;
+        std::vector< int > _fd;
     
     public:
-        Client(std::string name, in_addr_t IP);
+        Client();
         ~Client();
         Client(const Client &base);
         Client &operator=(const Client &base);
+
+        void addClient(std::string name, int fd);
+
+        // getters
+        std::string getName(int fd) const;
+        int getFD(std::string name) const;
 };

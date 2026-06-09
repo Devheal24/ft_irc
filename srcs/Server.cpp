@@ -9,6 +9,7 @@
 #include <cerrno>
 #include <cstring>
 #include <arpa/inet.h>
+#include <sstream>
 
 static int set_nonblocking(int fd)
 {
@@ -81,8 +82,6 @@ void Server::run_event_loop()
     listen_pollfd.revents = 0;
     fds.push_back(listen_pollfd);
 
-    //Client fzf();
-
     std::cout << "Server listening (event loop)" << std::endl;
 
     char tmp_buf[1024];
@@ -106,6 +105,7 @@ void Server::run_event_loop()
                 socklen_t client_len = sizeof(client_addr);
                 int client_fd = accept(_listen_fd, (sockaddr *)&client_addr, &client_len);
                 std::cout << inet_ntoa(client_addr.sin_addr) << std::endl;
+                std::cout << client_addr.sin_zero << std::endl;
                 if (client_fd < 0)
                 {
                     if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -129,9 +129,14 @@ void Server::run_event_loop()
                 fds.push_back(client_pollfd);
                 send(client_fd, "welcome to irc\n", 15, 0);
 
-                //clients.append("teto", "17.0.0.2")
-
-                std::cout << "client connected fd " << client_fd << std::endl;
+                // here i catch the nickname
+                recv(fds[client_fd].fd, tmp_buf, sizeof(tmp_buf), 0);
+                std::istringstream iss(tmp_buf);
+                std::string name;
+                for (int i = 0; i < 5; i++)
+                    iss >> name;
+                _clients.addClient(name, client_fd);
+                std::cout << "client " << name << " connected fd " << client_fd << std::endl;
             }
         }
 
