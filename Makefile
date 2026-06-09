@@ -12,7 +12,8 @@ SRCS_DIR	:= srcs/
 OBJS_DIR	:= objs/
 
 SRCS		:= $(SRCS_DIR)main.cpp \
-				$(SRCS_DIR)Server.cpp
+				$(SRCS_DIR)Server.cpp \
+				$(SRCS_DIR)Channel.cpp
 
 OBJS		:= $(SRCS:$(SRCS_DIR)%.cpp=$(OBJS_DIR)%.o)
 

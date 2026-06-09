@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 11:06:35 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 13:11:22 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/09 14:05:19 by jimbow           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,8 @@ int Server::init_server()
     //handle client connection request
     sockaddr_in client_handler;
     socklen_t clientLen = sizeof(client_handler);
-    if (accept(listen_fd, (sockaddr *)&serv_addr, &clientLen) < 0)
+    int clientSocket = accept(listen_fd, (sockaddr *)&serv_addr, &clientLen);
+    if (clientSocket < 0)
         std::cerr << "accept fail" << std::endl;
     std::cerr << "client connected" << std::endl;
     
@@ -79,6 +80,9 @@ int Server::init_server()
         close(listen_fd);
         return 1;
     }*/
+
+    close (listen_fd);
+    close (clientSocket);
     return 0;
 }
 
@@ -102,3 +106,21 @@ bool Server::parse_data(char **av) {
     std::cout << "Debug _port : " << GetPwd() << std::endl;
     return true;
 };
+
+
+void Server::joinChannel(int clientFd, const std::string& name)
+{
+    std::map<std::string, Channel>::iterator it;
+
+    it = _channels.find(name);
+
+    if (it == _channels.end())
+    {
+        _channels.insert(std::make_pair(name, Channel(name)));
+        it = _channels.find(name);
+        std::cout << "Channel created: " << name << std::endl;
+    }
+    
+    it->second.addMember(clientFd);
+    std::cout << "Client " << clientFd << " joined " << name << std::endl;
+}
