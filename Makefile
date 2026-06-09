@@ -1,35 +1,60 @@
-NAME		:= irc
+# COLOR
+GREEN   	:= \033[1;38;5;46m
+RESET   	:= \033[0m
+
+NAME		:= ircserv
 CPP			:= c++
 CPP_FLAGS	:= -Wall -Werror -Wextra -std=c++98 -g
 INCLUDES	:= -Iincludes
+
+# DIR
 SRCS_DIR	:= srcs/
 OBJS_DIR	:= objs/
 
-SRCS		:= \
-	srcs/main.cpp
+SRCS		:= $(SRCS_DIR)main.cpp \
 
 OBJS		:= $(SRCS:$(SRCS_DIR)%.cpp=$(OBJS_DIR)%.o)
 
-all: $(NAME)
-	@echo "prgrm created!"
+all:		$(NAME)
 
-$(NAME): $(OBJS)
-	@echo "Creating program."
-	@$(CPP) $(CPP_FLAGS) $(INCLUDES) $(OBJS) -o $(NAME)
+$(NAME):	$(OBJS)
+			@$(CPP) $(CPP_FLAGS) $(INCLUDES) $(OBJS) -o $(NAME)
+			@printf "${GREEN}\r[▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬] SUCCESS 100%%${RESET}\n"
+
+TOTAL		:= $(words $(SRCS))
+COUNT		:= 0
 
 $(OBJS_DIR)%.o: $(SRCS_DIR)%.cpp
-	@echo "Compiling mandatory part files..."
-	@mkdir -p $(dir $@)
-	@$(CPP) $(CPP_FLAGS) $(INCLUDES) -c $< -o $@
+			@mkdir -p $(dir $@)
+			@$(CPP) $(CPP_FLAGS) $(INCLUDES) -c $< -o $@
+			@$(eval COUNT=$(shell echo $$(($(COUNT)+1))))
+			@PERCENT=$$(($(COUNT)*99/$(TOTAL))) ; \
+			BAR=$$(($(COUNT)*39/$(TOTAL))) ; \
+			if [ $$PERCENT -lt 33 ]; then \
+				COLOR_CODE=196; \
+			elif [ $$PERCENT -lt 66 ]; then \
+				COLOR_CODE=208; \
+			else \
+				COLOR_CODE=226; \
+			fi ; \
+			printf "\033[38;5;%sm\r[" $$COLOR_CODE ; \
+			i=1; while [ $$i -le $$BAR ]; do printf "▬"; i=$$((i+1)); done ; \
+			while [ $$i -le 40 ]; do printf " "; i=$$((i+1)); done ; \
+			printf "] LOADING %3d%%\033[0m" $$PERCENT
+
 
 clean:
-	@clear
-	@echo "Removing object files."
-	@rm -f $(OBJS)
+			@if ls $(OBJS) >/dev/null 2>&1; then \
+			echo "${GREEN}====   $(NAME)   ==== : >>>OBJS CLEANED<<<${RESET}"; \
+			fi
+			@rm -f $(OBJS)
+			@rm -rf $(OBJS_DIR)
 
-fclean: clean
-	@echo "Removing program file."
-	@rm -f $(NAME)
+fclean:		clean
+			@if ls $(NAME) >/dev/null 2>&1; then \
+			echo "${GREEN}====   $(NAME)   ==== : >>>ALL CLEANED<<<${RESET}"; \
+			fi
+			@rm -f $(NAME)
 
 re: fclean all
 
