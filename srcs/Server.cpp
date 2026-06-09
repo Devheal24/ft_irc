@@ -8,6 +8,7 @@
 #include <vector>
 #include <cerrno>
 #include <cstring>
+#include <arpa/inet.h>
 
 static int set_nonblocking(int fd)
 {
@@ -104,7 +105,7 @@ void Server::run_event_loop()
                 sockaddr_in client_addr;
                 socklen_t client_len = sizeof(client_addr);
                 int client_fd = accept(_listen_fd, (sockaddr *)&client_addr, &client_len);
-                std::cout << client_addr.sin_addr.s_addr << std::endl;
+                std::cout << inet_ntoa(client_addr.sin_addr) << std::endl;
                 if (client_fd < 0)
                 {
                     if (errno == EAGAIN || errno == EWOULDBLOCK)
