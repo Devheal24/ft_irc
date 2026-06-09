@@ -6,14 +6,15 @@
 /*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 11:06:35 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 14:05:19 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/06/09 15:30:00 by jimbow           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#include "../includes/Server.hpp"
 #include <unistd.h>
 #include <netinet/in.h> //maybe needeed for socket
 #include <cstdlib> //atoi
+#include <sys/socket.h> //pour send();
 
 /**
  * @brief all getter / setter
@@ -121,6 +122,89 @@ void Server::joinChannel(int clientFd, const std::string& name)
         std::cout << "Channel created: " << name << std::endl;
     }
     
+    //firstMember is operator, else not
+    bool firstMember = (_channels[name].memberCount() == 0);
     it->second.addMember(clientFd);
+    if (firstMember)
+    {
+        _channels[name].addOperator(clientFd);
+        std::cout << "Client " << clientFd << " is operator" << std::endl;
+    }
     std::cout << "Client " << clientFd << " joined " << name << std::endl;
+}
+
+void Server::kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason)
+{
+    std::map<std::string, Channel>::iterator it = _channels.find(channelName);
+    //verify if channel exist
+    if (it == _channels.end())
+    {
+        std::string msg = ":server 403 " + channelName + " does not exist\r\n";
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+
+    //verify if client is operator
+    Channel& ch = it->second;
+    if (!ch.isOperator(clientFd))
+    {
+        std::string msg = ":server 482 " + channelName + " :You're not channel operator\r\n";
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+
+    ////// a decommenter lorsque la classe Client sera cree
+    //// Verify if target exist and is in channel
+    // std::map<int, Client> _clients;
+
+    // int targetFd = findClientFdByNick(targetName);
+    // if (targetFd == clientFd)
+    // {
+    //     send(clientFd, "You can't kick yourself\r\n", 26, 0);
+    //     return ;
+    // }
+    // if (!ch.hasMember(targetFd))
+    // {
+    //     std::string msg = targetName + " is not in the channnel\r\n";
+    //     send(clientFd, msg.c_str(), msg.size(), 0);
+    //     return ;
+    // }
+
+    // ch.removeMember(targetFd);
+    // ch.removeOperator(targetFd);
+
+    // std::string msg = ":" + getClientName(clientFd) + " KICK " + channelName + " " + targetName + " :" + reason + "\r\n";
+    // ch.broadcast(msg);
+}
+
+void Server::invite(int clientFd, const std::string& targetNick, const std::string& channelName)
+{
+    std::map<std::string, Channel>::iterator it = _channels.find(channelName);
+
+    //verify if channel exist
+    if (it == _channels.end())
+    {
+        std::string msg = ":server 403 " + channelName + " does not exist\r\n";
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+
+    Channel& ch = it->second;
+
+    //verify if client is operator
+    if (!ch.isOperator(clientFd))
+    {
+        std::string msg = ":server 482 " + channelName + " :You're not channel operator\r\n";
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+
+    // // Verify if target exist
+    // int targetFd = findClientByNick(targetNick);
+    // if (targetFd == -1)
+    // {
+    //     std::string msg = ":server 401 " + targetNick + " :user does not exist\r\n";
+    //     send(clientFd, msg.c_str(), msg.size(), 0);
+    //     return ;
+    // }
 }
