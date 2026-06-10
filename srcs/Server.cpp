@@ -68,10 +68,10 @@ bool Server::parse_data(char **av) {
  */
 static int set_nonblocking(int fd)
 {
-    int flags = fcntl(fd, F_GETFL, 0);
+    /*int flags = fcntl(fd, F_GETFL, 0);
     if (flags == -1)
-        return -1;
-    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+        return -1;*/
+    return fcntl(fd, F_SETFL, O_NONBLOCK);
 }
 
 
@@ -367,49 +367,55 @@ bool Server::handleClientInput(int clientFd)
             }
             continue;
         }
-
-        // PRIVMSG
-        if (token == "PRIVMSG") {
+        // PRIVMSG / NOTICE
+        if (token == "PRIVMSG" || token == "NOTICE") {
             std::string target;
             iss >> target;
             std::string message;
             std::getline(iss, message);
             if (!message.empty() && message[0] == ' ') message.erase(0, 1);
             if (!message.empty() && message[0] == ':') message.erase(0, 1);
-            std::string active = _clients[selfIdx].getActiveChannel();
-            if (active.empty()) {
-                std::string msg = "No channel joined. Try /join #<channel>\r\n";
-                send(clientFd, msg.c_str(), msg.size(), 0);
-                continue;
-            }
-            std::map<std::string, Channel>::iterator it = _channels.find(active);
-            if (it == _channels.end()) continue;
             std::string nick = _clients[selfIdx].getName();
             if (nick.empty()) nick = "client";
-            std::ostringstream prefixMsg;
-            prefixMsg << ":" << nick << "!" << nick << "@localhost PRIVMSG " << active << " :" << message << "\r\n";
-            std::string formatted = prefixMsg.str();
-            it->second.broadcastExcept(clientFd, formatted);
+
+            if (!target.empty() && (target[0] == '#' || target[0] == '&')) {
+                std::map<std::string, Channel>::iterator it = _channels.find(target);
+                if (it == _channels.end()) {
+                    std::cout << "DEBUG ROUTE missing channel target=[" << target << "] fd=" << clientFd << std::endl;
+                    continue;
+                }
+                _clients[selfIdx].setActiveChannel(target);
+                std::ostringstream prefixMsg;
+                prefixMsg << ":" << nick << "!" << nick << "@localhost " << token << " " << target << " :" << message << "\r\n";
+                std::string formatted = prefixMsg.str();
+                it->second.broadcastExcept(clientFd, formatted);
+                continue;
+            }
+
+            bool delivered = false;
+            for (size_t k = 0; k < _clients.size(); ++k) {
+                if (_clients[k].getFD() == clientFd)
+                    continue;
+                if (_clients[k].getName() == target) {
+                    std::ostringstream prefixMsg;
+                    prefixMsg << ":" << nick << "!" << nick << "@localhost " << token << " " << target << " :" << message << "\r\n";
+                    std::string formatted = prefixMsg.str();
+                    send(_clients[k].getFD(), formatted.c_str(), formatted.size(), 0);
+                    delivered = true;
+                    break;
+                }
+            }
+            if (!delivered) {
+                std::ostringstream err;
+                err << ":server 401 " << nick << " " << target << " :No such nick/channel\r\n";
+                std::string msg = err.str();
+                send(clientFd, msg.c_str(), msg.size(), 0);
+            }
             continue;
         }
 
-        // fallback: deliver raw line to active channel
-        if (selfIdx < _clients.size()) {
-            std::string active = _clients[selfIdx].getActiveChannel();
-            if (!active.empty()) {
-                std::map<std::string, Channel>::iterator it = _channels.find(active);
-                if (it != _channels.end()) {
-                    std::string sendline = line;
-                    if (sendline.size() < 2 || sendline[sendline.size()-2] != '\r') sendline += "\r\n";
-                    it->second.broadcastExcept(clientFd, sendline);
-                }
-            } else {
-                std::string msg = "You are not in any channel\r\n";
-                send(clientFd, msg.c_str(), msg.size(), 0);
-            }
-        }
+        std::cout << "DEBUG IGNORE fd=" << clientFd << " line=[" << line << "]" << std::endl;
     }
-    
     return true;
 }
 
