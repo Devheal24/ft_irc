@@ -176,13 +176,13 @@ void Server::run_event_loop()
                     close(client_fd);
                     continue;
                 }
+                
 
                 struct pollfd client_pollfd;
                 client_pollfd.fd = client_fd;
                 client_pollfd.events = POLLIN;
                 client_pollfd.revents = 0;
                 fds.push_back(client_pollfd);
-                send(client_fd, "welcome to irc\n", 15, 0);
                 // create placeholder client name so the client appears registered to hexChat
                 std::ostringstream cn;
                 cn << "client" << client_fd;
@@ -191,12 +191,8 @@ void Server::run_event_loop()
                 while (ci < _clients.size() && _clients[ci].getFD() != client_fd)
                     ++ci;
                 if (ci == _clients.size()) {
-                    _clients.push_back(Client(placeholderName, client_fd));
-                    // send RPL_WELCOME 001 as placeholder registration
-                    std::ostringstream w;
-                    w << ":server 001 " << placeholderName << " :Welcome to the IRC server\r\n";
-                    std::string wmsg = w.str();
-                    send(client_fd, wmsg.c_str(), wmsg.size(), 0);
+                    // use empty name placeholder so NAMES shows nothing until client sets NICK
+                    _clients.push_back(Client(std::string(""), client_fd));
                 }
                 std::cout << "client connected fd " << client_fd << std::endl;
             }
@@ -251,56 +247,169 @@ bool Server::handleClientInput(int clientFd)
 
     std::string data(buf, (size_t)n);
 
-    //client registration by fd (first token as temporary name)
-    //todo
-    std::istringstream iss2(data);
-    std::string token;
-    iss2 >> token;
-    std::string name = "client";
-    size_t j = 0;
-    while (j < _clients.size() && _clients[j].getFD() != clientFd)
-        ++j;
-    name += j + '0';
-    if (j == _clients.size()) {
-        _clients.push_back(Client(name, clientFd));
-        // j now points to the newly created client
+    // debug: raw data received
+    std::cout << "DEBUG RECV fd=" << clientFd << " -> [" << data << "]" << std::endl;
+
+    size_t selfIdx = 0;
+    while (selfIdx < _clients.size() && _clients[selfIdx].getFD() != clientFd)
+        ++selfIdx;
+
+    // ensure we have a client placeholder
+    if (selfIdx == _clients.size()) {
+        _clients.push_back(Client(std::string(""), clientFd));
+        selfIdx = _clients.size() - 1;
     }
 
-    
-    //join cmd
-    // IRC protocol: hexChat sends "JOIN", not "/JOIN" (/ is UI convention only)
-    // Accept both formats for compatibility
-    if (token == "JOIN" || token == "/JOIN")
-    {
-        std::string chan;
-        iss2 >> chan;
-        if (!chan.empty() && chan[0] == ':')
-            chan = chan.substr(1);
-        while (!chan.empty() && (chan[chan.size() - 1] == '\r' || chan[chan.size() - 1] == '\n'))
-            chan.resize(chan.size() - 1);
-        if (!chan.empty())
-        {
-            joinChannel(clientFd, chan);
-            return true; // command processed
-        }
-    }
-
-    //deliver to all members of all joined channel
-    if (j < _clients.size()) {
-        std::string active = _clients[j].getActiveChannel();
-        std::cout << "DEBUG: Client fd=" << clientFd << " name=" << _clients[j].getName() 
-                  << " activeChannel=[" << active << "]" << std::endl;
-        if (!active.empty()) {
-            std::map<std::string, Channel>::iterator it = _channels.find(active);
-            if (it != _channels.end()) {
-                it->second.broadcastExcept(clientFd, data);
-            }
+    // split data into lines by LF, trim CR, and process each line
+    std::vector<std::string> lines;
+    std::string cur;
+    for (size_t i = 0; i < data.size(); ++i) {
+        char c = data[i];
+        if (c == '\n') {
+            if (!cur.empty() && cur[cur.size() - 1] == '\r')
+                cur.resize(cur.size() - 1);
+            lines.push_back(cur);
+            cur.clear();
         } else {
-            std::string msg = "You are not in any channel\r\n";
-            send(clientFd, msg.c_str(), msg.size(), 0);
+            cur.push_back(c);
         }
     }
+    if (!cur.empty()) {
+        if (cur[cur.size() - 1] == '\r')
+            cur.resize(cur.size() - 1);
+        lines.push_back(cur);
+    }
 
+    for (size_t li = 0; li < lines.size(); ++li) {
+        std::string &line = lines[li];
+        if (line.empty())
+            continue;
+        std::istringstream iss(line);
+        std::string token;
+        iss >> token;
+
+        if (token == "PASS") {
+            std::string pass;
+            iss >> pass;
+            while (!pass.empty() && (pass[pass.size() - 1] == '\r' || pass[pass.size() - 1] == '\n')) pass.resize(pass.size() - 1);
+            _clients[selfIdx].setPass(pass);
+            std::cout << "DEBUG PASS fd=" << clientFd << " pass=[" << pass << "]" << std::endl;
+            continue;
+        }
+
+        if (token == "NICK") {
+            std::string nick;
+            iss >> nick;
+            while (!nick.empty() && (nick[nick.size() - 1] == '\r' || nick[nick.size() - 1] == '\n')) nick.resize(nick.size() - 1);
+            bool wasRegistered = _clients[selfIdx].isRegistered();
+            _clients[selfIdx].setNick(nick);
+            std::cout << "DEBUG NICK fd=" << clientFd << " nick=[" << nick << "] registered=" << _clients[selfIdx].isRegistered() << std::endl;
+            if (!wasRegistered && _clients[selfIdx].isRegistered()) {
+                bool needPass = !_pwd.empty();
+                if (needPass && (!_clients[selfIdx].hasPass() || _clients[selfIdx].getPass() != _pwd)) {
+                    std::ostringstream oss;
+                    oss << ":server 464 " << nick << " :Password incorrect\r\n";
+                    std::string msg = oss.str();
+                    send(clientFd, msg.c_str(), msg.size(), 0);
+                    std::cout << "DEBUG REGISTRATION FAILED fd=" << clientFd << " nick=" << nick << " (bad PASS) - disconnecting" << std::endl;
+                    return false; // disconnect client on failed registration
+                } else {
+                    std::ostringstream w;
+                    w << ":server 001 " << nick << " :Welcome to the IRC server\r\n";
+                    std::string wmsg = w.str();
+                    send(clientFd, wmsg.c_str(), wmsg.size(), 0);
+                    std::cout << "DEBUG REGISTERED fd=" << clientFd << " nick=" << nick << std::endl;
+                }
+            }
+            continue;
+        }
+
+        if (token == "USER") {
+            std::string user, mode, unused;
+            iss >> user >> mode >> unused;
+            std::string real;
+            std::getline(iss, real);
+            if (!real.empty() && real[0] == ' ') real.erase(0, 1);
+            if (!real.empty() && real[0] == ':') real.erase(0, 1);
+            while (!real.empty() && (real[real.size() - 1] == '\r' || real[real.size() - 1] == '\n')) real.resize(real.size() - 1);
+            bool wasRegistered = _clients[selfIdx].isRegistered();
+            _clients[selfIdx].setUser(user, real);
+            std::cout << "DEBUG USER fd=" << clientFd << " user=[" << user << "] real=[" << real << "] registered=" << _clients[selfIdx].isRegistered() << std::endl;
+            if (!wasRegistered && _clients[selfIdx].isRegistered()) {
+                std::string nick = _clients[selfIdx].getName();
+                bool needPass = !_pwd.empty();
+                if (needPass && (!_clients[selfIdx].hasPass() || _clients[selfIdx].getPass() != _pwd)) {
+                    std::ostringstream oss;
+                    oss << ":server 464 " << nick << " :Password incorrect\r\n";
+                    std::string msg = oss.str();
+                    send(clientFd, msg.c_str(), msg.size(), 0);
+                    std::cout << "DEBUG REGISTRATION FAILED fd=" << clientFd << " nick=" << nick << " (bad PASS) - disconnecting" << std::endl;
+                    return false; // disconnect client on failed registration
+                } else {
+                    std::ostringstream w;
+                    w << ":server 001 " << nick << " :Welcome to the IRC server\r\n";
+                    std::string wmsg = w.str();
+                    send(clientFd, wmsg.c_str(), wmsg.size(), 0);
+                    std::cout << "DEBUG REGISTERED fd=" << clientFd << " nick=" << nick << std::endl;
+                }
+            }
+            continue;
+        }
+
+        // JOIN
+        if (token == "JOIN" || token == "/JOIN") {
+            std::string chan;
+            iss >> chan;
+            if (!chan.empty() && chan[0] == ':') chan = chan.substr(1);
+            while (!chan.empty() && (chan[chan.size() - 1] == '\r' || chan[chan.size() - 1] == '\n')) chan.resize(chan.size() - 1);
+            if (!chan.empty()) {
+                joinChannel(clientFd, chan);
+            }
+            continue;
+        }
+
+        // PRIVMSG
+        if (token == "PRIVMSG") {
+            std::string target;
+            iss >> target;
+            std::string message;
+            std::getline(iss, message);
+            if (!message.empty() && message[0] == ' ') message.erase(0, 1);
+            if (!message.empty() && message[0] == ':') message.erase(0, 1);
+            std::string active = _clients[selfIdx].getActiveChannel();
+            if (active.empty()) {
+                std::string msg = "No channel joined. Try /join #<channel>\r\n";
+                send(clientFd, msg.c_str(), msg.size(), 0);
+                continue;
+            }
+            std::map<std::string, Channel>::iterator it = _channels.find(active);
+            if (it == _channels.end()) continue;
+            std::string nick = _clients[selfIdx].getName();
+            if (nick.empty()) nick = "client";
+            std::ostringstream prefixMsg;
+            prefixMsg << ":" << nick << "!" << nick << "@localhost PRIVMSG " << active << " :" << message << "\r\n";
+            std::string formatted = prefixMsg.str();
+            it->second.broadcastExcept(clientFd, formatted);
+            continue;
+        }
+
+        // fallback: deliver raw line to active channel
+        if (selfIdx < _clients.size()) {
+            std::string active = _clients[selfIdx].getActiveChannel();
+            if (!active.empty()) {
+                std::map<std::string, Channel>::iterator it = _channels.find(active);
+                if (it != _channels.end()) {
+                    std::string sendline = line;
+                    if (sendline.size() < 2 || sendline[sendline.size()-2] != '\r') sendline += "\r\n";
+                    it->second.broadcastExcept(clientFd, sendline);
+                }
+            } else {
+                std::string msg = "You are not in any channel\r\n";
+                send(clientFd, msg.c_str(), msg.size(), 0);
+            }
+        }
+    }
+    
     return true;
 }
 
@@ -384,6 +493,7 @@ void Server::joinChannel(int clientFd, const std::string& name)
             continue;
         std::string mname = _clients[kk].getName();
         if (mname.empty()) mname = "*";
+        std::cout << "DEBUG NAMES member fd=" << memberFd << " name=[" << _clients[kk].getName() << "] usedName=[" << mname << "]" << std::endl;
         names << mname;
         // detect if more members exist after kk
         bool more = false;
@@ -396,6 +506,11 @@ void Server::joinChannel(int clientFd, const std::string& name)
     r353 << ":server 353 " << nick << " = " << name << " :" << names.str() << "\r\n";
     std::string r353s = r353.str();
     send(clientFd, r353s.c_str(), r353s.size(), 0);
+
+    /*std::ostringstream r001;
+    r001 << ":server 001 " << ":welcome" << "\r\n";
+    std::string r001s = r001.str();
+    send(clientFd, r001s.c_str(), r001s.size(), 0);*/
 
     std::ostringstream r366;
     r366 << ":server 366 " << nick << " " << name << " :End of /NAMES list\r\n";

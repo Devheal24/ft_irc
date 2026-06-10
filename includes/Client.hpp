@@ -6,7 +6,7 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:37:27 by mgarnier          #+#    #+#             */
-/*   Updated: 2026/06/10 12:43:00 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/10 15:24:32 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,14 @@ class Client
         int         _fd;
         std::set<std::string> _joinedChannels;
         std::string           _activeChannel;
+        // registration fields
+        std::string _username;
+        std::string _realname;
+        std::string _pass;
+        bool        _hasPass;
+        bool        _hasNick;
+        bool        _hasUser;
+        bool        _registered;
     
     public:
         Client();
@@ -42,6 +50,14 @@ class Client
         void joinChannel(const std::string& channelName);
         void partChannel(const std::string& channelName);
         void setActiveChannel(const std::string& channelName);
+
+        // registration
+        void setNick(const std::string& nick);
+        void setUser(const std::string& user, const std::string& real);
+        void setPass(const std::string& pass);
+        bool isRegistered() const;
+        std::string getPass() const;
+        bool hasPass() const;
 
         std::string getActiveChannel() const;
         bool isInChannel(const std::string& channelName) const;

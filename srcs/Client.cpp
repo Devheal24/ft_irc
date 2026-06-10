@@ -6,7 +6,7 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:39:59 by mgarnier          #+#    #+#             */
-/*   Updated: 2026/06/10 12:36:00 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/10 15:24:32 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,12 @@
 #include "../includes/Client.hpp"
 #include <unistd.h>
 
-Client::Client(): _name(""), _fd(-1), _joinedChannels(), _activeChannel("")
+Client::Client(): _name(""), _fd(-1), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
 {
     return;
 }
 
-Client::Client(std::string name, int fd): _name(name), _fd(fd), _joinedChannels(), _activeChannel("")
+Client::Client(std::string name, int fd): _name(name), _fd(fd), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
 {
 	return;
 }
@@ -47,6 +47,13 @@ Client &Client::operator=(const Client &base)
         this->_fd = base._fd;
         this->_joinedChannels = base._joinedChannels;
         this->_activeChannel = base._activeChannel;
+        this->_username = base._username;
+        this->_realname = base._realname;
+        this->_pass = base._pass;
+        this->_hasPass = base._hasPass;
+        this->_hasNick = base._hasNick;
+        this->_hasUser = base._hasUser;
+        this->_registered = base._registered;
     }
     return (*this);
 }
@@ -66,6 +73,44 @@ void Client::addClient(std::string name, int fd)
 	_name = name;
 	_fd = fd;
     return;
+}
+
+void Client::setNick(const std::string& nick)
+{
+    _name = nick;
+    _hasNick = true;
+    if (_hasUser && _hasNick)
+        _registered = true;
+}
+
+void Client::setUser(const std::string& user, const std::string& real)
+{
+    _username = user;
+    _realname = real;
+    _hasUser = true;
+    if (_hasUser && _hasNick)
+        _registered = true;
+}
+
+void Client::setPass(const std::string& pass)
+{
+    _pass = pass;
+    _hasPass = true;
+}
+
+bool Client::isRegistered() const
+{
+    return _registered;
+}
+
+std::string Client::getPass() const
+{
+    return _pass;
+}
+
+bool Client::hasPass() const
+{
+    return _hasPass;
 }
 
 void Client::joinChannel(const std::string& channelName)
