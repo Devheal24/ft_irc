@@ -1,4 +1,18 @@
 #include "../includes/Server.hpp"
+/**
+ * @include <iostream> : (std::cout / std::cerr)
+ * @include <unistd.h> : fonctions POSIX (close, read, write, etc.)
+ * @include <netinet/in.h> : structures d'adressage réseau (sockaddr_in) for bind/accept
+ * @include <cstdlib> : atoi
+ * @include <fcntl.h> : contrôle des fichiers (fcntl) pour set non-blocking
+ * @include <poll.h> : interface poll() pour multiplexage
+ * @include <vector> : conteneur pour la liste des pollfd
+ * @include <cerrno> : codes d'erreur POSIX (errno) for accept() or revents
+ * @include <cstring> : C manipulation mémoire/chaînes
+ * @include <arpa/inet.h> : conversions d'adresses réseau (htons, inet_*) for addr_in (port
+ * @include <sstream> : flux sur chaînes/string
+ * @include <sys/socket.h> : API sockets (socket, bind, listen, accept, send)
+ */
 #include <iostream>
 #include <unistd.h>
 #include <netinet/in.h>
@@ -10,10 +24,48 @@
 #include <cstring>
 #include <arpa/inet.h>
 #include <sstream>
-#include <sys/socket.h> // pour send()
+#include <sys/socket.h>
 
 extern int g_sig;
 
+/**
+ * @brief all getter / setter
+ */
+
+int Server::GetPort() const {return _port;};
+void Server::SetPort (int port) {
+    _port = port;
+}
+
+std::string Server::GetPwd() const {return _pwd;};
+void Server::SetPwd (std::string pwd) {
+    _pwd = pwd;
+}
+
+/**
+ * @brief get User input and handle/parse them
+ */
+bool Server::parse_data(char **av) {
+    //port parsing
+    char *end = NULL;
+    this->SetPort(std::strtol(av[1], &end, 10));
+    if (GetPort() == 0 || end == av[1] || *end != '\0' || GetPort() < 6665 || GetPort() > 6669)
+    {
+        std::cerr << "Error\n -> port parsing : " << av[1] << std::endl;
+        return false;  
+    }
+    std::cout << "Debug _port : " << GetPort() << std::endl;
+
+    //pwd parsing
+    this->SetPwd((std::string)av[2]);
+    //if (! valid pwd) {return0 false;};
+    std::cout << "Debug _port : " << GetPwd() << std::endl;
+    return true;
+};
+
+/**
+ * @brief Set the client to nonblocking to still loop if no new input detected
+ */
 static int set_nonblocking(int fd)
 {
     int flags = fcntl(fd, F_GETFL, 0);
@@ -22,8 +74,12 @@ static int set_nonblocking(int fd)
     return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
-// Create, bind, listen and set non-blocking a listening socket for given port.
-// Returns listening fd on success, -1 on failure (and prints an error).
+
+
+
+/**
+ * @brief Create, bind, listen and set non-blocking a listening socket for given port
+ */
 int Server::init_server()
 {
     int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -72,9 +128,9 @@ int Server::init_server()
     return 0;
 }
 
-// Run the main poll() event loop on the provided listening fd.
-// This function does not return until the server stops; it closes
-// all client fds before returning.
+/**
+ * @brief Run the main "infinite" poll() event loop on listening fd.
+ */
 void Server::run_event_loop()
 {
     std::vector<struct pollfd> fds;
@@ -168,6 +224,9 @@ void Server::run_event_loop()
         close(fds[i].fd);
 }
 
+/**
+ * @brief handle each client input, look for special cmd and send broadcast correctly
+ */
 bool Server::handleClientInput(int clientFd)
 {
     char buf[1024];
@@ -177,7 +236,7 @@ bool Server::handleClientInput(int clientFd)
 
     std::string data(buf, (size_t)n);
 
-    // basic client registration by fd (first token as temporary name)
+    //client registration by fd (first token as temporary name)
     std::istringstream iss2(data);
     std::string token;
     iss2 >> token;
@@ -188,7 +247,8 @@ bool Server::handleClientInput(int clientFd)
     if (j == _clients.size())
         _clients.push_back(Client(name, clientFd));
 
-    // detect JOIN command
+    
+    //join cmd
     if (token == "/JOIN")
     {
         std::string chan;
@@ -204,7 +264,7 @@ bool Server::handleClientInput(int clientFd)
         }
     }
 
-    // IRC behaviour: deliver to all members of the active channel of the sender
+    //deliver to all members of all joined channel
     if (j < _clients.size()) {
         std::string active = _clients[j].getActiveChannel();
         if (!active.empty()) {
@@ -222,40 +282,8 @@ bool Server::handleClientInput(int clientFd)
 }
 
 /**
- * @brief all getter / setter
+ * @brief create and/or join channel
  */
-
-int Server::GetPort() const {return _port;};
-void Server::SetPort (int port) {
-    _port = port;
-}
-
-std::string Server::GetPwd() const {return _pwd;};
-void Server::SetPwd (std::string pwd) {
-    _pwd = pwd;
-}
-
-/**
- * @brief get User input and handle/parse them
- */
-bool Server::parse_data(char **av) {
-    //port parsing
-    char *end = NULL;
-    this->SetPort(std::strtol(av[1], &end, 10));
-    if (GetPort() == 0 || end == av[1] || *end != '\0' || GetPort() < 6665 || GetPort() > 6669)
-    {
-        std::cerr << "Error\n -> port parsing : " << av[1] << std::endl;
-        return false;  
-    }
-    std::cout << "Debug _port : " << GetPort() << std::endl;
-
-    //pwd parsing
-    this->SetPwd((std::string)av[2]);
-    //if (! valid pwd) {return0 false;};
-    std::cout << "Debug _port : " << GetPwd() << std::endl;
-    return true;
-};
-
 void Server::joinChannel(int clientFd, const std::string& name)
 {
     std::map<std::string, Channel>::iterator it;
@@ -270,7 +298,7 @@ void Server::joinChannel(int clientFd, const std::string& name)
         std::cout << "Channel created: " << name << std::endl;
     }
     
-    // if client already member: just set active channel and notify
+    // if client already member, just set active channel
     if (it->second.hasMember(clientFd))
     {
         size_t j = 0;
@@ -287,7 +315,7 @@ void Server::joinChannel(int clientFd, const std::string& name)
         return;
     }
 
-    //firstMember is operator, else not
+    //firstMember is def operator
     bool firstMember = (it->second.memberCount() == 0);
     it->second.addMember(clientFd);
     if (firstMember)
@@ -297,7 +325,6 @@ void Server::joinChannel(int clientFd, const std::string& name)
     }
     std::cout << "Client " << clientFd << " joined " << name << std::endl;
 
-    // update client state
     size_t j = 0;
     while (j < _clients.size() && _clients[j].getFD() != clientFd)
         ++j;
@@ -306,6 +333,9 @@ void Server::joinChannel(int clientFd, const std::string& name)
     _clients[j].joinChannel(name);
 }
 
+/**
+ * @brief when client quit irc, close/clean correctly all of his appearance in container/else
+ */
 void Server::removeClient(int clientFd)
 {
     size_t j = 0;

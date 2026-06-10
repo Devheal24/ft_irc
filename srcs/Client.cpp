@@ -6,10 +6,13 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:39:59 by mgarnier          #+#    #+#             */
-/*   Updated: 2026/06/10 11:47:36 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/10 12:36:00 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @brief <unistd.h> : fonctions POSIX (close, read, write, etc.)
+ */
 #include "../includes/Client.hpp"
 #include <unistd.h>
 
@@ -65,7 +68,6 @@ void Client::addClient(std::string name, int fd)
     return;
 }
 
-// channel management
 void Client::joinChannel(const std::string& channelName)
 {
     _joinedChannels.insert(channelName);

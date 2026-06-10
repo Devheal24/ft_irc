@@ -3,19 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 10:49:01 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 22:53:10 by mgarnier         ###   ########.fr       */
+/*   Updated: 2026/06/10 12:35:46 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+/**
+ * @include <iostream>
+ * @include <signal.h>
+ */
 #include "../includes/Server.hpp"
 #include <iostream>
 #include <signal.h>
 
 volatile int g_sig = 0;
 
+/**
+ * @brief handle signal
+ */
 void handler(sig_atomic_t signal)
 {
     g_sig = signal;

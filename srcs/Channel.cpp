@@ -6,11 +6,14 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 13:45:06 by jimbow            #+#    #+#             */
-/*   Updated: 2026/06/10 11:56:16 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/10 12:36:04 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/Channel.hpp"
+/**
+ * @brief <sys/socket.h> : définitions POSIX socket (send, recv, etc.)
+ */
+#include "Channel.hpp"
 #include <sys/socket.h>
 
 Channel::Channel(const std::string& name) : _name(name), _topicRestricted(false)

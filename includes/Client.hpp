@@ -6,10 +6,18 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:37:27 by mgarnier          #+#    #+#             */
-/*   Updated: 2026/06/10 11:48:00 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/10 12:36:13 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
+#ifndef CLIENT_HPP
+# define CLIENT_HPP
+
+/**
+ * @include <string> : stockage des noms et opérations sur chaînes
+ * @include <set> : structure pour membres/operateurs/invitations sans doublons
+ */
 #include <string>
 #include <set>
 
@@ -43,3 +51,5 @@ class Client
         std::string getName() const;
         int getFD() const;
 };
+
+#endif

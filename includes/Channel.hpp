@@ -6,12 +6,18 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 13:41:32 by jimbow            #+#    #+#             */
-/*   Updated: 2026/06/10 11:56:14 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/10 12:36:16 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
+
+/**
+ * @include <string> : stockage des noms et opérations sur chaînes
+ * @include <set> : structure pour membres/operateurs/invitations sans doublons
+ */
 #include <string>
 #include <set>
 
