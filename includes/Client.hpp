@@ -3,20 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:37:27 by mgarnier          #+#    #+#             */
-/*   Updated: 2026/06/09 23:01:40 by mgarnier         ###   ########.fr       */
+/*   Updated: 2026/06/10 11:48:00 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <string>
+#include <set>
 
 class Client
 {
     private:
         std::string _name;
         int         _fd;
+        std::set<std::string> _joinedChannels;
+        std::string           _activeChannel;
     
     public:
         Client();
@@ -26,6 +29,15 @@ class Client
         Client &operator=(const Client &base);
 
         void addClient(std::string name, int fd);
+
+        // channel management
+        void joinChannel(const std::string& channelName);
+        void partChannel(const std::string& channelName);
+        void setActiveChannel(const std::string& channelName);
+
+        std::string getActiveChannel() const;
+        bool isInChannel(const std::string& channelName) const;
+        const std::set<std::string>& getJoinedChannels() const;
 
         // getters
         std::string getName() const;

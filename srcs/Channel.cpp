@@ -6,7 +6,7 @@
 /*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 13:45:06 by jimbow            #+#    #+#             */
-/*   Updated: 2026/06/09 16:39:14 by jhubier          ###   ########.fr       */
+/*   Updated: 2026/06/10 11:56:16 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,4 +104,14 @@ void Channel::broadcast(const std::string& msg)
 {
 	for (std::set<int>::iterator it = _members.begin(); it != _members.end(); ++it)
 		send(*it, msg.c_str(), msg.size(), 0);
+}
+
+/**
+ * @brief avoid sending to exclude fd
+ */
+void Channel::broadcastExcept(int excludeFd, const std::string& msg)
+{
+	for (std::set<int>::iterator it = _members.begin(); it != _members.end(); ++it)
+		if (*it != excludeFd)
+			send(*it, msg.c_str(), msg.size(), 0);
 }

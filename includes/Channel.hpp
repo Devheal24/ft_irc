@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jimbow <jimbow@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 13:41:32 by jimbow            #+#    #+#             */
-/*   Updated: 2026/06/09 16:03:10 by jimbow           ###   ########.fr       */
+/*   Updated: 2026/06/10 11:56:14 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,9 @@ public:
 	void addInvite(int fd);
 	void removeInvite(int fd);
 	bool isInvited(int fd) const;
+
+    // broadcast helpers
+    void broadcastExcept(int excludeFd, const std::string& msg);
 
 	//operators
 	void addOperator(int fd);

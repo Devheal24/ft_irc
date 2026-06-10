@@ -4,7 +4,7 @@ RESET   	:= \033[0m
 
 NAME		:= ircserv
 CPP			:= c++
-CPP_FLAGS	:= -Wall -Werror -Wextra -std=c++98 -g
+CPP_FLAGS	:= -Wall -Werror -Wextra -std=c++98 -g -fPIE
 INCLUDES	:= -Iincludes
 
 # DIR
@@ -14,7 +14,7 @@ OBJS_DIR	:= objs/
 SRCS		:= $(SRCS_DIR)main.cpp \
 				$(SRCS_DIR)Server.cpp \
 				$(SRCS_DIR)Client.cpp \
-				#$(SRCS_DIR)Channel.cpp
+				$(SRCS_DIR)Channel.cpp
 
 OBJS		:= $(SRCS:$(SRCS_DIR)%.cpp=$(OBJS_DIR)%.o)
 

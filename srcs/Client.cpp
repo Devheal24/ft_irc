@@ -3,30 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 14:39:59 by mgarnier          #+#    #+#             */
-/*   Updated: 2026/06/09 23:31:09 by mgarnier         ###   ########.fr       */
+/*   Updated: 2026/06/10 11:47:36 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Client.hpp"
 #include <unistd.h>
 
-Client::Client(): _name(NULL), _fd(-1)
+Client::Client(): _name(""), _fd(-1), _joinedChannels(), _activeChannel("")
 {
     return;
 }
 
-Client::Client(std::string name, int fd): _name(name), _fd(fd)
+Client::Client(std::string name, int fd): _name(name), _fd(fd), _joinedChannels(), _activeChannel("")
 {
 	return;
 }
 
 Client::~Client()
 {
-	if (_fd)
-		close(_fd);
+	/*if (_fd)
+		close(_fd);*/
     return;
 }
 
@@ -42,6 +42,8 @@ Client &Client::operator=(const Client &base)
     {
 		this->_name = base._name;
         this->_fd = base._fd;
+        this->_joinedChannels = base._joinedChannels;
+        this->_activeChannel = base._activeChannel;
     }
     return (*this);
 }
@@ -61,4 +63,39 @@ void Client::addClient(std::string name, int fd)
 	_name = name;
 	_fd = fd;
     return;
+}
+
+// channel management
+void Client::joinChannel(const std::string& channelName)
+{
+    _joinedChannels.insert(channelName);
+    _activeChannel = channelName;
+}
+
+void Client::partChannel(const std::string& channelName)
+{
+    _joinedChannels.erase(channelName);
+    if (_activeChannel == channelName)
+        _activeChannel = "";
+}
+
+void Client::setActiveChannel(const std::string& channelName)
+{
+    if (_joinedChannels.find(channelName) != _joinedChannels.end())
+        _activeChannel = channelName;
+}
+
+std::string Client::getActiveChannel() const
+{
+    return _activeChannel;
+}
+
+bool Client::isInChannel(const std::string& channelName) const
+{
+    return _joinedChannels.find(channelName) != _joinedChannels.end();
+}
+
+const std::set<std::string>& Client::getJoinedChannels() const
+{
+    return _joinedChannels;
 }

@@ -10,6 +10,7 @@
 #include <cstring>
 #include <arpa/inet.h>
 #include <sstream>
+#include <sys/socket.h> // pour send()
 
 extern int g_sig;
 
@@ -20,7 +21,6 @@ static int set_nonblocking(int fd)
         return -1;
     return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
-#include <sys/socket.h> //pour send();
 
 // Create, bind, listen and set non-blocking a listening socket for given port.
 // Returns listening fd on success, -1 on failure (and prints an error).
@@ -86,9 +86,6 @@ void Server::run_event_loop()
 
     std::cout << "Server listening (event loop)" << std::endl;
 
-    char tmp_buf[1024];
-	memset(tmp_buf, 0, sizeof(tmp_buf));
-
     while (!g_sig)
     {
         int ready = poll(&fds[0], fds.size(), -1);
@@ -100,6 +97,7 @@ void Server::run_event_loop()
             break;
         }
 
+        // incoming connections
         if (fds[0].revents & POLLIN)
         {
             while (!g_sig)
@@ -129,8 +127,11 @@ void Server::run_event_loop()
                 client_pollfd.revents = 0;
                 fds.push_back(client_pollfd);
                 send(client_fd, "welcome to irc\n", 15, 0);
+                std::cout << "client connected fd " << client_fd << std::endl;
             }
         }
+
+        // events on client sockets
         for (size_t i = 1; i < fds.size(); ++i)
         {
             short revents = fds[i].revents;
@@ -140,6 +141,7 @@ void Server::run_event_loop()
             if (revents & (POLLHUP | POLLERR | POLLNVAL))
             {
                 std::cout << "client disconnected fd " << fds[i].fd << std::endl;
+                removeClient(fds[i].fd);
                 close(fds[i].fd);
                 fds.erase(fds.begin() + i);
                 --i;
@@ -148,47 +150,75 @@ void Server::run_event_loop()
 
             if (revents & POLLIN)
             {
-                ssize_t n = recv(fds[i].fd, tmp_buf, sizeof(tmp_buf), 0);
-                if (n <= 0)
+                int clientFd = fds[i].fd;
+                bool connected = handleClientInput(clientFd);
+                if (!connected)
                 {
-                    std::cout << "client disconnected fd " << fds[i].fd << std::endl;
-                    close(fds[i].fd);
+                    std::cout << "client disconnected fd " << clientFd << std::endl;
+                    removeClient(clientFd);
+                    close(clientFd);
                     fds.erase(fds.begin() + i);
                     --i;
-                    continue;
                 }
+            }
+        }
+    }
 
-				// here i catch the nickname #############
-				// some work to do
-                std::istringstream iss(tmp_buf);
-                std::string name;
-                iss >> name; // not good for now
-				size_t j = 0;
-				while (j < _clients.size())
-					if (static_cast<int>(i) == _clients[j++].getFD())
-						break;
-				if (j == _clients.size())
-                	_clients.push_back(Client(name, i));
-				// ########################################
-
-                std::string data(tmp_buf, (size_t)n);
-                ssize_t sent = 0;
-                for (size_t ind = 1; ind < fds.size(); ++ind)
-                {
-                    if (ind == i)
-                        continue;
-                    sent = 0;
-                    while (sent < (ssize_t)data.size()) {
-                        ssize_t s = send(fds[ind].fd, data.c_str() + sent, data.size() - sent, 0);
-                        if (s <= 0) break;
-                        sent += s;
-                    }
-                }
-			}
-		}
-	}
     for (size_t i = 0; i < fds.size(); ++i)
-		close(fds[i].fd);
+        close(fds[i].fd);
+}
+
+bool Server::handleClientInput(int clientFd)
+{
+    char buf[1024];
+    ssize_t n = recv(clientFd, buf, sizeof(buf), 0);
+    if (n <= 0)
+        return false;
+
+    std::string data(buf, (size_t)n);
+
+    // basic client registration by fd (first token as temporary name)
+    std::istringstream iss2(data);
+    std::string token;
+    iss2 >> token;
+    std::string name = token;
+    size_t j = 0;
+    while (j < _clients.size() && _clients[j].getFD() != clientFd)
+        ++j;
+    if (j == _clients.size())
+        _clients.push_back(Client(name, clientFd));
+
+    // detect JOIN command
+    if (token == "/JOIN")
+    {
+        std::string chan;
+        iss2 >> chan;
+        if (!chan.empty() && chan[0] == ':')
+            chan = chan.substr(1);
+        while (!chan.empty() && (chan[chan.size() - 1] == '\r' || chan[chan.size() - 1] == '\n'))
+            chan.resize(chan.size() - 1);
+        if (!chan.empty())
+        {
+            joinChannel(clientFd, chan);
+            return true; // command processed
+        }
+    }
+
+    // IRC behaviour: deliver to all members of the active channel of the sender
+    if (j < _clients.size()) {
+        std::string active = _clients[j].getActiveChannel();
+        if (!active.empty()) {
+            std::map<std::string, Channel>::iterator it = _channels.find(active);
+            if (it != _channels.end()) {
+                it->second.broadcastExcept(clientFd, data);
+            }
+        } else {
+            std::string msg = "You are not in any channel\r\n";
+            send(clientFd, msg.c_str(), msg.size(), 0);
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -226,11 +256,11 @@ bool Server::parse_data(char **av) {
     return true;
 };
 
-/*
 void Server::joinChannel(int clientFd, const std::string& name)
 {
     std::map<std::string, Channel>::iterator it;
 
+    std::cout << "attempting to join channel : " << name << std::endl;
     it = _channels.find(name);
 
     if (it == _channels.end())
@@ -240,17 +270,67 @@ void Server::joinChannel(int clientFd, const std::string& name)
         std::cout << "Channel created: " << name << std::endl;
     }
     
+    // if client already member: just set active channel and notify
+    if (it->second.hasMember(clientFd))
+    {
+        size_t j = 0;
+        while (j < _clients.size() && _clients[j].getFD() != clientFd)
+            ++j;
+        if (j == _clients.size())
+            _clients.push_back(Client(std::string(""), clientFd));
+        _clients[j].setActiveChannel(name);
+        std::ostringstream oss;
+        oss << ":server NOTICE " << clientFd << " :Now active in " << name << "\r\n";
+        std::string msg = oss.str();
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        std::cout << "Client " << clientFd << " set active " << name << std::endl;
+        return;
+    }
+
     //firstMember is operator, else not
-    bool firstMember = (_channels[name].memberCount() == 0);
+    bool firstMember = (it->second.memberCount() == 0);
     it->second.addMember(clientFd);
     if (firstMember)
     {
-        _channels[name].addOperator(clientFd);
+        it->second.addOperator(clientFd);
         std::cout << "Client " << clientFd << " is operator" << std::endl;
     }
     std::cout << "Client " << clientFd << " joined " << name << std::endl;
+
+    // update client state
+    size_t j = 0;
+    while (j < _clients.size() && _clients[j].getFD() != clientFd)
+        ++j;
+    if (j == _clients.size())
+        _clients.push_back(Client(std::string(""), clientFd));
+    _clients[j].joinChannel(name);
 }
 
+void Server::removeClient(int clientFd)
+{
+    size_t j = 0;
+    while (j < _clients.size() && _clients[j].getFD() != clientFd)
+        ++j;
+    if (j == _clients.size())
+        return;
+
+    const std::set<std::string>& chans = _clients[j].getJoinedChannels();
+    for (std::set<std::string>::const_iterator it = chans.begin(); it != chans.end(); ++it)
+    {
+        std::map<std::string, Channel>::iterator cit = _channels.find(*it);
+        if (cit != _channels.end())
+        {
+            cit->second.removeMember(clientFd);
+            cit->second.removeOperator(clientFd);
+            if (cit->second.memberCount() == 0)
+                _channels.erase(cit);
+        }
+    }
+
+    _clients.erase(_clients.begin() + j);
+}
+
+/*
 void Server::kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason)
 {
     std::map<std::string, Channel>::iterator it = _channels.find(channelName);

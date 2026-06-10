@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 10:46:29 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/09 22:59:40 by mgarnier         ###   ########.fr       */
+/*   Updated: 2026/06/10 12:02:16 by jhubier          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,11 @@ public:
     bool parse_data(char **av);
     int init_server();
     void run_event_loop();
+    bool handleClientInput(int clientFd);
     
     //client join
     void joinChannel(int clientFd, const std::string& name);
+    void removeClient(int clientFd);
 
     //operator actions
     /*void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
