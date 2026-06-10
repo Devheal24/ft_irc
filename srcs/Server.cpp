@@ -131,7 +131,6 @@ void Server::run_event_loop()
                 send(client_fd, "welcome to irc\n", 15, 0);
             }
         }
-
         for (size_t i = 1; i < fds.size(); ++i)
         {
             short revents = fds[i].revents;
@@ -140,7 +139,7 @@ void Server::run_event_loop()
 
             if (revents & (POLLHUP | POLLERR | POLLNVAL))
             {
-                std::cout << "client " << _clients[i].getName() << " disconnected fd " << fds[i].fd << std::endl;
+                std::cout << "client disconnected fd " << fds[i].fd << std::endl;
                 close(fds[i].fd);
                 fds.erase(fds.begin() + i);
                 --i;
@@ -190,7 +189,6 @@ void Server::run_event_loop()
 	}
     for (size_t i = 0; i < fds.size(); ++i)
 		close(fds[i].fd);
-	fds.clear();
 }
 
 /**
