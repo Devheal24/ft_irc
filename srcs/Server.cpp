@@ -183,6 +183,21 @@ void Server::run_event_loop()
                 client_pollfd.revents = 0;
                 fds.push_back(client_pollfd);
                 send(client_fd, "welcome to irc\n", 15, 0);
+                // create placeholder client name so the client appears registered to hexChat
+                std::ostringstream cn;
+                cn << "client" << client_fd;
+                std::string placeholderName = cn.str();
+                size_t ci = 0;
+                while (ci < _clients.size() && _clients[ci].getFD() != client_fd)
+                    ++ci;
+                if (ci == _clients.size()) {
+                    _clients.push_back(Client(placeholderName, client_fd));
+                    // send RPL_WELCOME 001 as placeholder registration
+                    std::ostringstream w;
+                    w << ":server 001 " << placeholderName << " :Welcome to the IRC server\r\n";
+                    std::string wmsg = w.str();
+                    send(client_fd, wmsg.c_str(), wmsg.size(), 0);
+                }
                 std::cout << "client connected fd " << client_fd << std::endl;
             }
         }
@@ -237,19 +252,25 @@ bool Server::handleClientInput(int clientFd)
     std::string data(buf, (size_t)n);
 
     //client registration by fd (first token as temporary name)
+    //todo
     std::istringstream iss2(data);
     std::string token;
     iss2 >> token;
-    std::string name = token;
+    std::string name = "client";
     size_t j = 0;
     while (j < _clients.size() && _clients[j].getFD() != clientFd)
         ++j;
-    if (j == _clients.size())
+    name += j + '0';
+    if (j == _clients.size()) {
         _clients.push_back(Client(name, clientFd));
+        // j now points to the newly created client
+    }
 
     
     //join cmd
-    if (token == "/JOIN")
+    // IRC protocol: hexChat sends "JOIN", not "/JOIN" (/ is UI convention only)
+    // Accept both formats for compatibility
+    if (token == "JOIN" || token == "/JOIN")
     {
         std::string chan;
         iss2 >> chan;
@@ -267,6 +288,8 @@ bool Server::handleClientInput(int clientFd)
     //deliver to all members of all joined channel
     if (j < _clients.size()) {
         std::string active = _clients[j].getActiveChannel();
+        std::cout << "DEBUG: Client fd=" << clientFd << " name=" << _clients[j].getName() 
+                  << " activeChannel=[" << active << "]" << std::endl;
         if (!active.empty()) {
             std::map<std::string, Channel>::iterator it = _channels.find(active);
             if (it != _channels.end()) {
@@ -331,6 +354,53 @@ void Server::joinChannel(int clientFd, const std::string& name)
     if (j == _clients.size())
         _clients.push_back(Client(std::string(""), clientFd));
     _clients[j].joinChannel(name);
+
+    // IRC standard: broadcast JOIN message to all channel members (including sender)
+    std::ostringstream oss;
+    oss << ":" << _clients[j].getName() << " JOIN " << name << "\r\n";
+    std::string joinMsg = oss.str();
+    it->second.broadcast(joinMsg);
+
+    // Send topic (332) or no topic (331) to the joining client
+    std::string nick = _clients[j].getName();
+    if (nick.empty()) nick = "*";
+    if (!it->second.getTopic().empty()) {
+        std::ostringstream tss;
+        tss << ":server 332 " << nick << " " << name << " :" << it->second.getTopic() << "\r\n";
+        std::string tmsg = tss.str();
+        send(clientFd, tmsg.c_str(), tmsg.size(), 0);
+    } else {
+        std::ostringstream tss;
+        tss << ":server 331 " << nick << " " << name << " :No topic is set\r\n";
+        std::string tmsg = tss.str();
+        send(clientFd, tmsg.c_str(), tmsg.size(), 0);
+    }
+
+    // Send NAMES reply (353) and end of names (366)
+    std::ostringstream names;
+    for (size_t kk = 0; kk < _clients.size(); ++kk) {
+        int memberFd = _clients[kk].getFD();
+        if (!it->second.hasMember(memberFd))
+            continue;
+        std::string mname = _clients[kk].getName();
+        if (mname.empty()) mname = "*";
+        names << mname;
+        // detect if more members exist after kk
+        bool more = false;
+        for (size_t kk2 = kk + 1; kk2 < _clients.size(); ++kk2) {
+            if (it->second.hasMember(_clients[kk2].getFD())) { more = true; break; }
+        }
+        if (more) names << ' ';
+    }
+    std::ostringstream r353;
+    r353 << ":server 353 " << nick << " = " << name << " :" << names.str() << "\r\n";
+    std::string r353s = r353.str();
+    send(clientFd, r353s.c_str(), r353s.size(), 0);
+
+    std::ostringstream r366;
+    r366 << ":server 366 " << nick << " " << name << " :End of /NAMES list\r\n";
+    std::string r366s = r366.str();
+    send(clientFd, r366s.c_str(), r366s.size(), 0);
 }
 
 /**

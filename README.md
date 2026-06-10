@@ -938,3 +938,64 @@ close()
 11. **sigaction**
 
 Ces fonctions constituent le cœur d'un serveur TCP multi-clients non bloquant.
+
+
+Bonne idée — voici un récap clair (sans toucher au code) des messages/séquences que HexChat (et la plupart des clients IRC) attend pour se « mettre en place » correctement. Respecte strictement les formats et terminaisons CRLF ("\r\n").
+
+Principes clés
+
+Le client UI (/join, /nick) convertit en commandes IRC sans / (ex: JOIN #chan\r\n).
+Le serveur doit envoyer les numerics (001/332/353/366 ...) et réponses standard pour que le client considère la connexion « registered » et affiche correctement canaux / membres.
+Toutes les lignes réseau doivent finir par \r\n.
+À la connexion (accept)
+Après accept(), pour que le client considère la session « enregistrée », envoie au moins:
+RPL_WELCOME (001) : confirme l’enregistrement
+Exemple:
+:server 001 <nick> :Welcome to the IRC server\r\n
+Optionnel mais recommandé: 002, 003, 004 (yourhost/created/myinfo)
+Exemple:
+:server 002 <nick> :Your host is server, running version X\r\n
+:server 003 <nick> :This server was created ...\r\n
+:server 004 <nick> servername version usermodes chanmodes\r\n
+Si tu n’as pas encore reçu NICK/USER, tu peux fournir un placeholder nick (client<fd>) puis remplacer plus tard.
+Enregistrement (NICK / USER)
+Client envoie:
+NICK newnick\r\n
+USER username mode unused :Real Name\r\n
+Serveur: quand reçu NICK+USER, marque registered et envoie 001..004.
+Sur JOIN (client envoie JOIN #chan)
+Serveur doit:
+a) Ajouter le membre au channel.
+b) Broadcast à tous les membres (y compris le joineur) le JOIN avec prefix complet:
+:nick!user@host JOIN #chan\r\n
+(idéal : inclure !user@host; au minimum :nick JOIN #chan\r\n).
+c) Envoyer au client qui join:
+RPL_TOPIC (332) si topic présent:
+:server 332 <nick> <channel> :<topic>\r\n
+sinon RPL_NOTOPIC (331):
+:server 331 <nick> <channel> :No topic is set\r\n
+RPL_NAMREPLY (353): liste des nicks dans le channel
+:server 353 <nick> = <channel> :nick1 nick2 nick3\r\n
+(le caractère après 353 — ici = — indique public/secret)
+RPL_ENDOFNAMES (366):
+:server 366 <nick> <channel> :End of /NAMES list\r\n
+d) Optionnel: RPL_TOPICWHOTIME (333), MODE (324), creation time (329).
+Pour les messages (PRIVMSG)
+Quand un client envoie un message depuis HexChat, il enverra:
+PRIVMSG #channel :le message\r\n
+Serveur doit broadcast au channel avec prefix:
+:nick!user@host PRIVMSG #channel :le message\r\n
+Autres points importants
+Préfixe (nick!user@host) : utile pour que le client affiche correctement l’auteur. Implémente NICK/USER pour construire ce préfixe proprement.
+Numériques d’erreur : renvoie 401/403/442/482/... quand nécessaire (client non enregistré, channel n’existe pas, pas op, pas dans channel, etc.)
+PING/PONG : implémente PING → PONG pour garder la connexion alive:
+Client: PING :abcd\r\n → Server: PONG :abcd\r\n
+Terminaison CRLF obligatoire — HexChat dépend de ça.
+Encodage des messages: échappe/traite correctement : en début de param terminal (le protocole utilise : pour le param libre final).
+Checklist minimal pour que HexChat affiche/autorise le channel
+
+envoyer 001 au client après connexion (ou après NICK/USER) — indispensable ;
+après JOIN, envoyer JOIN broadcast + 332/331 + 353 + 366 ;
+renvoyer les messages (PRIVMSG) préfixés :nick!user@host PRIVMSG ... ;
+répondre aux PING.
+Souhaite-tu que j’écrive un court exemple de session (séquence client→serveur et serveur→client) complète ? Ou que j’implémente proprement NICK/USER et remplacements de placeholders dans le code ?
