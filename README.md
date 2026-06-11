@@ -14,7 +14,8 @@ This project is to create a server while the purpose is to allow a text-based ch
 `./ircserv <port> <password>`
 
 Launch Hexchat and connect with the ip of the server.
-<img src="images/Hexchat_image01.png">
+
+<h1 align="center"><video src="images/hexchat.mp4" autoplay loop muted width="1000"></video></h1>
 
 
 # <span style="color:white">Resources</span>
