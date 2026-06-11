@@ -60,6 +60,12 @@ std::string Client::getIP() const
     return (_ip);
 }
 
+void Client::setFD(int fd)
+{
+    _fd = fd;
+    return;
+}
+
 void Client::addClient(std::string name, int fd)
 {
 	_name = name;

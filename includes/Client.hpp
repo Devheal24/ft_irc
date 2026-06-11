@@ -45,6 +45,7 @@ class Client
         void setNick(const std::string& nick);
         void setUser(const std::string& user, const std::string& real);
         void setPass(const std::string& pass);
+        void setFD(int fd);
         bool isRegistered() const;
         std::string getPass() const;
         bool hasPass() const;

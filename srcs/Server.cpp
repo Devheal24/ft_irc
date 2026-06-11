@@ -171,9 +171,22 @@ void Server::run_event_loop()
                     close(client_fd);
                     continue;
                 }
+                std::string ip = inet_ntoa(client_addr.sin_addr);
+                bool client_existed = false;
                 
                 // check if client already exist
-
+                for (size_t i = 0; i < _clients.size(); ++i)
+                {
+                    if (ip == _clients[i].getIP())
+                    {
+                        client_existed = true;
+                        _clients[i].setFD(client_fd);
+                        std::cout << "client reconnected fd " << client_fd << " with ip= " << ip << std::endl;
+                        break;
+                    }
+                }
+                if (client_existed == true)
+                    continue;
                 struct pollfd client_pollfd;
                 client_pollfd.fd = client_fd;
                 client_pollfd.events = POLLIN;
@@ -183,7 +196,6 @@ void Server::run_event_loop()
                 std::ostringstream cn;
                 cn << "client" << client_fd;
                 std::string placeholderName = cn.str();
-                std::string ip = inet_ntoa(client_addr.sin_addr);
                 _clients.push_back(Client(std::string(""), client_fd, ip));
                 std::cout << "client connected fd " << client_fd << " with ip= " << ip << std::endl;
             }
@@ -202,7 +214,7 @@ void Server::run_event_loop()
                 removeClient(fds[i].fd);
                 /*close(fds[i].fd);
                 fds.erase(fds.begin() + i)*/;
-                --i;
+                // --i;
                 continue;
             }
 
@@ -217,7 +229,7 @@ void Server::run_event_loop()
                     removeClient(clientFd);
                     /*close(clientFd);
                     fds.erase(fds.begin() + i);*/
-                    --i;
+                    // --i;
                 }
             }
         }
@@ -343,10 +355,10 @@ void Server::removeClient(int clientFd)
         }
     }*/
 
-    int i = 0;
-    while (fds[i].fd != clientFd)
-        i++;
-    close(fds[i].fd);
-    fds.erase(fds.begin() + i);
+    // int i = 0;
+    // while (fds[i].fd != clientFd)
+    //     i++;
+    // close(fds[i].fd);
+    // fds.erase(fds.begin() + i);
     //_clients.erase(_clients.begin() + j);
 }
