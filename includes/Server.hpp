@@ -5,11 +5,13 @@
 /**
  * @include <vector> : conteneur séquentiel utilisé pour clients
  * @include <map> : table (key->value) utilisée pour channels par nom
+ * @include <poll.h> : interface poll() pour multiplexage
  */
 #include "Channel.hpp"
 #include "Client.hpp"
 #include <vector>
 #include <map>
+#include <poll.h>
 
 class Server {
 private:
@@ -18,6 +20,7 @@ private:
     std::map<std::string, Channel>  _channels;
     std::vector< Client >           _clients;
     int                             _listen_fd;
+    std::vector<struct pollfd>      fds;
 
     void CommandPrivMsg(std::istringstream &iss, std::string &token, size_t selfIdx, int clientFd);
     void CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd);

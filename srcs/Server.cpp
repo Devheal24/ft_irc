@@ -1,11 +1,9 @@
-#include "../includes/Server.hpp"
 /**
  * @include <iostream> : (std::cout / std::cerr)
  * @include <unistd.h> : fonctions POSIX (close, read, write, etc.)
  * @include <netinet/in.h> : structures d'adressage réseau (sockaddr_in) for bind/accept
  * @include <cstdlib> : atoi
  * @include <fcntl.h> : contrôle des fichiers (fcntl) pour set non-blocking
- * @include <poll.h> : interface poll() pour multiplexage
  * @include <vector> : conteneur pour la liste des pollfd
  * @include <cerrno> : codes d'erreur POSIX (errno) for accept() or revents
  * @include <cstring> : C manipulation mémoire/chaînes
@@ -13,12 +11,12 @@
  * @include <sstream> : flux sur chaînes/string
  * @include <sys/socket.h> : API sockets (socket, bind, listen, accept, send)
  */
+#include "../includes/Server.hpp"
 #include <iostream>
 #include <unistd.h>
 #include <netinet/in.h>
 #include <cstdlib>
 #include <fcntl.h>
-#include <poll.h>
 #include <vector>
 #include <cerrno>
 #include <cstring>
@@ -31,12 +29,10 @@ extern int g_sig;
 /**
  * @brief all getter / setter
  */
-
 int Server::GetPort() const {return _port;};
 void Server::SetPort (int port) {
     _port = port;
 }
-
 std::string Server::GetPwd() const {return _pwd;};
 void Server::SetPwd (std::string pwd) {
     _pwd = pwd;
@@ -133,7 +129,6 @@ int Server::init_server()
  */
 void Server::run_event_loop()
 {
-    std::vector<struct pollfd> fds;
     struct pollfd listen_pollfd;
     listen_pollfd.fd = _listen_fd;
     listen_pollfd.events = POLLIN;
@@ -209,8 +204,8 @@ void Server::run_event_loop()
             {
                 std::cout << "client disconnected fd " << fds[i].fd << std::endl;
                 removeClient(fds[i].fd);
-                close(fds[i].fd);
-                fds.erase(fds.begin() + i);
+                /*close(fds[i].fd);
+                fds.erase(fds.begin() + i)*/;
                 --i;
                 continue;
             }
@@ -224,8 +219,8 @@ void Server::run_event_loop()
                 {
                     std::cout << "client disconnected fd " << clientFd << std::endl;
                     removeClient(clientFd);
-                    close(clientFd);
-                    fds.erase(fds.begin() + i);
+                    /*close(clientFd);
+                    fds.erase(fds.begin() + i);*/
                     --i;
                 }
             }
@@ -235,6 +230,11 @@ void Server::run_event_loop()
     //close all fd when server shutdown
     for (size_t i = 0; i < fds.size(); ++i)
         close(fds[i].fd);
+
+    for (size_t i = 0; i < fds.size(); ++i)
+    {
+        std::cout << "connected at close : " << fds[i].fd << std::endl;
+    }
 }
 
 /**
@@ -334,7 +334,7 @@ void Server::removeClient(int clientFd)
     if (j == _clients.size())
         return;
 
-    const std::set<std::string>& chans = _clients[j].getJoinedChannels();
+    /*const std::set<std::string>& chans = _clients[j].getJoinedChannels();
     for (std::set<std::string>::const_iterator it = chans.begin(); it != chans.end(); ++it)
     {
         std::map<std::string, Channel>::iterator cit = _channels.find(*it);
@@ -345,7 +345,12 @@ void Server::removeClient(int clientFd)
             if (cit->second.memberCount() == 0)
                 _channels.erase(cit);
         }
-    }
+    }*/
 
-    _clients.erase(_clients.begin() + j);
+    int i = 0;
+    while (fds[i].fd != clientFd)
+        i++;
+    close(fds[i].fd);
+    fds.erase(fds.begin() + i);
+    //_clients.erase(_clients.begin() + j);
 }
