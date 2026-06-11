@@ -16,7 +16,7 @@ class Client
         int         _fd;
         std::set<std::string> _joinedChannels;
         std::string           _activeChannel;
-        // registration fields
+
         std::string _username;
         std::string _realname;
         std::string _pass;
@@ -51,7 +51,7 @@ class Client
         bool isInChannel(const std::string& channelName) const;
         const std::set<std::string>& getJoinedChannels() const;
 
-        // getters
+
         std::string getName() const;
         int getFD() const;
 };

@@ -24,6 +24,9 @@ private:
     void CommandJoin(std::istringstream &iss, int clientFd);
     bool CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd);
     bool CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd);
+    /*void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
+    void invite(int clientFd, const std::string& targetNick, const std::string& channelName);
+    void topic(int clientFd, const std::string& channelName, const std::string& newTopic);*/
 public:
 
     Server() {};
@@ -32,10 +35,6 @@ public:
     void SetPwd (std::string pwd);
     std::string GetPwd() const;
 
-    //parse input
-    //init server listening service
-    //run listening for new clients or input
-    //handle new clients inputs
     bool parse_data(char **av);
     int init_server();
     void run_event_loop();
@@ -43,11 +42,6 @@ public:
     
     void joinChannel(int clientFd, const std::string& name);
     void removeClient(int clientFd);
-
-    //operator actions
-    /*void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
-    void invite(int clientFd, const std::string& targetNick, const std::string& channelName);
-    void topic(int clientFd, const std::string& channelName, const std::string& newTopic);*/
 };
 
 # endif
