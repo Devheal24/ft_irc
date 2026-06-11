@@ -9,7 +9,7 @@ Client::Client(): _name(""), _fd(-1), _ip(0), _joinedChannels(), _activeChannel(
     return;
 }
 
-Client::Client(std::string name, int fd, in_addr_t ip): _name(name), _fd(fd), _ip(ip), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
+Client::Client(std::string name, int fd, std::string ip): _name(name), _fd(fd), _ip(ip), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
 {
 	return;
 }
@@ -55,7 +55,7 @@ int Client::getFD() const
 	return (_fd);
 }
 
-in_addr_t Client::getIP() const
+std::string Client::getIP() const
 {
     return (_ip);
 }

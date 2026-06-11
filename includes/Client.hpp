@@ -15,7 +15,7 @@ class Client
     private:
         std::string _name;
         int         _fd;
-        in_addr_t   _ip;
+        std::string _ip;
         std::set<std::string> _joinedChannels;
         std::string           _activeChannel;
 
@@ -29,7 +29,7 @@ class Client
     
     public:
         Client();
-        Client(std::string name, int fd, in_addr_t ip);
+        Client(std::string name, int fd, std::string ip);
         ~Client();
         Client(const Client &base);
         Client &operator=(const Client &base);
@@ -55,8 +55,8 @@ class Client
 
 
         std::string getName() const;
-        int getFD() const;
-        in_addr_t getIP() const;
+        int         getFD() const;
+        std::string getIP() const;
 };
 
 #endif

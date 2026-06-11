@@ -183,14 +183,9 @@ void Server::run_event_loop()
                 std::ostringstream cn;
                 cn << "client" << client_fd;
                 std::string placeholderName = cn.str();
-                size_t ci = 0;
-                while (ci < _clients.size() && _clients[ci].getFD() != client_fd)
-                    ++ci;
-                if (ci == _clients.size()) {
-                    // use empty name placeholder so NAMES shows nothing until client sets NICK
-                    _clients.push_back(Client(std::string(""), client_fd, client_addr.sin_addr.s_addr));
-                }
-                std::cout << "client connected fd " << client_fd << " with ip= " << client_addr.sin_addr.s_addr << std::endl;
+                std::string ip = inet_ntoa(client_addr.sin_addr);
+                _clients.push_back(Client(std::string(""), client_fd, ip));
+                std::cout << "client connected fd " << client_fd << " with ip= " << ip << std::endl;
             }
         }
 
