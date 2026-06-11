@@ -1,19 +1,7 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Channel.cpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/09 13:45:06 by jimbow            #+#    #+#             */
-/*   Updated: 2026/06/10 12:41:33 by jhubier          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 /**
- * @brief <sys/socket.h> : définitions POSIX socket (send, recv, etc.)
+ * @brief <sys/socket.h> : definitions POSIX socket (send, recv, etc.)
  */
-#include "Channel.hpp"
+#include "../includes/Channel.hpp"
 #include <sys/socket.h>
 
 Channel::Channel(const std::string& name) : _name(name), _topicRestricted(false)

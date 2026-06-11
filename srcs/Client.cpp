@@ -1,17 +1,5 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Client.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/09 14:39:59 by mgarnier          #+#    #+#             */
-/*   Updated: 2026/06/10 15:24:32 by jhubier          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 /**
- * @brief <unistd.h> : fonctions POSIX (close, read, write, etc.)
+ * @brief <unistd.h> : functions POSIX (close, read, write, ...)
  */
 #include "../includes/Client.hpp"
 #include <unistd.h>

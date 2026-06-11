@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jhubier <jhubier@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/09 10:46:29 by jhubier           #+#    #+#             */
-/*   Updated: 2026/06/10 12:36:53 by jhubier          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #pragma once
 #ifndef SERVER_HPP
 # define SERVER_HPP
@@ -30,6 +18,12 @@ private:
     std::map<std::string, Channel>  _channels;
     std::vector< Client >           _clients;
     int                             _listen_fd;
+
+    void CommandPrivMsg(std::istringstream &iss, std::string &token, size_t selfIdx, int clientFd);
+    void CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd);
+    void CommandJoin(std::istringstream &iss, int clientFd);
+    bool CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd);
+    bool CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd);
 public:
 
     Server() {};
