@@ -223,8 +223,6 @@ void Server::joinChannel(int clientFd, const std::string& name)
         size_t j = 0;
         while (j < _clients.size() && _clients[j].getFD() != clientFd)
             ++j;
-        if (j == _clients.size())
-            _clients.push_back(Client(std::string(""), clientFd));
         _clients[j].setActiveChannel(name);
         std::ostringstream oss;
         oss << ":server NOTICE " << clientFd << " :Now active in " << name << "\r\n";
@@ -247,8 +245,6 @@ void Server::joinChannel(int clientFd, const std::string& name)
     size_t j = 0;
     while (j < _clients.size() && _clients[j].getFD() != clientFd)
         ++j;
-    if (j == _clients.size())
-        _clients.push_back(Client(std::string(""), clientFd));
     _clients[j].joinChannel(name);
 
 

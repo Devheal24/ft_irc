@@ -172,6 +172,7 @@ void Server::run_event_loop()
                     continue;
                 }
                 
+                // check if client already exist
 
                 struct pollfd client_pollfd;
                 client_pollfd.fd = client_fd;
@@ -187,9 +188,9 @@ void Server::run_event_loop()
                     ++ci;
                 if (ci == _clients.size()) {
                     // use empty name placeholder so NAMES shows nothing until client sets NICK
-                    _clients.push_back(Client(std::string(""), client_fd));
+                    _clients.push_back(Client(std::string(""), client_fd, client_addr.sin_addr.s_addr));
                 }
-                std::cout << "client connected fd " << client_fd << std::endl;
+                std::cout << "client connected fd " << client_fd << " with ip= " << client_addr.sin_addr.s_addr << std::endl;
             }
         }
 
@@ -257,10 +258,10 @@ bool Server::handleClientInput(int clientFd)
         ++selfIdx;
 
     // ensure we have a client placeholder
-    if (selfIdx == _clients.size()) {
-        _clients.push_back(Client(std::string(""), clientFd));
-        selfIdx = _clients.size() - 1;
-    }
+    // if (selfIdx == _clients.size()) {
+    //     _clients.push_back(Client(std::string(""), clientFd));
+    //     selfIdx = _clients.size() - 1;
+    // }
 
     // split data into lines by LF, trim CR, and process each line
     std::vector<std::string> lines;

@@ -4,20 +4,18 @@
 #include "../includes/Client.hpp"
 #include <unistd.h>
 
-Client::Client(): _name(""), _fd(-1), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
+Client::Client(): _name(""), _fd(-1), _ip(0), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
 {
     return;
 }
 
-Client::Client(std::string name, int fd): _name(name), _fd(fd), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
+Client::Client(std::string name, int fd, in_addr_t ip): _name(name), _fd(fd), _ip(ip), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
 {
 	return;
 }
 
 Client::~Client()
 {
-	/*if (_fd)
-		close(_fd);*/
     return;
 }
 
@@ -33,6 +31,7 @@ Client &Client::operator=(const Client &base)
     {
 		this->_name = base._name;
         this->_fd = base._fd;
+        this->_ip = base._ip;
         this->_joinedChannels = base._joinedChannels;
         this->_activeChannel = base._activeChannel;
         this->_username = base._username;
@@ -54,6 +53,11 @@ std::string Client::getName() const
 int Client::getFD() const
 {
 	return (_fd);
+}
+
+in_addr_t Client::getIP() const
+{
+    return (_ip);
 }
 
 void Client::addClient(std::string name, int fd)

@@ -6,6 +6,7 @@
  * @include <string> : stockage des noms et opérations sur chaînes
  * @include <set> : structure pour membres/operateurs/invitations sans doublons
  */
+#include <arpa/inet.h>
 #include <string>
 #include <set>
 
@@ -14,6 +15,7 @@ class Client
     private:
         std::string _name;
         int         _fd;
+        in_addr_t   _ip;
         std::set<std::string> _joinedChannels;
         std::string           _activeChannel;
 
@@ -27,7 +29,7 @@ class Client
     
     public:
         Client();
-        Client(std::string name, int fd);
+        Client(std::string name, int fd, in_addr_t ip);
         ~Client();
         Client(const Client &base);
         Client &operator=(const Client &base);
@@ -54,6 +56,7 @@ class Client
 
         std::string getName() const;
         int getFD() const;
+        in_addr_t getIP() const;
 };
 
 #endif

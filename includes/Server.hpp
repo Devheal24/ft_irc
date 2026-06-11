@@ -7,8 +7,8 @@
  * @include <map> : table (key->value) utilisée pour channels par nom
  * @include <poll.h> : interface poll() pour multiplexage
  */
-#include "Channel.hpp"
-#include "Client.hpp"
+#include "../includes/Channel.hpp"
+#include "../includes/Client.hpp"
 #include <vector>
 #include <map>
 #include <poll.h>
