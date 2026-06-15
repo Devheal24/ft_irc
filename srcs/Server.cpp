@@ -55,7 +55,7 @@ bool Server::parse_data(char **av) {
     //pwd parsing
     this->SetPwd((std::string)av[2]);
     //if (! valid pwd) {return0 false;};
-    std::cout << "Debug _port : " << GetPwd() << std::endl;
+    std::cout << "Debug _pwd: " << GetPwd() << std::endl;
     return true;
 };
 
@@ -64,14 +64,18 @@ bool Server::parse_data(char **av) {
  */
 static int set_nonblocking(int fd)
 {
-    /*int flags = fcntl(fd, F_GETFL, 0);
+    int flags = fcntl(fd, F_GETFL, 0);
     if (flags == -1)
-        return -1;*/
+        return -1;
     return fcntl(fd, F_SETFL, O_NONBLOCK);
 }
 
-
-
+void Server::display_status() {
+    std::cout << std::endl << "SERVER STATE:" << std::endl;
+    for (int i = 0; i < (int)_clients.size(); i++)
+        std::cout << "client n°" << i << " == fd[" << _clients[i].getFD() << "] :ip[" << _clients[i].getIP() << "] :name[" <<_clients[i].getName() <<"] :pwd[" << _clients[i].getPass() << "] :user[" << _clients[i].getUsername() << "]" << std::endl;
+    std::cout << std::endl << std::endl;
+}
 
 /**
  * @brief Create, bind, listen and set non-blocking a listening socket for given port
@@ -182,6 +186,7 @@ void Server::run_event_loop()
                         client_existed = true;
                         _clients[i].setFD(client_fd);
                         std::cout << "client reconnected fd " << client_fd << " with ip= " << ip << std::endl;
+                        display_status();
                         break;
                     }
                 }
@@ -198,6 +203,7 @@ void Server::run_event_loop()
                 std::string placeholderName = cn.str();
                 _clients.push_back(Client(std::string(""), client_fd, ip));
                 std::cout << "client connected fd " << client_fd << " with ip= " << ip << std::endl;
+                display_status();
             }
         }
 
@@ -210,7 +216,7 @@ void Server::run_event_loop()
 
             if (revents & (POLLHUP | POLLERR | POLLNVAL))
             {
-                std::cout << "client disconnected fd " << fds[i].fd << std::endl;
+                std::cout << "client disconnected POLLHUP fd " << fds[i].fd << std::endl;
                 removeClient(fds[i].fd);
                 /*close(fds[i].fd);
                 fds.erase(fds.begin() + i)*/;
@@ -225,7 +231,7 @@ void Server::run_event_loop()
                 bool connected = handleClientInput(clientFd);
                 if (!connected)
                 {
-                    std::cout << "client disconnected fd " << clientFd << std::endl;
+                    std::cout << "client disconnected POLLIN fd " << clientFd << std::endl;
                     removeClient(clientFd);
                     /*close(clientFd);
                     fds.erase(fds.begin() + i);*/
@@ -252,13 +258,14 @@ bool Server::handleClientInput(int clientFd)
 {
     char buf[1024];
     ssize_t n = recv(clientFd, buf, sizeof(buf), 0);
-    if (n <= 0)
+    if (n < 0)
         return false;
-
+    if (n==0)
+        return true;
     std::string data(buf, (size_t)n);
 
     // debug: raw data received
-    std::cout << "DEBUG RECV fd=" << clientFd << " -> [" << data << "]" << std::endl;
+    std::cout << "DEBUG RECV fd=" << clientFd << " ->[" << data;
 
     size_t selfIdx = 0;
     while (selfIdx < _clients.size() && _clients[selfIdx].getFD() != clientFd)
@@ -340,7 +347,9 @@ bool Server::handleClientInput(int clientFd)
             CommandTopic(iss, clientFd);
             continue;   
         }
-        std::cout << "DEBUG IGNORE fd=" << clientFd << " line=[" << line << "]" << std::endl;
+        if (token == "QUIT")
+            display_status(); continue;
+        std::cout << "DEBUG IGNORED fd=" << clientFd << " line=[" << line << std::endl << std::endl;
     }
     return true;
 }
@@ -350,6 +359,7 @@ bool Server::handleClientInput(int clientFd)
  */
 void Server::removeClient(int clientFd)
 {
+    display_status();
     size_t j = 0;
     while (j < _clients.size() && _clients[j].getFD() != clientFd)
         ++j;

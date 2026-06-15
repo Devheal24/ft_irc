@@ -41,6 +41,8 @@ public:
     void SetPwd (std::string pwd);
     std::string GetPwd() const;
 
+    void display_status();
+
     bool parse_data(char **av);
     int init_server();
     void run_event_loop();
