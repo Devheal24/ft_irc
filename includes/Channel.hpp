@@ -37,6 +37,7 @@ public:
 	void removeMember(int fd);
 	bool hasMember(int fd) const;
 	size_t	memberCount() const;
+	void printMembers() const;
 
 	//invited
 	void addInvite(int fd);
@@ -59,6 +60,7 @@ public:
 
 	//member function
 	void broadcast(const std::string& msg);
+
 };
 
 #endif
