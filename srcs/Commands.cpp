@@ -384,6 +384,7 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
     ch.removeMember(targetFd);
     ch.removeOperator(targetFd);
 
+    ch.printMembers();
     std::string msg = ":" + getClientPrefix(clientFd) + " KICK " + channelName + " " + targetName + " :" + reason + "\r\n";
     ch.broadcast(msg);
 }

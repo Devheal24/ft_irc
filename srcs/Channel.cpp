@@ -3,6 +3,7 @@
  */
 #include "../includes/Channel.hpp"
 #include <sys/socket.h>
+#include <iostream>
 
 Channel::Channel(const std::string& name) : _name(name), _topicRestricted(false)
 {
@@ -34,6 +35,12 @@ bool Channel::hasMember(int fd) const
 size_t	Channel::memberCount() const
 {
 	return _members.size();
+}
+
+void Channel::printMembers() const
+{
+	for (std::set<int>::const_iterator it = _members.begin(); it != _members.end(); ++it)
+		std::cout << *it << std::endl;
 }
 
 // INVITED
