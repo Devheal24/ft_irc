@@ -325,7 +325,21 @@ bool Server::handleClientInput(int clientFd)
             CommandPrivMsg(iss, token, selfIdx, clientFd);
             continue;
         }
-
+        if (token == "KICK" || token == "/KICK")
+        {
+            CommandKick(iss, clientFd);
+            continue;   
+        }
+        if (token == "INVITE" || token == "/INVITE")
+        {
+            CommandInvite(iss, clientFd);
+            continue;   
+        }
+        if (token == "TOPIC" || token == "/TOPIC")
+        {
+            CommandTopic(iss, clientFd);
+            continue;   
+        }
         std::cout << "DEBUG IGNORE fd=" << clientFd << " line=[" << line << "]" << std::endl;
     }
     return true;
@@ -361,4 +375,44 @@ void Server::removeClient(int clientFd)
     // close(fds[i].fd);
     // fds.erase(fds.begin() + i);
     //_clients.erase(_clients.begin() + j);
+}
+
+int Server::getClientFdByName(const std::string& name) const
+{
+    for (std::vector<Client>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+    {
+        if (it->getName() == name)
+            return it->getFD();
+    }
+    return -1;
+}
+
+Client* Server::getClientByFd(int fd)
+{
+    for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    {
+        if (it->getFD() == fd)
+            return &(*it);
+    }
+    return NULL;
+}
+
+const Client* Server::getClientByFd(int fd) const
+{
+    for (std::vector<Client>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+    {
+        if (it->getFD() == fd)
+            return &(*it);
+    }
+    return NULL;
+}
+
+std::string Server::getClientPrefix(int fd) const
+{
+    const Client* client = getClientByFd(fd);
+
+    if (client == NULL)
+        return "unknown!unknown@localhost";
+    
+    return client->getName() + "!" + client->getUsername() + "@localhost";
 }

@@ -56,6 +56,7 @@ class Client
 
 
         std::string getName() const;
+        std::string getUsername() const;
         int         getFD() const;
         std::string getIP() const;
 };
