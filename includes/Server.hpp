@@ -30,6 +30,7 @@ private:
     void CommandKick(std::istringstream &iss, int clientFD);
     void CommandInvite(std::istringstream &iss, int clientFD);
     void CommandTopic(std::istringstream &iss, int clientFD);
+    void CommandMode(std::istringstream &iss, int clientFD);
     void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
     void invite(int clientFd, const std::string& targetNick, const std::string& channelName);
     void topic(int clientFd, const std::string& channelName, const std::string& newTopic);

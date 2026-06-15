@@ -5,7 +5,7 @@
 #include <sys/socket.h>
 #include <iostream>
 
-Channel::Channel(const std::string& name) : _name(name), _topicRestricted(false)
+Channel::Channel(const std::string& name) : _name(name), _topicRestricted(false), _inviteOnly(false)
 {
 	
 }
@@ -57,6 +57,16 @@ void Channel::removeInvite(int fd)
 bool Channel::isInvited(int fd) const
 {
 	return _invited.find(fd) != _invited.end();
+}
+
+bool Channel::isInviteOnly() const
+{
+	return _inviteOnly;
+}
+
+void Channel::setInviteOnly(bool value)
+{
+	_inviteOnly = value;
 }
 
 // OPERATOR

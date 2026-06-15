@@ -347,6 +347,11 @@ bool Server::handleClientInput(int clientFd)
             CommandTopic(iss, clientFd);
             continue;   
         }
+        if (token == "MODE" || token == "/MODE")
+        {
+            CommandMode(iss, clientFd);
+            continue;
+        }
         if (token == "QUIT")
         {
             display_status();

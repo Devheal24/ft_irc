@@ -232,7 +232,17 @@ void Server::joinChannel(int clientFd, const std::string& name)
         return;
     }
 
-    //firstMember is def operator
+	// Check if channel is InviteOnly
+	if (it->second.isInviteOnly() == true)
+	{
+		if (!it->second.isInvited(clientFd))
+		{
+			std::string msg = ":server 473 " + name + " :Cannot join channel (+i)\r\n";
+			return ;
+		}
+	}
+
+    // firstMember is def operator
     bool firstMember = (it->second.memberCount() == 0);
     it->second.addMember(clientFd);
     if (firstMember)
@@ -336,6 +346,34 @@ void Server::CommandTopic(std::istringstream &iss, int clientFD)
     topic(clientFD, channel, NewTopic);
 }
 
+void Server::CommandMode(std::istringstream &iss, int clientFD)
+{
+    std::string channel;
+    std::string mode;
+
+    iss >> channel;
+    iss >> mode;
+
+    //verify if channel exist
+    std::map<std::string, Channel>::iterator it = _channels.find(channel);
+    if (it == _channels.end())
+    {
+        std::string msg = ":server 482 " + channel + " does not exist\r\n";
+        send(clientFD, msg.c_str(), msg.size(), 0);
+        return;
+    }
+    Channel& ch = it->second;
+
+    if (mode == "i")
+    {
+        if (ch.isInviteOnly() == true)
+            ch.setInviteOnly(false);
+        else
+            ch.setInviteOnly(true);
+        return ;
+    }
+}
+
 void Server::kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason)
 {
     std::map<std::string, Channel>::iterator it = _channels.find(channelName);
@@ -347,7 +385,6 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
         return ;
     }
 
-    //verify if client is operator
     Channel& ch = it->second;
 
     //verify if client is in channel
@@ -358,6 +395,7 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
         return ;
     }
 
+    //verify if client is operator
     if (!ch.isOperator(clientFd))
     {
         std::string msg = ":server 482 " + channelName + " :You're not channel operator\r\n";

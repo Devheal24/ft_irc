@@ -20,7 +20,7 @@ private:
 	std::string		_topic;
 	bool			_topicRestricted; // +t mode
 
-	// bool			_inviteOnly;
+	bool			_inviteOnly;
 	// bool			_hasKey;
 	// std::string		_key;
 
@@ -43,6 +43,8 @@ public:
 	void addInvite(int fd);
 	void removeInvite(int fd);
 	bool isInvited(int fd) const;
+	bool isInviteOnly() const;
+	void setInviteOnly(bool value);
 
     // broadcast helpers
     void broadcastExcept(int excludeFd, const std::string& msg);
