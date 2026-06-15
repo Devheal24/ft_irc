@@ -348,7 +348,10 @@ bool Server::handleClientInput(int clientFd)
             continue;   
         }
         if (token == "QUIT")
-            display_status(); continue;
+        {
+            display_status();
+            continue;
+        }
         std::cout << "DEBUG IGNORED fd=" << clientFd << " line=[" << line << std::endl << std::endl;
     }
     return true;
