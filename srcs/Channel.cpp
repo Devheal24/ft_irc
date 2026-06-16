@@ -5,7 +5,7 @@
 #include <sys/socket.h>
 #include <iostream>
 
-Channel::Channel(const std::string& name) : _name(name), _topicRestricted(false), _inviteOnly(false)
+Channel::Channel(const std::string& name) : _name(name), _inviteOnly(false), _topicRestricted(false), _hasKey(false), _userLimit(0), _hasUserLimit(false)
 {
 	
 }
@@ -112,6 +112,47 @@ void Channel::broadcast(const std::string& msg)
 {
 	for (std::set<int>::iterator it = _members.begin(); it != _members.end(); ++it)
 		send(*it, msg.c_str(), msg.size(), 0);
+}
+
+// KEY
+bool Channel::hasKey() const
+{
+	return _hasKey;
+}
+
+const std::string& Channel::getKey() const
+{
+	return _key;
+}
+
+void Channel::setKey(const std::string& key)
+{
+	_key = key;
+	_hasKey = true;
+}
+
+void Channel::removeKey()
+{
+	_key.clear();
+	_hasKey = false;
+}
+
+//LIMIT
+void Channel::setLimit(size_t limit)
+{
+	_userLimit = limit;
+	_hasUserLimit = true;
+}
+
+void Channel::removeLimit()
+{
+	_userLimit = 0;
+	_hasUserLimit = false;
+}
+
+bool Channel::isFull() const
+{
+	return _hasUserLimit && _members.size() >= _userLimit;
 }
 
 /**

@@ -15,17 +15,18 @@ private:
 	std::string		_name;
 	std::set<int>	_members;
 	std::set<int>	_operators;
+
 	std::set<int>	_invited;
+	bool			_inviteOnly;
 
 	std::string		_topic;
-	bool			_topicRestricted; // +t mode
+	bool			_topicRestricted;
 
-	bool			_inviteOnly;
-	// bool			_hasKey;
-	// std::string		_key;
+	std::string		_key;
+	bool			_hasKey;
 
-	// bool			_hasUserLimit;
-	// size_t			_userLimit;
+	size_t			_userLimit;
+	bool			_hasUserLimit;
 
 public:
 	Channel(const std::string& name);
@@ -59,6 +60,17 @@ public:
 	void setTopic(const std::string& topic);
 	bool isTopicRestricted() const;
 	void setTopicRestricted(bool restricted);
+
+	//key
+	bool hasKey() const;
+	const std::string& getKey() const;
+	void setKey(const std::string& key);
+	void removeKey();
+
+	//limit
+	void setLimit(size_t limit);
+	void removeLimit();
+	bool isFull() const;
 
 	//member function
 	void broadcast(const std::string& msg);
