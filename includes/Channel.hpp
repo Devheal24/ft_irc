@@ -8,6 +8,7 @@
  */
 #include <string>
 #include <set>
+#include <vector>
 
 class Channel
 {
@@ -27,6 +28,9 @@ private:
 
 	size_t			_userLimit;
 	bool			_hasUserLimit;
+
+	std::vector<std::string> _botMessages;
+	bool			_botEnabled;
 
 public:
 	Channel(const std::string& name);
@@ -71,6 +75,11 @@ public:
 	void setLimit(size_t limit);
 	void removeLimit();
 	bool isFull() const;
+
+	//bot
+	void setBotEnabled(bool value);
+	bool isBotEnabled() const;
+	void botReply(int clientFd);
 
 	//member function
 	void broadcast(const std::string& msg);

@@ -129,6 +129,13 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
 {
     std::string target;
     iss >> target;
+
+    if (target == "BOT")
+    {
+        CommandBot(iss, clientFd);
+        return ;
+    }
+
     std::string message;
     std::getline(iss, message);
 
@@ -154,6 +161,8 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
         prefixMsg << ":" << nick << "!" << nick << "@localhost " << token << " " << target << " :" << message << "\r\n";
         std::string formatted = prefixMsg.str();
         it->second.broadcastExcept(clientFd, formatted);
+        if (it->second.isBotEnabled())
+            it->second.botReply(clientFd);
         return;
     }
 
@@ -161,7 +170,7 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
     for (size_t k = 0; k < _clients.size(); ++k)
     {
         if (_clients[k].getFD() == clientFd)
-            return;
+            continue;
         if (_clients[k].getName() == target)
         {
             std::ostringstream prefixMsg;
@@ -465,6 +474,34 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
             break;
         }
     }
+}
+
+void Server::CommandBot(std::istringstream& iss, int clientFd)
+{
+    std::string channel;
+    std::string mode;
+
+    iss >> channel;
+    iss >> mode;
+
+    //verify if channel exist
+    std::map<std::string, Channel>::iterator it = _channels.find(channel);
+    if (it == _channels.end())
+    {
+        std::string msg = ":server 482 " + channel + " does not exist\r\n";
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+    Channel& ch = it->second;
+    if (mode != "+" && mode != "-")
+    {
+        std::string msg = ":bot unknown mode\r\n";
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+    bool sign = (mode[0] == '+');
+    ch.setBotEnabled(sign);
+    ch.broadcast(":" + getClientPrefix(clientFd) + " " + channel + " BOT " + mode + "\r\n");
 }
 
 void Server::kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason)

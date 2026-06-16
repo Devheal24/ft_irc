@@ -4,10 +4,17 @@
 #include "../includes/Channel.hpp"
 #include <sys/socket.h>
 #include <iostream>
+#include <cstdlib>
 
-Channel::Channel(const std::string& name) : _name(name), _inviteOnly(false), _topicRestricted(false), _hasKey(false), _userLimit(0), _hasUserLimit(false)
+Channel::Channel(const std::string& name) : _name(name), _inviteOnly(false), _topicRestricted(false), _hasKey(false), _userLimit(0), _hasUserLimit(false), _botEnabled(false)
 {
-	
+	_botMessages.push_back("Salut à tous !");
+	_botMessages.push_back("AH ! Le négociateur...");
+	_botMessages.push_back("C'est pas faux.");
+	_botMessages.push_back("Non je peux pas, j'ai AquaPoney.");
+	_botMessages.push_back("De quoi ?");
+	_botMessages.push_back("Oui.");
+	_botMessages.push_back("Chut !");
 }
 
 const std::string& Channel::getName() const
@@ -153,6 +160,28 @@ void Channel::removeLimit()
 bool Channel::isFull() const
 {
 	return _hasUserLimit && _members.size() >= _userLimit;
+}
+
+//BOT
+void Channel::setBotEnabled(bool value)
+{
+	_botEnabled = value;
+}
+
+bool Channel::isBotEnabled() const
+{
+	return _botEnabled;
+}
+
+void Channel::botReply(int clientFd)
+{
+	if (_members.size() == 0)
+		return ;
+	
+	int r = rand() % _botMessages.size();
+	std::string msg = _botMessages[r];
+	std::string full = ":BOT!bot@localhost PRIVMSG " + _name + " :" + msg + "\r\n";
+	broadcastExcept(clientFd, full);
 }
 
 /**

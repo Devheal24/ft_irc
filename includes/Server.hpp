@@ -31,6 +31,7 @@ private:
     void CommandInvite(std::istringstream &iss, int clientFd);
     void CommandTopic(std::istringstream &iss, int clientFd);
     void CommandMode(std::istringstream &iss, int clientFd);
+    void CommandBot(std::istringstream &iss, int clientFd);
     void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
     void invite(int clientFd, const std::string& targetNick, const std::string& channelName);
     void topic(int clientFd, const std::string& channelName, const std::string& newTopic);
