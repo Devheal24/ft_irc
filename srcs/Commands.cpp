@@ -53,8 +53,8 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
     if (!wasRegistered && _clients[selfIdx].isRegistered())
     {
         bool needPass = !_pwd.empty();
-        bool noPass = !_clients[selfIdx].getPass().empty();
-        if (needPass != noPass || _clients[selfIdx].getPass() != _pwd)
+        bool hasPass = !_clients[selfIdx].getPass().empty();
+        if (needPass != hasPass || _clients[selfIdx].getPass() != _pwd)
         {
             std::string msg = numRep(464, nick);
             send(clientFd, msg.c_str(), msg.size(), 0);
@@ -109,9 +109,9 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
     {
         std::string nick = _clients[selfIdx].getName();
         bool needPass = !_pwd.empty();
-        bool noPass = !_clients[selfIdx].getPass().empty();
+        bool hasPass = !_clients[selfIdx].getPass().empty();
 
-        if (needPass != noPass || _clients[selfIdx].getPass() != _pwd)
+        if (needPass != hasPass || _clients[selfIdx].getPass() != _pwd)
         {
             std::ostringstream oss;
             oss << ":server 464 " << nick << " :Password incorrect\r\n";

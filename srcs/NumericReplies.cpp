@@ -6,7 +6,7 @@
 /*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/17 17:18:38 by jodone            #+#    #+#             */
-/*   Updated: 2026/06/17 17:47:18 by jodone           ###   ########.fr       */
+/*   Updated: 2026/06/17 18:03:48 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ std::string numRep(int code, const std::string& nick)
 	{
 	case 001:
 		msg = msg + "Welcome to the IRC server, " + nick + "\r\n";
+		break;
 	case 464:
 		msg = msg + "Password incorrect\r\n";
 		break;
