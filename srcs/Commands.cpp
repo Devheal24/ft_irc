@@ -204,7 +204,7 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
     else
     {
         std::ostringstream err;
-        err << ":server 400 " << chan << " : No such channel\r\n";
+        err << ":server 401 : " << chan << " :No such channel\r\n";
         std::string msg = err.str();
         send(clientFd, msg.c_str(), msg.size(), 0);
     }
@@ -401,7 +401,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
     }
 
     bool sign = (mode[0] == '+');
-    if (mode.size() != 1)
+    if (mode.size() != 2)
     {
         std::string msg = ":server 472 " + mode + " :is unknown mode char\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
