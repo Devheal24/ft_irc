@@ -129,13 +129,6 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
 {
     std::string target;
     iss >> target;
-
-    if (target == "BOT")
-    {
-        CommandBot(iss, clientFd);
-        return ;
-    }
-
     std::string message;
     std::getline(iss, message);
 
@@ -161,8 +154,6 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
         prefixMsg << ":" << nick << "!" << nick << "@localhost " << token << " " << target << " :" << message << "\r\n";
         std::string formatted = prefixMsg.str();
         it->second.broadcastExcept(clientFd, formatted);
-        if (it->second.isBotEnabled())
-            it->second.botReply(clientFd);
         return;
     }
 

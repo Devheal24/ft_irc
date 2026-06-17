@@ -30,7 +30,6 @@ private:
 	bool			_hasUserLimit;
 
 	std::vector<std::string> _botMessages;
-	bool			_botEnabled;
 
 public:
 	Channel(const std::string& name);
@@ -77,8 +76,6 @@ public:
 	bool isFull() const;
 
 	//bot
-	void setBotEnabled(bool value);
-	bool isBotEnabled() const;
 	void botReply(int clientFd);
 
 	//member function

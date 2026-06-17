@@ -6,7 +6,7 @@
 #include <iostream>
 #include <cstdlib>
 
-Channel::Channel(const std::string& name) : _name(name), _inviteOnly(false), _topicRestricted(false), _hasKey(false), _userLimit(0), _hasUserLimit(false), _botEnabled(false)
+Channel::Channel(const std::string& name) : _name(name), _inviteOnly(false), _topicRestricted(false), _hasKey(false), _userLimit(0), _hasUserLimit(false)
 {
 	_botMessages.push_back("Salut à tous !");
 	_botMessages.push_back("AH ! Le négociateur...");
@@ -163,16 +163,6 @@ bool Channel::isFull() const
 }
 
 //BOT
-void Channel::setBotEnabled(bool value)
-{
-	_botEnabled = value;
-}
-
-bool Channel::isBotEnabled() const
-{
-	return _botEnabled;
-}
-
 void Channel::botReply(int clientFd)
 {
 	if (_members.size() == 0)
