@@ -34,7 +34,7 @@ private:
     void CommandBot(std::istringstream &iss, int clientFd);
     void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
     void invite(int clientFd, const std::string& targetNick, const std::string& channelName);
-    void topic(int clientFd, const std::string& channelName, const std::string& newTopic);
+    void topic(int clientFd, const std::string& channelName, std::string& newTopic);
 public:
 
     Server() {};

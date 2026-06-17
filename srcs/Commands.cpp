@@ -309,6 +309,8 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
             continue;
         std::string mname = _clients[kk].getName();
         if (mname.empty()) mname = "*";
+        if (it->second.isOperator(memberFd))
+            mname = "@" + mname;
         std::cout << "DEBUG NAMES member fd=" << memberFd << " name=[" << _clients[kk].getName() << "] usedName=[" << mname << "]" << std::endl;
         names << mname;
         // detect if more members exist after kk
@@ -392,7 +394,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
     }
 
     bool sign = (mode[0] == '+');
-    if (mode[1] == '\0')
+    if (mode.size() != 1)
     {
         std::string msg = ":server 472 " + mode + " :is unknown mode char\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
@@ -466,34 +468,6 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
     }
 }
 
-// void Server::CommandBot(std::istringstream& iss, int clientFd)
-// {
-//     std::string channel;
-//     std::string mode;
-
-//     iss >> channel;
-//     iss >> mode;
-
-//     //verify if channel exist
-//     std::map<std::string, Channel>::iterator it = _channels.find(channel);
-//     if (it == _channels.end())
-//     {
-//         std::string msg = ":server 482 " + channel + " does not exist\r\n";
-//         send(clientFd, msg.c_str(), msg.size(), 0);
-//         return ;
-//     }
-//     Channel& ch = it->second;
-//     if (mode != "+" && mode != "-")
-//     {
-//         std::string msg = ":bot unknown mode\r\n";
-//         send(clientFd, msg.c_str(), msg.size(), 0);
-//         return ;
-//     }
-//     bool sign = (mode[0] == '+');
-//     ch.setBotEnabled(sign);
-//     ch.broadcast(":" + getClientPrefix(clientFd) + " " + channel + " BOT " + mode + "\r\n");
-// }
-
 void Server::kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason)
 {
     std::map<std::string, Channel>::iterator it = _channels.find(channelName);
@@ -527,11 +501,6 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
     std::map<int, Client> _clients;
 
     int targetFd = getClientFdByName(targetName);
-    if (targetFd == clientFd)
-    {
-        send(clientFd, "You can't kick yourself\r\n", 26, 0);
-        return ;
-    }
     if (!ch.hasMember(targetFd))
     {
         std::string msg = targetName + " is not in the channnel\r\n";
@@ -539,12 +508,12 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
         return ;
     }
 
-    ch.removeMember(targetFd);
-    ch.removeOperator(targetFd);
-
     ch.printMembers();
     std::string msg = ":" + getClientPrefix(clientFd) + " KICK " + channelName + " " + targetName + " :" + reason + "\r\n";
     ch.broadcast(msg);
+
+    ch.removeMember(targetFd);
+    ch.removeOperator(targetFd);
 }
 
 void Server::invite(int clientFd, const std::string& targetNick, const std::string& channelName)
@@ -594,7 +563,7 @@ void Server::invite(int clientFd, const std::string& targetNick, const std::stri
     send(targetFd, msg.c_str(), msg.size(), 0);
 }
 
-void Server::topic(int clientFd, const std::string& channelName, const std::string& newTopic)
+void Server::topic(int clientFd, const std::string& channelName, std::string& newTopic)
 {
     std::map<std::string, Channel>::iterator it = _channels.find(channelName);
 
@@ -641,6 +610,10 @@ void Server::topic(int clientFd, const std::string& channelName, const std::stri
         return ;
     }
 
+    if (newTopic[0] == ' ')
+        newTopic.erase(0, 1);
+    if (newTopic[0] == ':')
+        newTopic.erase(0, 1);
     ch.setTopic(newTopic);
     std::string msg = ":" + getClientPrefix(clientFd) + " TOPIC " + channelName + " :" + newTopic + "\r\n";
     ch.broadcast(msg);
