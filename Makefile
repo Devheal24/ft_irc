@@ -15,7 +15,8 @@ SRCS		:= $(SRCS_DIR)main.cpp \
 				$(SRCS_DIR)Server.cpp \
 				$(SRCS_DIR)Client.cpp \
 				$(SRCS_DIR)Channel.cpp \
-				$(SRCS_DIR)Commands.cpp
+				$(SRCS_DIR)Commands.cpp \
+				$(SRCS_DIR)NumericReplies.cpp
 
 OBJS		:= $(SRCS:$(SRCS_DIR)%.cpp=$(OBJS_DIR)%.o)
 

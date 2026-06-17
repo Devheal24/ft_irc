@@ -56,20 +56,14 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
         bool noPass = !_clients[selfIdx].getPass().empty();
         if (needPass != noPass || _clients[selfIdx].getPass() != _pwd)
         {
-            std::ostringstream oss;
-            oss << ":server 464 " << nick << " :Password incorrect\r\n";
-            std::string msg = oss.str();
-
+            std::string msg = numRep(464, nick);
             send(clientFd, msg.c_str(), msg.size(), 0);
             std::cout << "DEBUG REGISTRATION FAILED fd=" << clientFd << " nick=" << nick << " (bad PASS) - disconnecting" << std::endl;
             return false; // disconnect client on failed registration
         }
         else
         {
-            std::ostringstream w;
-            w << ":server 001 " << nick << " :Welcome1 to the IRC server, " << nick << "\r\n";
-            std::string wmsg = w.str();
-
+            std::string wmsg = numRep(001, nick);
             send(clientFd, wmsg.c_str(), wmsg.size(), 0);
             std::cout << "DEBUG REGISTERED fd=" << clientFd << " nick=" << nick << std::endl;
         }
@@ -601,6 +595,14 @@ void Server::invite(int clientFd, const std::string& targetNick, const std::stri
     if (targetFd == -1)
     {
         std::string msg = ":server 441 " + clientName + " " + targetNick + " :No such nick on that channel\r\n";
+        send(clientFd, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+
+    // Verify if target is already in channel
+    if (ch.hasMember(targetFd))
+    {
+        std::string msg = ":server 443 " + clientName + " " + targetNick + " :Is already on channel\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }

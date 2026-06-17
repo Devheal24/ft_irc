@@ -58,4 +58,8 @@ public:
     std::string getClientPrefix(int fd) const;
 };
 
+std::string numRep(int code, const std::string& nick);
+std::string numRepChannel(int code, const std::string& nick, const std::string& channel);
+std::string numRepTarget(int code, const std::string& nick, const std::string& target);
+
 # endif
