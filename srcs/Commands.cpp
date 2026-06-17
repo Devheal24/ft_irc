@@ -43,9 +43,8 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 
     if (!wasRegistered && _clients[selfIdx].isRegistered())
     {
-        bool needPass = !_pwd.empty();
 
-        if (needPass && (!_clients[selfIdx].hasPass() || _clients[selfIdx].getPass() != _pwd))
+        if (!_clients[selfIdx].hasPass() || _clients[selfIdx].getPass() != _pwd)
         {
             std::ostringstream oss;
             oss << ":server 464 " << nick << " :Password incorrect\r\n";
@@ -467,33 +466,33 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
     }
 }
 
-void Server::CommandBot(std::istringstream& iss, int clientFd)
-{
-    std::string channel;
-    std::string mode;
+// void Server::CommandBot(std::istringstream& iss, int clientFd)
+// {
+//     std::string channel;
+//     std::string mode;
 
-    iss >> channel;
-    iss >> mode;
+//     iss >> channel;
+//     iss >> mode;
 
-    //verify if channel exist
-    std::map<std::string, Channel>::iterator it = _channels.find(channel);
-    if (it == _channels.end())
-    {
-        std::string msg = ":server 482 " + channel + " does not exist\r\n";
-        send(clientFd, msg.c_str(), msg.size(), 0);
-        return ;
-    }
-    Channel& ch = it->second;
-    if (mode != "+" && mode != "-")
-    {
-        std::string msg = ":bot unknown mode\r\n";
-        send(clientFd, msg.c_str(), msg.size(), 0);
-        return ;
-    }
-    bool sign = (mode[0] == '+');
-    ch.setBotEnabled(sign);
-    ch.broadcast(":" + getClientPrefix(clientFd) + " " + channel + " BOT " + mode + "\r\n");
-}
+//     //verify if channel exist
+//     std::map<std::string, Channel>::iterator it = _channels.find(channel);
+//     if (it == _channels.end())
+//     {
+//         std::string msg = ":server 482 " + channel + " does not exist\r\n";
+//         send(clientFd, msg.c_str(), msg.size(), 0);
+//         return ;
+//     }
+//     Channel& ch = it->second;
+//     if (mode != "+" && mode != "-")
+//     {
+//         std::string msg = ":bot unknown mode\r\n";
+//         send(clientFd, msg.c_str(), msg.size(), 0);
+//         return ;
+//     }
+//     bool sign = (mode[0] == '+');
+//     ch.setBotEnabled(sign);
+//     ch.broadcast(":" + getClientPrefix(clientFd) + " " + channel + " BOT " + mode + "\r\n");
+// }
 
 void Server::kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason)
 {

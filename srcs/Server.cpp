@@ -176,22 +176,6 @@ void Server::run_event_loop()
                     continue;
                 }
                 std::string ip = inet_ntoa(client_addr.sin_addr);
-                bool client_existed = false;
-                
-                // check if client already exist
-                for (size_t i = 0; i < _clients.size(); ++i)
-                {
-                    if (ip == _clients[i].getIP())
-                    {
-                        client_existed = true;
-                        _clients[i].setFD(client_fd);
-                        std::cout << "client reconnected fd " << client_fd << " with ip= " << ip << std::endl;
-                        display_status();
-                        break;
-                    }
-                }
-                if (client_existed == true)
-                    continue;
                 struct pollfd client_pollfd;
                 client_pollfd.fd = client_fd;
                 client_pollfd.events = POLLIN;
@@ -218,9 +202,9 @@ void Server::run_event_loop()
             {
                 std::cout << "client disconnected POLLHUP fd " << fds[i].fd << std::endl;
                 removeClient(fds[i].fd);
-                /*close(fds[i].fd);
-                fds.erase(fds.begin() + i)*/;
-                // --i;
+                close(fds[i].fd);
+                fds.erase(fds.begin() + i);
+                --i;
                 continue;
             }
 
@@ -233,9 +217,9 @@ void Server::run_event_loop()
                 {
                     std::cout << "client disconnected POLLIN fd " << clientFd << std::endl;
                     removeClient(clientFd);
-                    /*close(clientFd);
-                    fds.erase(fds.begin() + i);*/
-                    // --i;
+                    close(clientFd);
+                    fds.erase(fds.begin() + i);
+                    --i;
                 }
             }
         }
