@@ -1,13 +1,12 @@
 # Si password faux puis vrai:
 # Fix : NO
 # Working on : ...
-step 1/ si un user essaye de se connecter avec le mauvais mot de passe => erreur, OK.
-step 2/ puis il met le bon mot de passe => connecté OK.
-step 3/ il essaye de join un salon => rien ne se passe KO !
 # end
 
 # Si ...
 # Fix : ...
 # Working on : ...
-remplacer l'utilisation de errno apres le poll
+comprendre l'utilisation de errno apres le poll (pour le sujet de correction)
+embellir le code.
+bot.
 # end
