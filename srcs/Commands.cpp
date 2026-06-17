@@ -39,6 +39,15 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
     bool wasRegistered = _clients[selfIdx].isRegistered();
     _clients[selfIdx].setNick(nick);
 
+    size_t j = -1;
+    while (++j < _clients.size())
+    {
+        if (_clients[j].getName() == nick && _clients[j].getFD() != clientFd)
+        {
+            std::cerr << "nickname already used !" << std::endl; return false;
+        }
+    }
+
     std::cout << "DEBUG NICK fd=" << clientFd << " nick=[" << nick << "] registered=" << _clients[selfIdx].isRegistered() << std::endl;
 
     if (!wasRegistered && _clients[selfIdx].isRegistered())
@@ -89,6 +98,16 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 
     bool wasRegistered = _clients[selfIdx].isRegistered();
     _clients[selfIdx].setUser(user, real);
+
+    size_t j = -1;
+    while (++j < _clients.size())
+    {
+        if (_clients[j].getUsername() == user && _clients[j].getFD() != clientFd)
+        {
+            std::cerr << "Username already used !" << std::endl; return false;
+        }
+    }
+
     std::cout << "DEBUG USER fd=" << clientFd << " user=[" << user << "] real=[" << real << "] registered=" << _clients[selfIdx].isRegistered() << std::endl;
 
     if (!wasRegistered && _clients[selfIdx].isRegistered())
@@ -401,7 +420,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
     }
 
     bool sign = (mode[0] == '+');
-    if (mode.size() != 1)
+    if (mode.size() != 2)
     {
         std::string msg = ":server 472 " + mode + " :is unknown mode char\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);

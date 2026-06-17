@@ -64,9 +64,9 @@ bool Server::parse_data(char **av) {
  */
 static int set_nonblocking(int fd)
 {
-    int flags = fcntl(fd, F_GETFL, 0);
+    /*int flags = fcntl(fd, F_GETFL, 0);
     if (flags == -1)
-        return -1;
+        return -1;*/
     return fcntl(fd, F_SETFL, O_NONBLOCK);
 }
 
@@ -376,7 +376,7 @@ void Server::removeClient(int clientFd)
     //     i++;
     // close(fds[i].fd);
     // fds.erase(fds.begin() + i);
-    // _clients.erase(_clients.begin() + j);
+    _clients.erase(_clients.begin() + j);
 }
 
 int Server::getClientFdByName(const std::string& name) const
