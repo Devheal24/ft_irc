@@ -358,7 +358,7 @@ void Server::removeClient(int clientFd)
     if (j == _clients.size())
         return;
 
-    /*const std::set<std::string>& chans = _clients[j].getJoinedChannels();
+    const std::set<std::string>& chans = _clients[j].getJoinedChannels();
     for (std::set<std::string>::const_iterator it = chans.begin(); it != chans.end(); ++it)
     {
         std::map<std::string, Channel>::iterator cit = _channels.find(*it);
@@ -369,14 +369,14 @@ void Server::removeClient(int clientFd)
             if (cit->second.memberCount() == 0)
                 _channels.erase(cit);
         }
-    }*/
+    }
 
     // int i = 0;
     // while (fds[i].fd != clientFd)
     //     i++;
     // close(fds[i].fd);
     // fds.erase(fds.begin() + i);
-    //_clients.erase(_clients.begin() + j);
+    // _clients.erase(_clients.begin() + j);
 }
 
 int Server::getClientFdByName(const std::string& name) const

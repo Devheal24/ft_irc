@@ -199,8 +199,15 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
             (chan[chan.size() - 1] == '\r' || chan[chan.size() - 1] == '\n')) 
         chan.resize(chan.size() - 1);
 
-    if (!chan.empty())
+    if (!chan.empty() && chan[0] == '#')
         joinChannel(clientFd, chan, key);
+    else
+    {
+        std::ostringstream err;
+        err << ":server 400 " << chan << " : No such channel\r\n";
+        std::string msg = err.str();
+        send(clientFd, msg.c_str(), msg.size(), 0);
+    }
     return;
 }
 
