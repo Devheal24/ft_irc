@@ -47,7 +47,7 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
         if (!_clients[selfIdx].hasPass() || _clients[selfIdx].getPass() != _pwd)
         {
             std::ostringstream oss;
-            oss << ":server 464 " << nick << " :Password incorrect\r\n";
+            oss << ":server 464 : " << nick << " :Password incorrect\r\n";
             std::string msg = oss.str();
 
             send(clientFd, msg.c_str(), msg.size(), 0);
@@ -57,7 +57,7 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
         else
         {
             std::ostringstream w;
-            w << ":server 001 " << nick << " :Welcome to the IRC server\r\n";
+            w << ":server 001 : " << nick << " :Welcome to the IRC server\r\n";
             std::string wmsg = w.str();
 
             send(clientFd, wmsg.c_str(), wmsg.size(), 0);
@@ -99,7 +99,7 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
         if (needPass && (!_clients[selfIdx].hasPass() || _clients[selfIdx].getPass() != _pwd))
         {
             std::ostringstream oss;
-            oss << ":server 464 " << nick << " :Password incorrect\r\n";
+            oss << ":server 464 : " << nick << " :Password incorrect\r\n";
             std::string msg = oss.str();\
 
             send(clientFd, msg.c_str(), msg.size(), 0);
@@ -109,7 +109,7 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
         else
         {
             std::ostringstream w;
-            w << ":server 001 " << nick << " :Welcome to the IRC server\r\n";
+            w << ":server 001 : " << nick << " :Welcome to the IRC server\r\n";
             std::string wmsg = w.str();
 
             send(clientFd, wmsg.c_str(), wmsg.size(), 0);
@@ -150,7 +150,7 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
         }
         _clients[selfIdx].setActiveChannel(target);
         std::ostringstream prefixMsg;
-        prefixMsg << ":" << nick << "!" << nick << "@localhost " << token << " " << target << " :" << message << "\r\n";
+        prefixMsg << ":" << nick << "!" << _clients[selfIdx].getUsername() << "@localhost " << token << " " << target << " :" << message << "\r\n";
         std::string formatted = prefixMsg.str();
         it->second.broadcastExcept(clientFd, formatted);
         return;
@@ -164,7 +164,7 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
         if (_clients[k].getName() == target)
         {
             std::ostringstream prefixMsg;
-            prefixMsg << ":" << nick << "!" << nick << "@localhost " << token << " " << target << " :" << message << "\r\n";
+            prefixMsg << ":" << nick << "!" << _clients[selfIdx].getUsername() << "@localhost " << token << " " << target << " :" << message << "\r\n";
             std::string formatted = prefixMsg.str();
             send(_clients[k].getFD(), formatted.c_str(), formatted.size(), 0);
             delivered = true;
@@ -174,7 +174,7 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
     if (!delivered)
     {
         std::ostringstream err;
-        err << ":server 401 " << nick << " " << target << " :No such nick/channel\r\n";
+        err << ":server 401 : " << nick << " " << target << " :No such nick/channel\r\n";
         std::string msg = err.str();
         send(clientFd, msg.c_str(), msg.size(), 0);
     }
@@ -204,7 +204,7 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
     else
     {
         std::ostringstream err;
-        err << ":server 401 : " << chan << " :No such channel\r\n";
+        err << ":server 403 : " << chan << " :No such channel\r\n";
         std::string msg = err.str();
         send(clientFd, msg.c_str(), msg.size(), 0);
     }
@@ -233,7 +233,7 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
             ++j;
         _clients[j].setActiveChannel(name);
         std::ostringstream oss;
-        oss << ":server NOTICE " << clientFd << " :Now active in " << name << "\r\n";
+        oss << ":server NOTICE : " << clientFd << " :Now active in " << name << "\r\n";
         std::string msg = oss.str();
         send(clientFd, msg.c_str(), msg.size(), 0);
         std::cout << "Client " << clientFd << " set active " << name << std::endl;
@@ -245,7 +245,7 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
 	{
 		if (!it->second.isInvited(clientFd))
 		{
-			std::string msg = ":server 473 " + name + " :Cannot join channel (+i)\r\n";
+			std::string msg = ":server 473 : " + name + " :Cannot join, channel is in invite only (+i)\r\n";
 			return ;
 		}
 	}
@@ -255,7 +255,7 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
     {
         if (key != it->second.getKey())
         {
-            std::string msg = ":server 475 " + name + " :Cannot join channel (+k)\r\n";
+            std::string msg = ":server 475 : " + name + " :Cannot join channel, bad password (+k)\r\n";
             send(clientFd, msg.c_str(), msg.size(), 0);
             return ;
         }
@@ -264,7 +264,7 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
     // Check if channel is full with limit enable
     if (it->second.isFull())
     {
-        std::string msg = ":server 471 " + name + " :Cannot join channel (+l)\r\n";
+        std::string msg = ":server 471 : " + name + " :Cannot join, channel is full (+l)\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
     }
 
@@ -298,12 +298,12 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
     if (nick.empty()) nick = "*";
     if (!it->second.getTopic().empty()) {
         std::ostringstream tss;
-        tss << ":server 332 " << nick << " " << name << " :" << it->second.getTopic() << "\r\n";
+        tss << ":server 332 : " << nick << " " << name << " :" << it->second.getTopic() << "\r\n";
         std::string tmsg = tss.str();
         send(clientFd, tmsg.c_str(), tmsg.size(), 0);
     } else {
         std::ostringstream tss;
-        tss << ":server 331 " << nick << " " << name << " :No topic is set\r\n";
+        tss << ":server 331 : " << nick << " " << name << " :No topic is set\r\n";
         std::string tmsg = tss.str();
         send(clientFd, tmsg.c_str(), tmsg.size(), 0);
     }
@@ -328,12 +328,12 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
         if (more) names << ' ';
     }
     std::ostringstream r353;
-    r353 << ":server 353 " << nick << " = " << name << " :" << names.str() << "\r\n";
+    r353 << ":server 353 : " << nick << " = " << name << " :" << names.str() << "\r\n";
     std::string r353s = r353.str();
     send(clientFd, r353s.c_str(), r353s.size(), 0);
 
     std::ostringstream r366;
-    r366 << ":server 366 " << nick << " " << name << " :End of /NAMES list\r\n";
+    r366 << ":server 366 : " << nick << " " << name << " :End of /NAMES list\r\n";
     std::string r366s = r366.str();
     send(clientFd, r366s.c_str(), r366s.size(), 0);
 }
@@ -386,7 +386,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
     std::map<std::string, Channel>::iterator it = _channels.find(channel);
     if (it == _channels.end())
     {
-        std::string msg = ":server 482 " + channel + " does not exist\r\n";
+        std::string msg = ":server 403 : " + channel + " :No such channel\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -395,7 +395,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
     //verify is client is operator
     if (!ch.isOperator(clientFd))
     {
-        std::string msg = ":server 482 " + ch.getName() + " :You're not channel operator\r\n";
+        std::string msg = ":server 482 : " + ch.getName() + " :You're not channel operator\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -403,7 +403,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
     bool sign = (mode[0] == '+');
     if (mode.size() != 2)
     {
-        std::string msg = ":server 472 " + mode + " :is unknown mode char\r\n";
+        std::string msg = ":server 472 : " + mode + " :is unknown mode char\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -442,7 +442,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
             int targetFd = getClientFdByName(targetName);
             if (targetFd == -1)
             {
-                std::string msg = ":server 401 " + targetName + " :No such name\r\n";
+                std::string msg = ":server 401 : " + targetName + " :No such nick\r\n";
                 send(clientFd, msg.c_str(), msg.size(), 0);
                 return ;
             }
@@ -468,7 +468,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
             break;
         }
         default:
-            std::string msg = ":server 472 " + mode + " :is unknown mode char\r\n";
+            std::string msg = ":server 472 : " + mode + " :is unknown mode char\r\n";
             send(clientFd, msg.c_str(), msg.size(), 0);
             break;
         }
@@ -481,7 +481,7 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
     //verify if channel exist
     if (it == _channels.end())
     {
-        std::string msg = ":server 403 " + channelName + " does not exist\r\n";
+        std::string msg = ":server 403 : " + channelName + " :No such channel\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -491,7 +491,7 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
     //verify if client is in channel
     if (!ch.hasMember(clientFd))
     {
-        std::string msg = ":server 442 " + channelName + " :You're not in that channel\r\n";
+        std::string msg = ":server 442 : " + channelName + " :You're not on that channel\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -499,7 +499,7 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
     //verify if client is operator
     if (!ch.isOperator(clientFd))
     {
-        std::string msg = ":server 482 " + channelName + " :You're not channel operator\r\n";
+        std::string msg = ":server 482 : " + channelName + " :You're not channel operator\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -510,7 +510,7 @@ void Server::kick(int clientFd, const std::string& channelName, const std::strin
     int targetFd = getClientFdByName(targetName);
     if (!ch.hasMember(targetFd))
     {
-        std::string msg = targetName + " is not in the channnel\r\n";
+        std::string msg = ":server 441 : " + targetName + " :No such nick on that channel\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -530,7 +530,7 @@ void Server::invite(int clientFd, const std::string& targetNick, const std::stri
     //verify if channel exist
     if (it == _channels.end())
     {
-        std::string msg = ":server 403 " + channelName + " does not exist\r\n";
+        std::string msg = ":server 403 : " + channelName + " :No such channel\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -540,7 +540,7 @@ void Server::invite(int clientFd, const std::string& targetNick, const std::stri
     //verify if client is in channel
     if (!ch.hasMember(clientFd))
     {
-        std::string msg = ":server 442 " + channelName + " :You're not in that channel\r\n";
+        std::string msg = ":server 442 : " + channelName + " :You're not in that channel\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -548,7 +548,7 @@ void Server::invite(int clientFd, const std::string& targetNick, const std::stri
     //verify if client is operator
     if (!ch.isOperator(clientFd))
     {
-        std::string msg = ":server 482 " + channelName + " :You're not channel operator\r\n";
+        std::string msg = ":server 482 : " + channelName + " :You're not channel operator\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -557,14 +557,14 @@ void Server::invite(int clientFd, const std::string& targetNick, const std::stri
     int targetFd = getClientFdByName(targetNick);
     if (targetFd == -1)
     {
-        std::string msg = ":server 401 " + targetNick + " :user does not exist\r\n";
+        std::string msg = ":server 441 : " + targetNick + " :No such nick on that channel\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
 
     ch.addInvite(targetFd);
     Client* client = getClientByFd(clientFd);
-    std::string msg = ":server 341 " + client->getName() + " " + targetNick + " " + channelName + "\r\n";
+    std::string msg = ":server 341 : " + client->getName() + " " + targetNick + " " + channelName + "\r\n";
     send(clientFd, msg.c_str(), msg.size(), 0);
     msg = ":" + getClientPrefix(clientFd) + " INVITE " + targetNick + " :" + channelName + "\r\n";
     send(targetFd, msg.c_str(), msg.size(), 0);
@@ -577,7 +577,7 @@ void Server::topic(int clientFd, const std::string& channelName, std::string& ne
     //verify if channel exist
     if (it == _channels.end())
     {
-        std::string msg = ":server 403 " + channelName + " does not exist\r\n";
+        std::string msg = ":server 403 : " + channelName + " :No such channel\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -587,7 +587,7 @@ void Server::topic(int clientFd, const std::string& channelName, std::string& ne
     //verify if client is in channel
     if (!ch.hasMember(clientFd))
     {
-        std::string msg = ":server 442 " + channelName + " :You're not in that channel\r\n";
+        std::string msg = ":server 442 : " + channelName + " :You're not in that channel\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
@@ -598,12 +598,12 @@ void Server::topic(int clientFd, const std::string& channelName, std::string& ne
     {
         if (ch.getTopic().empty())
         {
-            std::string msg = ":server 331 " + client->getName() + " " + channelName + " :No topic is set\r\n";
+            std::string msg = ":server 331 : " + client->getName() + " " + channelName + " :No topic is set\r\n";
             send(clientFd, msg.c_str(), msg.size(), 0);
         }
         else
         {
-            std::string msg = ":server 332 " + client->getName() + " " + channelName + ":" + ch.getTopic() + "\r\n";
+            std::string msg = ":server 332 : " + client->getName() + " " + channelName + ":" + ch.getTopic() + "\r\n";
             send(clientFd, msg.c_str(), msg.size(), 0);
         }
         return ;
@@ -612,7 +612,7 @@ void Server::topic(int clientFd, const std::string& channelName, std::string& ne
     //verify if client is operator and topic restricted
     if (ch.isTopicRestricted() && !ch.isOperator(clientFd))
     {
-        std::string msg = ":server 482 " + channelName + " :You're not channel operator\r\n";
+        std::string msg = ":server 482 : " + channelName + " :You're not channel operator\r\n";
         send(clientFd, msg.c_str(), msg.size(), 0);
         return ;
     }
