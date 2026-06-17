@@ -52,8 +52,9 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 
     if (!wasRegistered && _clients[selfIdx].isRegistered())
     {
-
-        if (!_clients[selfIdx].hasPass() || _clients[selfIdx].getPass() != _pwd)
+        bool needPass = !_pwd.empty();
+        bool noPass = !_clients[selfIdx].getPass().empty();
+        if (needPass != noPass || _clients[selfIdx].getPass() != _pwd)
         {
             std::ostringstream oss;
             oss << ":server 464 " << nick << " :Password incorrect\r\n";
@@ -66,7 +67,7 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
         else
         {
             std::ostringstream w;
-            w << ":server 001 " << nick << " :Welcome to the IRC server\r\n";
+            w << ":server 001 " << nick << " :Welcome1 to the IRC server, " << nick << "\r\n";
             std::string wmsg = w.str();
 
             send(clientFd, wmsg.c_str(), wmsg.size(), 0);
@@ -114,8 +115,9 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
     {
         std::string nick = _clients[selfIdx].getName();
         bool needPass = !_pwd.empty();
+        bool noPass = !_clients[selfIdx].getPass().empty();
 
-        if (needPass && (!_clients[selfIdx].hasPass() || _clients[selfIdx].getPass() != _pwd))
+        if (needPass != noPass || _clients[selfIdx].getPass() != _pwd)
         {
             std::ostringstream oss;
             oss << ":server 464 " << nick << " :Password incorrect\r\n";
@@ -128,7 +130,7 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
         else
         {
             std::ostringstream w;
-            w << ":server 001 " << nick << " :Welcome to the IRC server\r\n";
+            w << ":server 001 " << nick << " :Welcome2 to the IRC server, " << nick << "\r\n";
             std::string wmsg = w.str();
 
             send(clientFd, wmsg.c_str(), wmsg.size(), 0);

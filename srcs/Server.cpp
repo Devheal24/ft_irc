@@ -53,7 +53,7 @@ bool Server::parse_data(char **av) {
     std::cout << "Debug _port : " << GetPort() << std::endl;
 
     //pwd parsing
-    this->SetPwd((std::string)av[2]);
+    this->SetPwd(static_cast<std::string>(av[2]));
     //if (! valid pwd) {return0 false;};
     std::cout << "Debug _pwd: " << GetPwd() << std::endl;
     return true;
@@ -338,6 +338,11 @@ bool Server::handleClientInput(int clientFd)
         }
         if (token == "QUIT")
         {
+            for (size_t i = 0; i < fds.size(); i++)
+                if (fds[i].fd == clientFd)
+                    fds.erase(fds.begin() + i);
+            removeClient(clientFd);
+            close(clientFd);
             display_status();
             continue;
         }
