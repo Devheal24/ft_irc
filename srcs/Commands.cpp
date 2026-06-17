@@ -223,7 +223,7 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
     else
     {
         std::ostringstream err;
-        err << ":server 400 " << chan << " : No such channel\r\n";
+        err << ":server 401 : " << chan << " :No such channel\r\n";
         std::string msg = err.str();
         send(clientFd, msg.c_str(), msg.size(), 0);
     }
