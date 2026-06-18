@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   NumericReplies.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/17 17:18:38 by jodone            #+#    #+#             */
-/*   Updated: 2026/06/18 15:16:38 by mgarnier         ###   ########.fr       */
+/*   Updated: 2026/06/18 16:35:27 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ std::string numRepChannel(int code, const std::string& nick, const std::string& 
 		msg = msg + " :Cannot join, channel is full (+l)\r\n";
 		break;
 	case 472:
-		msg = msg + " :is unknown mode char\r\n";
+		msg = msg + " :is unknown mode char" + channel + "\r\n";
 		break;
 	case 473:
 		msg = msg + " :Cannot join, channel is in invite only (+i)\r\n";

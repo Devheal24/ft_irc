@@ -17,7 +17,7 @@ void Server::CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd)
             (pass[pass.size() - 1] == '\r' || pass[pass.size() - 1] == '\n'))
         pass.resize(pass.size() - 1);
 
-    if (pass.length() < PWD_MINXL || pass.length() > PWD_MAXL)
+    if (!pass.empty() && (pass.length() < PWD_MINXL || pass.length() > PWD_MAXL))
     {
         std::cout << "invalid length of pass (64> || <8)" << pass << std::endl;
         return;
