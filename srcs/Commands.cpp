@@ -44,12 +44,16 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
     {
         if (_clients[j].getName() == nick && _clients[j].getFD() != clientFd)
         {
-            std::cerr << "nickname already used !" << std::endl; return false;
+            std::cerr << "nickname already used !" << std::endl;
+            std::string msg = ":server 433 : " + nick + " :Nickname is already in use\r\n";
+            send(clientFd, msg.c_str(), msg.size(), 0);
+            return false;
         }
     }
 
     std::cout << "DEBUG NICK fd=" << clientFd << " nick=[" << nick << "] registered=" << _clients[selfIdx].isRegistered() << std::endl;
 
+    std::cout << !wasRegistered << " + " << _clients[selfIdx].isRegistered() << std::endl;
     if (!wasRegistered && _clients[selfIdx].isRegistered())
     {
         bool needPass = !_pwd.empty();
