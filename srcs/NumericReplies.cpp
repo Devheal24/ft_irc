@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   NumericReplies.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
+/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/17 17:18:38 by jodone            #+#    #+#             */
-/*   Updated: 2026/06/17 18:03:48 by jodone           ###   ########.fr       */
+/*   Updated: 2026/06/18 10:14:34 by mgarnier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#include "../includes/Server.hpp"
 #include <sys/socket.h>
 #include <sstream>
 #include <iostream>
