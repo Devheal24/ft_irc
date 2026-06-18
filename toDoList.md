@@ -14,4 +14,7 @@ Enlever les debugs.
 
 ctr+c un nc doesnt clear client
 need to check if user.nick.pwd all set before handling any other input than PASS NICK USER
+Co^Dmm^Dand^D
+
+ :is unknown mode char apparait au debut
 # end

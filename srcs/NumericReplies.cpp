@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   NumericReplies.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/17 17:18:38 by jodone            #+#    #+#             */
-/*   Updated: 2026/06/18 10:14:34 by mgarnier         ###   ########.fr       */
+/*   Updated: 2026/06/18 14:17:07 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,28 +29,74 @@ std::string numRep(int code, const std::string& nick)
 	case 001:
 		msg = msg + "Welcome to the IRC server, " + nick + "\r\n";
 		break;
+	case 433:
+		msg = msg + "Nickname is already in use\r\n";
+		break;
+	case 461:
+		msg = msg + "Not enough parameters\r\n";
+		break;
 	case 464:
 		msg = msg + "Password incorrect\r\n";
 		break;
-	
 	default:
 		break;
 	}
 	return msg;
 }
 
-std::string numRepChannel(int code, const std::string& nick, const std::string& channel)
+std::string numRepChannel(int code, const std::string& nick, const std::string& channel, const std::string& addon)
 {
-	(void)code;
-	(void)nick;
-	(void)channel;
-	return NULL;
-}
-
-std::string numRepTarget(int code, const std::string& nick, const std::string& target)
-{
-	(void)code;
-	(void)nick;
-	(void)target;
-	return NULL;
+	std::ostringstream oss;
+	oss << ":server " << code << " " << nick << " " << channel;
+	std::string msg = oss.str();
+	switch (code)
+	{
+	case 331:
+		msg = msg + " :No topic is set\r\n";
+		break;
+	case 332:
+		msg = msg + ":" + addon + "\r\n";
+		break;
+	case 341:
+		msg = msg + " " + addon + "\r\n";
+	case 353:
+		msg = ":server 353 " + nick + " = " + channel + " :" + addon + "\r\n";
+		break;
+	case 366:
+		msg = msg + " :End of /NAMES list\r\n";
+		break;
+	case 401:
+		msg = msg + " :No such nick/channel\r\n";
+		break;
+	case 403:
+		msg = msg + " :No such channel\r\n";
+		break;
+	case 441:
+		msg = msg + " :No such nick on that channel\r\n";
+		break;
+	case 442:
+		msg = msg + " :You're not on that channel\r\n";
+		break;
+	case 443:
+		msg = msg + " :Is already on channel\r\n";
+		break;
+	case 471:
+		msg = msg + " :Cannot join, channel is full (+l)\r\n";
+		break;
+	case 472:
+		msg = msg + " :is unknown mode char\r\n";
+		break;
+	case 473:
+		msg = msg + " :Cannot join, channel is in invite only (+i)\r\n";
+		break;
+	case 475:
+		msg = msg + " :Cannot join channel, bad password (+k)\r\n";
+		break;
+	case 482:
+		msg = msg + " :You're not channel operator\r\n";
+		break;
+	default:
+		break;
+	}
+	return msg;
 }
