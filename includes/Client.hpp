@@ -55,7 +55,6 @@ class Client
         bool isInChannel(const std::string& channelName) const;
         const std::set<std::string>& getJoinedChannels() const;
 
-
         std::string getName() const;
         std::string getUsername() const;
         int         getFD() const;

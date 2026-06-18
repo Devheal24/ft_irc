@@ -16,6 +16,27 @@ void Server::CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd)
             (pass[pass.size() - 1] == '\r' || pass[pass.size() - 1] == '\n'))
         pass.resize(pass.size() - 1);
 
+    if (pass.length() < 8 || pass.length() > 64)
+    {
+        std::cout << "invalid length of pass (64> || <8)" << pass << std::endl;
+        return;
+    }
+    for (size_t i = 0; i < pass.length(); i++)
+    {
+        if (!isprint(pass[i]) && pass[i] != '_' && pass[i] != '-')
+        {
+            std::cout << "invalid character in passname" << pass << std::endl;
+            return;
+        }
+    }
+    
+
+    /*if (pass != _pwd)
+    {
+        std::cout << "passeword doesnt match server pwd" << pass << std::endl;
+        return;
+    }*/
+
     _clients[selfIdx].setPass(pass);
 
     std::cout << "DEBUG PASS fd=" << clientFd << " pass=[" << pass << "]" << std::endl;
@@ -36,6 +57,22 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
             (nick[nick.size() - 1] == '\r' || nick[nick.size() - 1] == '\n'))
         nick.resize(nick.size() - 1);
 
+
+    //test norm
+    if (nick.length() >= 10)
+    {
+        std::cout << "invalid length of nickname (>10)" << nick << std::endl;
+        return (true);
+    }
+    for (size_t i = 0; i < nick.length(); i++)
+    {
+        if (!isdigit(nick[i]) && !isalnum(nick[i]) && nick[i] != '_' && nick[i] != '-')
+        {
+            std::cout << "invalid character in nickname" << nick << std::endl;
+            return (true);
+        }
+    }
+    
     bool wasRegistered = _clients[selfIdx].isRegistered();
     _clients[selfIdx].setNick(nick);
 
@@ -94,6 +131,22 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
     while (!real.empty() &&
             (real[real.size() - 1] == '\r' || real[real.size() - 1] == '\n'))
         real.resize(real.size() - 1);
+
+    
+    //test norm
+    if (user.length() >= 20)
+    {
+        std::cout << "invalid length of username (>20)" << user << std::endl;
+        return (true);
+    }
+    for (size_t i = 0; i < user.length(); i++)
+    {
+        if (!isdigit(user[i]) && !isalnum(user[i]) && user[i] != '_' && user[i] != '-')
+        {
+            std::cout << "invalid character in username" << user << std::endl;
+            return (true);
+        }
+    }
 
     bool wasRegistered = _clients[selfIdx].isRegistered();
     _clients[selfIdx].setUser(user, real);
