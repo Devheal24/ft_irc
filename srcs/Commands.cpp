@@ -424,6 +424,8 @@ void Server::CommandClose(std::istringstream &iss, int clientFd)
         _channels.erase(cit);
         std::cout << "channel erase (0 member)"  << std::endl;
     }
+
+    //send
 }
 
 void Server::CommandMode(std::istringstream &iss, int clientFd)

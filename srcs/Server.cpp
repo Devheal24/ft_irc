@@ -306,6 +306,9 @@ bool Server::handleClientInput(int clientFd)
                 return false;
             continue;
         }
+
+        //check if nick+user+pwd set (pwd optional)
+
         if (token == "JOIN" || token == "/JOIN")
         {
             CommandJoin(iss, clientFd);

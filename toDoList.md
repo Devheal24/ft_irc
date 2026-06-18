@@ -11,4 +11,7 @@ embellir le code.
 bot.
 parsing du nick, et du password et du channel.
 Enlever les debugs.
+
+ctr+c un nc doesnt clear client
+need to check if user.nick.pwd all set before handling any other input than PASS NICK USER
 # end
