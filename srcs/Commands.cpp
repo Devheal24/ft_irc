@@ -266,8 +266,25 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
             (chan[chan.size() - 1] == '\r' || chan[chan.size() - 1] == '\n')) 
         chan.resize(chan.size() - 1);
 
+
+
     if (!chan.empty() && chan[0] == '#')
+    {
+        if (chan.length() >= 20)
+        {
+            std::cout << "invalid length of channel name (>20)" << chan << std::endl;
+            return;
+        }
+        for (size_t i = 1; i < chan.length(); i++)
+        {
+            if (!isdigit(chan[i]) && !isalnum(chan[i]) && chan[i] != '_' && chan[i] != '-')
+            {
+                std::cout << "invalid character in channel name" << chan << std::endl;
+                return;
+            }
+        }
         joinChannel(clientFd, chan, key);
+    }
     else
     {
         std::string msg = numRepChannel(403, client->getName(), chan, "");
