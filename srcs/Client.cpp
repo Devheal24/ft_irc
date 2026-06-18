@@ -4,12 +4,12 @@
 #include "../includes/Client.hpp"
 #include <unistd.h>
 
-Client::Client(): _name(""), _fd(-1), _ip(0), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
+Client::Client(): _name(""), _fd(-1), _ip(0), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false), _is_fully_logged(false)
 {
     return;
 }
 
-Client::Client(std::string name, int fd, std::string ip): _name(name), _fd(fd), _ip(ip), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
+Client::Client(std::string name, int fd, std::string ip): _name(name), _fd(fd), _ip(ip), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false), _is_fully_logged(false)
 {
 	return;
 }
@@ -41,6 +41,7 @@ Client &Client::operator=(const Client &base)
         this->_hasNick = base._hasNick;
         this->_hasUser = base._hasUser;
         this->_registered = base._registered;
+        this->_is_fully_logged = base._is_fully_logged;
     }
     return (*this);
 }
@@ -53,6 +54,15 @@ std::string Client::getName() const
 int Client::getFD() const
 {
 	return (_fd);
+}
+
+int Client::getFullLog() const {
+    return (_is_fully_logged);
+}
+
+void Client::setFullLog(bool state) {
+    _is_fully_logged = state;
+    return;
 }
 
 std::string Client::getIP() const

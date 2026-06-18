@@ -307,7 +307,22 @@ bool Server::handleClientInput(int clientFd)
             continue;
         }
 
-        //check if nick+user+pwd set (pwd optional)
+        //check if nick+user set (pwd optional)
+        int i;
+        for (i = 0; i < (int)_clients.size(); i++)
+        {
+            if (_clients[i].getFD() == clientFd)
+            {
+                if (_clients[i].getName().empty() || _clients[i].getUsername().empty())
+                {
+                    std::cerr << "client is not fully logged-in" << std::endl;
+                }
+                break;
+                _clients[i].setFullLog(true);
+            }
+        }
+        if (!_clients[i].getFullLog())
+            break;
 
         if (token == "JOIN" || token == "/JOIN")
         {
