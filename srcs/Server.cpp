@@ -338,6 +338,7 @@ bool Server::handleClientInput(int clientFd)
             if (_clients[i].getFD() == clientFd)
                 break;
         }
+        std::cout << "is client registered = " << _clients[i].isRegistered() << std::endl;
         if (!_clients[i].isRegistered())
         {
             std::cout << _clients[i].getName() << std::endl;
