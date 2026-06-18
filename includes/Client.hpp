@@ -26,7 +26,6 @@ class Client
         bool        _hasNick;
         bool        _hasUser;
         bool        _registered;
-        bool        _is_fully_logged;
     
     public:
         Client();
@@ -46,7 +45,6 @@ class Client
         void setNick(const std::string& nick);
         void setUser(const std::string& user, const std::string& real);
         void setPass(const std::string& pass);
-        void setFullLog(bool state);
         void setFD(int fd);
         bool isRegistered() const;
         std::string getPass() const;
@@ -61,7 +59,6 @@ class Client
         std::string getUsername() const;
         int         getFD() const;
         std::string getIP() const;
-        int         getFullLog() const;
 };
 
 #endif

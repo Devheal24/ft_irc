@@ -308,21 +308,44 @@ bool Server::handleClientInput(int clientFd)
         }
 
         //check if nick+user set (pwd optional)
-        int i;
+        /*int i;
         for (i = 0; i < (int)_clients.size(); i++)
         {
             if (_clients[i].getFD() == clientFd)
             {
-                if (_clients[i].getName().empty() || _clients[i].getUsername().empty())
+                if (_clients[i].getFullLog() == false)
                 {
-                    std::cerr << "client is not fully logged-in" << std::endl;
+                    std::cout << _clients[i].getName() << std::endl;
+                    std::cout << _clients[i].getUsername() << std::endl;
+                    if (_clients[i].getName().empty() || _clients[i].getUsername().empty())
+                    {
+                        std::cerr << "client is not fully logged-in" << std::endl;
+                        break;
+                    }
+                    else
+                        _clients[i].setFullLog(true);
+                    break;
                 }
-                break;
-                _clients[i].setFullLog(true);
             }
         }
         if (!_clients[i].getFullLog())
+            break;*/
+
+        //check if nick+user set (pwd optional)
+        int i;
+        for (i = 0; i < (int)_clients.size(); i++)
+        {
+            if (_clients[i].getFD() == clientFd)
+                break;
+        }
+        if (!_clients[i].isRegistered())
+        {
+            std::cout << _clients[i].getName() << std::endl;
+            std::cout << _clients[i].getUsername() << std::endl;
+            std::cerr << "client is not fully logged-in" << std::endl;
             break;
+        }
+
 
         if (token == "JOIN" || token == "/JOIN")
         {
