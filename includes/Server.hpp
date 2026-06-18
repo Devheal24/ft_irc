@@ -13,6 +13,16 @@
 #include <map>
 #include <poll.h>
 
+/**
+ * @brief all user data "inputs" max length.
+ */
+#define PWD_MAXL 64
+#define PWD_MINXL 64
+#define USR_MAXL 20
+#define NICK_MAXL 20
+#define CHNL_MAXL 20
+
+
 class Server {
 private:
     int         _port;

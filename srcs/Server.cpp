@@ -54,7 +54,19 @@ bool Server::parse_data(char **av) {
 
     //pwd parsing
     this->SetPwd(static_cast<std::string>(av[2]));
-    //if (! valid pwd) {return0 false;};
+    if (_pwd.length() < PWD_MINXL || _pwd.length() > PWD_MAXL)
+    {
+        std::cout << "invalid length of pass (64> || <8)" << _pwd << std::endl;
+        return false;
+    }
+    for (size_t i = 0; i < _pwd.length(); i++)
+    {
+        if (!isprint(_pwd[i]))
+        {
+            std::cout << "invalid character in passname" << _pwd << std::endl;
+            return false;
+        }
+    }
     std::cout << "Debug _pwd: " << GetPwd() << std::endl;
     return true;
 };
