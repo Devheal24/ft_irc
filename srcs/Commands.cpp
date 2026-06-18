@@ -128,7 +128,7 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
         else
         {
             std::ostringstream w;
-            w << ":server 001 " << nick << " :Welcome2 to the IRC server, " << nick << "\r\n";
+            w << ":server 001 " << nick << " :Welcome to the IRC server, " << nick << "\r\n";
             std::string wmsg = w.str();
 
             send(clientFd, wmsg.c_str(), wmsg.size(), 0);
