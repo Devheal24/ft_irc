@@ -392,6 +392,36 @@ void Server::CommandTopic(std::istringstream &iss, int clientFd)
     topic(clientFd, channel, NewTopic);
 }
 
+void Server::CommandClose(std::istringstream &iss, int clientFd)
+{
+    /*std::string tmp;
+    iss >> tmp;
+    if (!tmp.empty())
+    {
+        std::cout << "close syntaxe error" << std::endl;
+        return;
+    }*/
+    (void)iss;
+
+    std::cerr << "close cmd used " << std::endl;
+
+    size_t j = 0;
+    while (j < _clients.size() && _clients[j].getFD() != clientFd)
+        ++j;
+    if (j == _clients.size())
+        return;
+
+    const std::string& chans = _clients[j].getActiveChannel();
+    std::map<std::string, Channel>::iterator cit = _channels.find(chans);
+    cit->second.removeMember(clientFd);
+    cit->second.removeOperator(clientFd);
+    if (cit->second.memberCount() == 0)
+    {
+        _channels.erase(cit);
+        std::cout << "channel erase (0 member)"  << std::endl;
+    }
+}
+
 void Server::CommandMode(std::istringstream &iss, int clientFd)
 {
     Client* client = getClientByFd(clientFd);

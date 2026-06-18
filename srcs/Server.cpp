@@ -336,6 +336,11 @@ bool Server::handleClientInput(int clientFd)
             CommandMode(iss, clientFd);
             continue;
         }
+        if (token == "PART" || token == "/PART")
+        {
+            CommandClose(iss, clientFd);
+            continue;
+        }
         if (token == "QUIT")
         {
             for (size_t i = 0; i < fds.size(); i++)
@@ -356,7 +361,7 @@ bool Server::handleClientInput(int clientFd)
  */
 void Server::removeClient(int clientFd)
 {
-    display_status();
+    //display_status();
     size_t j = 0;
     while (j < _clients.size() && _clients[j].getFD() != clientFd)
         ++j;
@@ -372,7 +377,10 @@ void Server::removeClient(int clientFd)
             cit->second.removeMember(clientFd);
             cit->second.removeOperator(clientFd);
             if (cit->second.memberCount() == 0)
+            {
                 _channels.erase(cit);
+                std::cout << "channel erase (0 member)"  << std::endl;
+            }
         }
     }
 
@@ -382,6 +390,7 @@ void Server::removeClient(int clientFd)
     // close(fds[i].fd);
     // fds.erase(fds.begin() + i);
     _clients.erase(_clients.begin() + j);
+    display_status();
 }
 
 int Server::getClientFdByName(const std::string& name) const

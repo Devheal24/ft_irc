@@ -149,3 +149,4 @@ const std::set<std::string>& Client::getJoinedChannels() const
 {
     return _joinedChannels;
 }
+
