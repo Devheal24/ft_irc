@@ -240,10 +240,10 @@ bool Server::handleClientInput(int clientFd)
 {
     char buf[1024];
     ssize_t n = recv(clientFd, buf, sizeof(buf), 0);
-    if (n < 0)
+    if (n <= 0)
         return false;
-    if (n==0)
-        return true;
+    /*if (n==0)
+        return true;*/
     std::string data(buf, (size_t)n);
 
     // debug: raw data received
