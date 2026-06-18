@@ -304,7 +304,6 @@ bool Server::handleClientInput(int clientFd)
                 return false;
             continue;
         }
-
         //check if nick+user set (pwd optional)
         // int i;
         // for (i = 0; i < (int)_clients.size(); i++)
@@ -336,6 +335,18 @@ bool Server::handleClientInput(int clientFd)
             if (_clients[i].getFD() == clientFd)
                 break;
             std::cout << "test" << std::endl;
+        }
+        if (token == "QUIT" || token == "/QUIT")
+        {
+            for (size_t i = 0; i < fds.size(); i++)
+                if (fds[i].fd == clientFd)
+                    fds.erase(fds.begin() + i);
+            std::string msg = ":server 901 " + _clients[i].getName() + " " + _clients[i].getUsername() + "@localhost" + " :You are now logged out\r\n";
+            send(clientFd, msg.c_str(), msg.size(), 0);
+            removeClient(clientFd);
+            close(clientFd);
+            display_status();
+            continue;
         }
         std::cout << "is client registered = " << _clients[i].isRegistered() << std::endl;
         if (!_clients[i].isRegistered())
@@ -380,16 +391,6 @@ bool Server::handleClientInput(int clientFd)
         if (token == "PART" || token == "/PART")
         {
             CommandClose(iss, clientFd);
-            continue;
-        }
-        if (token == "QUIT" || token == "/QUIT")
-        {
-            for (size_t i = 0; i < fds.size(); i++)
-                if (fds[i].fd == clientFd)
-                    fds.erase(fds.begin() + i);
-            removeClient(clientFd);
-            close(clientFd);
-            display_status();
             continue;
         }
         std::cout << "DEBUG IGNORED fd=" << clientFd << " line=[" << line << std::endl << std::endl;

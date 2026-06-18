@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   NumericReplies.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
+/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/17 17:18:38 by jodone            #+#    #+#             */
-/*   Updated: 2026/06/18 14:17:07 by jodone           ###   ########.fr       */
+/*   Updated: 2026/06/18 15:16:38 by mgarnier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,9 @@ std::string numRep(int code, const std::string& nick)
 		break;
 	case 464:
 		msg = msg + "Password incorrect\r\n";
+		break;
+	case 901:
+		msg = msg + "You are now logged out\r\n";
 		break;
 	default:
 		break;
