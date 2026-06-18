@@ -83,7 +83,7 @@ void Client::setNick(const std::string& nick)
     _name = nick;
     _hasNick = true;
     if (_hasUser && _hasNick)
-        _registered = true;
+        this->setRegistered(true);
 }
 
 void Client::setUser(const std::string& user, const std::string& real)
@@ -92,7 +92,12 @@ void Client::setUser(const std::string& user, const std::string& real)
     _realname = real;
     _hasUser = true;
     if (_hasUser && _hasNick)
-        _registered = true;
+        this->setRegistered(true);
+}
+
+void Client::setRegistered(bool state) {
+    _registered = state;
+    return;
 }
 
 void Client::setPass(const std::string& pass)
