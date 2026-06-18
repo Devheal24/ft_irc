@@ -13,19 +13,19 @@
 class Client
 {
     private:
-        std::string _name;
-        int         _fd;
-        std::string _ip;
-        std::set<std::string> _joinedChannels;
-        std::string           _activeChannel;
+        std::string             _name;
+        int                     _fd;
+        std::string             _ip;
+        std::set<std::string>   _joinedChannels;
+        std::string             _activeChannel;
 
-        std::string _username;
-        std::string _realname;
-        std::string _pass;
-        bool        _hasPass;
-        bool        _hasNick;
-        bool        _hasUser;
-        bool        _registered;
+        std::string             _username;
+        std::string             _realname;
+        std::string             _pass;
+        bool                    _hasPass;
+        bool                    _hasNick;
+        bool                    _hasUser;
+        bool                    _registered;
     
     public:
         Client();

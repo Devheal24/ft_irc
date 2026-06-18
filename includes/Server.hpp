@@ -17,7 +17,7 @@
  * @brief all user data "inputs" max length.
  */
 #define PWD_MAXL 64
-#define PWD_MINXL 64
+#define PWD_MINXL 8
 #define USR_MAXL 20
 #define NICK_MAXL 20
 #define CHNL_MAXL 20
@@ -25,51 +25,51 @@
 
 class Server {
 private:
-    int         _port;
-    std::string _pwd;
-    std::map<std::string, Channel>  _channels;
-    std::vector< Client >           _clients;
-    int                             _listen_fd;
-    std::vector<struct pollfd>      fds;
+	int                             _port;
+	std::string                     _pwd;
+	std::map<std::string, Channel>  _channels;
+	std::vector< Client >           _clients;
+	int                             _listen_fd;
+	std::vector<struct pollfd>      _fds;
 
-    void CommandPrivMsg(std::istringstream &iss, std::string &token, size_t selfIdx, int clientFd);
-    void CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd);
-    void CommandJoin(std::istringstream &iss, int clientFd);
-    bool CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd);
-    bool CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd);
-    void CommandKick(std::istringstream &iss, int clientFd);
-    void CommandInvite(std::istringstream &iss, int clientFd);
-    void CommandTopic(std::istringstream &iss, int clientFd);
-    void CommandClose(std::istringstream &iss, int clientFd);
-    void CommandMode(std::istringstream &iss, int clientFd);
-    void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
-    void invite(int clientFd, const std::string& targetNick, const std::string& channelName);
-    void topic(int clientFd, const std::string& channelName, std::string& newTopic);
+	void CommandPrivMsg(std::istringstream &iss, std::string &token, size_t selfIdx, int clientFd);
+	void CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd);
+	void CommandJoin(std::istringstream &iss, int clientFd);
+	bool CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd);
+	bool CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd);
+	void CommandKick(std::istringstream &iss, int clientFd);
+	void CommandInvite(std::istringstream &iss, int clientFd);
+	void CommandTopic(std::istringstream &iss, int clientFd);
+	void CommandClose(std::istringstream &iss, int clientFd);
+	void CommandMode(std::istringstream &iss, int clientFd);
+	void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
+	void invite(int clientFd, const std::string& targetNick, const std::string& channelName);
+	void topic(int clientFd, const std::string& channelName, std::string& newTopic);
 public:
 
-    Server() {};
-    void SetPort (int port);
-    int GetPort() const;
-    void SetPwd (std::string pwd);
-    std::string GetPwd() const;
+	Server() {};
+	void            SetPort (int port);
+	int             GetPort() const;
+	void            SetPwd (std::string pwd);
+	std::string     GetPwd() const;
 
-    void display_status();
+	void            display_status();
 
-    bool parse_data(char **av);
-    int init_server();
-    void run_event_loop();
-    bool handleClientInput(int clientFd);
-    
-    void joinChannel(int clientFd, const std::string& name, const std::string& key);
-    void removeClient(int clientFd);
+	bool            parse_data(char **av);
+	int             init_server();
+	void            run_event_loop();
+	bool            handleClientInput(int clientFd);
 
-    int getClientFdByName(const std::string& name) const;
-    Client* getClientByFd(int fd);
-    const Client* getClientByFd(int fd) const;
-    std::string getClientPrefix(int fd) const;
+	void            joinChannel(int clientFd, const std::string& name, const std::string& key);
+	void            removeClient(int clientFd);
+
+	int             getClientFdByName(const std::string& name) const;
+	Client*         getClientByFd(int fd);
+	const Client*   getClientByFd(int fd) const;
+	std::string     getClientPrefix(int fd) const;
 };
 
-std::string numRep(int code, const std::string& nick);
-std::string numRepChannel(int code, const std::string& nick, const std::string& channel, const std::string& addon);
+std::string         numRep(int code, const std::string& nick);
+std::string         numRepChannel(int code, const std::string& nick, const std::string& channel, const std::string& addon);
 
 # endif

@@ -149,13 +149,13 @@ void Server::run_event_loop()
     listen_pollfd.fd = _listen_fd;
     listen_pollfd.events = POLLIN;
     listen_pollfd.revents = 0;
-    fds.push_back(listen_pollfd);
+    _fds.push_back(listen_pollfd);
 
     std::cout << "Server listening (event loop)" << std::endl;
 
     while (!g_sig)
     {
-        int ready = poll(&fds[0], fds.size(), -1);
+        int ready = poll(&_fds[0], _fds.size(), -1);
         if (ready < 0)
         {
             if (errno == EINTR)
@@ -165,7 +165,7 @@ void Server::run_event_loop()
         }
 
         // incoming connections
-        if (fds[0].revents & POLLIN)
+        if (_fds[0].revents & POLLIN)
         {
             while (!g_sig)
             {
@@ -192,7 +192,7 @@ void Server::run_event_loop()
                 client_pollfd.fd = client_fd;
                 client_pollfd.events = POLLIN;
                 client_pollfd.revents = 0;
-                fds.push_back(client_pollfd);
+                _fds.push_back(client_pollfd);
                 // create placeholder client name so the client appears registered to hexChat
                 std::ostringstream cn;
                 cn << "client" << client_fd;
@@ -203,32 +203,32 @@ void Server::run_event_loop()
             }
         }
         // events on client sockets
-        for (size_t i = 1; i < fds.size(); ++i)
+        for (size_t i = 1; i < _fds.size(); ++i)
         {
-            short revents = fds[i].revents;
+            short revents = _fds[i].revents;
             if (revents == 0)
                 continue;
 
             if (revents & (POLLHUP | POLLERR | POLLNVAL))
             {
-                std::cout << "client disconnected POLLHUP fd " << fds[i].fd << std::endl;
-                removeClient(fds[i].fd);
-                close(fds[i].fd);
-                fds.erase(fds.begin() + i);
+                std::cout << "client disconnected POLLHUP fd " << _fds[i].fd << std::endl;
+                removeClient(_fds[i].fd);
+                close(_fds[i].fd);
+                _fds.erase(_fds.begin() + i);
                 --i;
                 continue;
             }
             // if a client have send something we handle what we received
             if (revents & POLLIN)
             {
-                int clientFd = fds[i].fd;
+                int clientFd = _fds[i].fd;
                 bool connected = handleClientInput(clientFd);
                 if (!connected)
                 {
                     std::cout << "client disconnected POLLIN fd " << clientFd << std::endl;
                     removeClient(clientFd);
                     close(clientFd);
-                    fds.erase(fds.begin() + i);
+                    _fds.erase(_fds.begin() + i);
                     --i;
                 }
             }
@@ -236,12 +236,12 @@ void Server::run_event_loop()
     }
 
     //close all fd when server shutdown
-    for (size_t i = 0; i < fds.size(); ++i)
-        close(fds[i].fd);
+    for (size_t i = 0; i < _fds.size(); ++i)
+        close(_fds[i].fd);
 
-    for (size_t i = 0; i < fds.size(); ++i)
+    for (size_t i = 0; i < _fds.size(); ++i)
     {
-        std::cout << "connected at close : " << fds[i].fd << std::endl;
+        std::cout << "connected at close : " << _fds[i].fd << std::endl;
     }
 }
 
@@ -350,9 +350,9 @@ bool Server::handleClientInput(int clientFd)
         }
         if (token == "QUIT" || token == "/QUIT")
         {
-            for (size_t i = 0; i < fds.size(); i++)
-                if (fds[i].fd == clientFd)
-                    fds.erase(fds.begin() + i);
+            for (size_t i = 0; i < _fds.size(); i++)
+                if (_fds[i].fd == clientFd)
+                    _fds.erase(_fds.begin() + i);
             std::string msg = ":server 901 " + _clients[i].getName() + " " + _clients[i].getUsername() + "@localhost" + " :You are now logged out\r\n";
             send(clientFd, msg.c_str(), msg.size(), 0);
             removeClient(clientFd);
@@ -438,11 +438,6 @@ void Server::removeClient(int clientFd)
         }
     }
 
-    // int i = 0;
-    // while (fds[i].fd != clientFd)
-    //     i++;
-    // close(fds[i].fd);
-    // fds.erase(fds.begin() + i);
     _clients.erase(_clients.begin() + j);
     display_status();
 }
