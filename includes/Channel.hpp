@@ -74,6 +74,7 @@ public:
 	void setLimit(size_t limit);
 	void removeLimit();
 	bool isFull() const;
+	bool haslimit() const;
 
 	//bot
 	void botReply(int clientFd);

@@ -190,7 +190,6 @@ void Server::run_event_loop()
                 display_status();
             }
         }
-
         // events on client sockets
         for (size_t i = 1; i < fds.size(); ++i)
         {
@@ -207,7 +206,6 @@ void Server::run_event_loop()
                 --i;
                 continue;
             }
-
             // if a client have send something we handle what we received
             if (revents & POLLIN)
             {
@@ -308,28 +306,28 @@ bool Server::handleClientInput(int clientFd)
         }
 
         //check if nick+user set (pwd optional)
-        /*int i;
-        for (i = 0; i < (int)_clients.size(); i++)
-        {
-            if (_clients[i].getFD() == clientFd)
-            {
-                if (_clients[i].getFullLog() == false)
-                {
-                    std::cout << _clients[i].getName() << std::endl;
-                    std::cout << _clients[i].getUsername() << std::endl;
-                    if (_clients[i].getName().empty() || _clients[i].getUsername().empty())
-                    {
-                        std::cerr << "client is not fully logged-in" << std::endl;
-                        break;
-                    }
-                    else
-                        _clients[i].setFullLog(true);
-                    break;
-                }
-            }
-        }
-        if (!_clients[i].getFullLog())
-            break;*/
+        // int i;
+        // for (i = 0; i < (int)_clients.size(); i++)
+        // {
+        //     if (_clients[i].getFD() == clientFd)
+        //     {
+        //         if (_clients[i].getFullLog() == false)
+        //         {
+        //             std::cout << _clients[i].getName() << std::endl;
+        //             std::cout << _clients[i].getUsername() << std::endl;
+        //             if (_clients[i].getName().empty() || _clients[i].getUsername().empty())
+        //             {
+        //                 std::cerr << "client is not fully logged-in" << std::endl;
+        //                 break;
+        //             }
+        //             else
+                        // _clients[i].setFullLog(true);
+        //             break;
+        //         }
+        //     }
+        // }
+        // if (!_clients[i].getFullLog())
+        //     break;
 
         //check if nick+user set (pwd optional)
         int i;
@@ -337,6 +335,7 @@ bool Server::handleClientInput(int clientFd)
         {
             if (_clients[i].getFD() == clientFd)
                 break;
+            std::cout << "test" << std::endl;
         }
         std::cout << "is client registered = " << _clients[i].isRegistered() << std::endl;
         if (!_clients[i].isRegistered())
@@ -344,7 +343,7 @@ bool Server::handleClientInput(int clientFd)
             std::cout << _clients[i].getName() << std::endl;
             std::cout << _clients[i].getUsername() << std::endl;
             std::cerr << "client is not fully logged-in" << std::endl;
-            break;
+            continue;
         }
 
 
@@ -383,7 +382,7 @@ bool Server::handleClientInput(int clientFd)
             CommandClose(iss, clientFd);
             continue;
         }
-        if (token == "QUIT")
+        if (token == "QUIT" || token == "/QUIT")
         {
             for (size_t i = 0; i < fds.size(); i++)
                 if (fds[i].fd == clientFd)
