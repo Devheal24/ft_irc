@@ -17,7 +17,7 @@ void Server::CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd)
             (pass[pass.size() - 1] == '\r' || pass[pass.size() - 1] == '\n'))
         pass.resize(pass.size() - 1);
 
-    if (pass.length() < 8 || pass.length() > 64)
+    if (pass.length() < PWD_MINXL || pass.length() > PWD_MAXL)
     {
         std::cout << "invalid length of pass (64> || <8)" << pass << std::endl;
         return;
@@ -60,7 +60,7 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 
 
     //test norm
-    if (nick.length() >= 10)
+    if (nick.length() >= NICK_MAXL)
     {
         std::cout << "invalid length of nickname (>10)" << nick << std::endl;
         return (true);
@@ -135,7 +135,7 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 
     
     //test norm
-    if (user.length() >= 20)
+    if (user.length() >= USR_MAXL)
     {
         std::cout << "invalid length of username (>20)" << user << std::endl;
         return (true);
@@ -270,7 +270,7 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
 
     if (!chan.empty() && chan[0] == '#')
     {
-        if (chan.length() >= 20)
+        if (chan.length() >= CHNL_MAXL)
         {
             std::cout << "invalid length of channel name (>20)" << chan << std::endl;
             return;
