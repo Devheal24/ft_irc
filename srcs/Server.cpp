@@ -318,7 +318,7 @@ bool Server::handleClientInput(int clientFd)
         }
         //check if nick+user set (pwd optional)
         // int i;
-        // for (i = 0; i < (int)_clients.size(); i++)
+        // for (i = 0; i < (int)_clients.size(); ++i)
         // {
         //     if (_clients[i].getFD() == clientFd)
         //     {
@@ -342,7 +342,7 @@ bool Server::handleClientInput(int clientFd)
 
         //check if nick+user set (pwd optional)
         int i;
-        for (i = 0; i < (int)_clients.size(); i++)
+        for (i = 0; i < (int)_clients.size(); ++i)
         {
             if (_clients[i].getFD() == clientFd)
                 break;
@@ -353,6 +353,14 @@ bool Server::handleClientInput(int clientFd)
             for (size_t i = 0; i < _fds.size(); i++)
                 if (_fds[i].fd == clientFd)
                     _fds.erase(_fds.begin() + i);
+            for (std::map<std::string, Channel>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)
+            {
+                if (it->second.hasMember(clientFd))
+                {
+                    _clients[i].setActiveChannel(it->second.getName());
+                    CommandClose(iss, clientFd);
+                }
+            }
             std::string msg = ":server 901 " + _clients[i].getName() + " " + _clients[i].getUsername() + "@localhost" + " :You are now logged out\r\n";
             send(clientFd, msg.c_str(), msg.size(), 0);
             removeClient(clientFd);
