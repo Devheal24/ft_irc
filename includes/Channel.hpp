@@ -50,8 +50,8 @@ public:
 	bool isInviteOnly() const;
 	void setInviteOnly(bool value);
 
-    // broadcast helpers
-    void broadcastExcept(int excludeFd, const std::string& msg);
+	// broadcast helpers
+	void broadcastExcept(int excludeFd, const std::string& msg);
 
 	//operators
 	void addOperator(int fd);

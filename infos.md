@@ -79,11 +79,11 @@ Configure des options sur une socket.
 
 ```cpp
 int setsockopt(
-    int sockfd,
-    int level,
-    int optname,
-    const void *optval,
-    socklen_t optlen
+	int sockfd,
+	int level,
+	int optname,
+	const void *optval,
+	socklen_t optlen
 );
 ```
 
@@ -93,11 +93,11 @@ int setsockopt(
 int yes = 1;
 
 setsockopt(
-    fd,
-    SOL_SOCKET,
-    SO_REUSEADDR,
-    &yes,
-    sizeof(yes)
+	fd,
+	SOL_SOCKET,
+	SO_REUSEADDR,
+	&yes,
+	sizeof(yes)
 );
 ```
 
@@ -124,9 +124,9 @@ Récupère l'adresse locale associée à une socket.
 
 ```cpp
 int getsockname(
-    int sockfd,
-    struct sockaddr *addr,
-    socklen_t *addrlen
+	int sockfd,
+	struct sockaddr *addr,
+	socklen_t *addrlen
 );
 ```
 
@@ -210,10 +210,10 @@ Version moderne de résolution DNS.
 
 ```cpp
 int getaddrinfo(
-    const char *node,
-    const char *service,
-    const struct addrinfo *hints,
-    struct addrinfo **res
+	const char *node,
+	const char *service,
+	const struct addrinfo *hints,
+	struct addrinfo **res
 );
 ```
 
@@ -229,10 +229,10 @@ hints.ai_family = AF_INET;
 hints.ai_socktype = SOCK_STREAM;
 
 getaddrinfo(
-    "google.com",
-    "80",
-    &hints,
-    &result
+	"google.com",
+	"80",
+	&hints,
+	&result
 );
 ```
 
@@ -277,9 +277,9 @@ Associe une socket à une adresse IP et un port.
 
 ```cpp
 int bind(
-    int sockfd,
-    const struct sockaddr *addr,
-    socklen_t addrlen
+	int sockfd,
+	const struct sockaddr *addr,
+	socklen_t addrlen
 );
 ```
 
@@ -287,9 +287,9 @@ int bind(
 
 ```cpp
 bind(
-    fd,
-    (sockaddr *)&addr,
-    sizeof(addr)
+	fd,
+	(sockaddr *)&addr,
+	sizeof(addr)
 );
 ```
 
@@ -335,9 +335,9 @@ Accepte une connexion entrante.
 
 ```cpp
 int accept(
-    int sockfd,
-    struct sockaddr *addr,
-    socklen_t *addrlen
+	int sockfd,
+	struct sockaddr *addr,
+	socklen_t *addrlen
 );
 ```
 
@@ -345,9 +345,9 @@ int accept(
 
 ```cpp
 int client_fd = accept(
-    server_fd,
-    (sockaddr *)&client_addr,
-    &len
+	server_fd,
+	(sockaddr *)&client_addr,
+	&len
 );
 ```
 
@@ -372,9 +372,9 @@ Crée une socket dédiée au client connecté.
 
 ```cpp
 int connect(
-    int sockfd,
-    const struct sockaddr *addr,
-    socklen_t addrlen
+	int sockfd,
+	const struct sockaddr *addr,
+	socklen_t addrlen
 );
 ```
 
@@ -382,9 +382,9 @@ int connect(
 
 ```cpp
 connect(
-    fd,
-    (sockaddr *)&addr,
-    sizeof(addr)
+	fd,
+	(sockaddr *)&addr,
+	sizeof(addr)
 );
 ```
 
@@ -522,10 +522,10 @@ Version moderne.
 
 ```cpp
 const char *inet_ntop(
-    int af,
-    const void *src,
-    char *dst,
-    socklen_t size
+	int af,
+	const void *src,
+	char *dst,
+	socklen_t size
 );
 ```
 
@@ -535,10 +535,10 @@ const char *inet_ntop(
 char buffer[INET6_ADDRSTRLEN];
 
 inet_ntop(
-    AF_INET,
-    &addr.sin_addr,
-    buffer,
-    sizeof(buffer)
+	AF_INET,
+	&addr.sin_addr,
+	buffer,
+	sizeof(buffer)
 );
 ```
 
@@ -558,10 +558,10 @@ Envoie des données.
 
 ```cpp
 ssize_t send(
-    int sockfd,
-    const void *buf,
-    size_t len,
-    int flags
+	int sockfd,
+	const void *buf,
+	size_t len,
+	int flags
 );
 ```
 
@@ -569,10 +569,10 @@ ssize_t send(
 
 ```cpp
 send(
-    fd,
-    msg.c_str(),
-    msg.size(),
-    0
+	fd,
+	msg.c_str(),
+	msg.size(),
+	0
 );
 ```
 
@@ -590,10 +590,10 @@ Lit des données.
 
 ```cpp
 ssize_t recv(
-    int sockfd,
-    void *buf,
-    size_t len,
-    int flags
+	int sockfd,
+	void *buf,
+	size_t len,
+	int flags
 );
 ```
 
@@ -603,10 +603,10 @@ ssize_t recv(
 char buffer[512];
 
 recv(
-    fd,
-    buffer,
-    sizeof(buffer),
-    0
+	fd,
+	buffer,
+	sizeof(buffer),
+	0
 );
 ```
 
@@ -661,9 +661,9 @@ Version moderne recommandée.
 
 ```cpp
 int sigaction(
-    int signum,
-    const struct sigaction *act,
-    struct sigaction *oldact
+	int signum,
+	const struct sigaction *act,
+	struct sigaction *oldact
 );
 ```
 
@@ -751,9 +751,9 @@ Déplace le curseur d'un fichier.
 
 ```cpp
 off_t lseek(
-    int fd,
-    off_t offset,
-    int whence
+	int fd,
+	off_t offset,
+	int whence
 );
 ```
 
@@ -781,8 +781,8 @@ Obtient les informations d'un fichier.
 
 ```cpp
 int fstat(
-    int fd,
-    struct stat *buf
+	int fd,
+	struct stat *buf
 );
 ```
 
@@ -813,9 +813,9 @@ Contrôle le comportement d'un descripteur.
 
 ```cpp
 int fcntl(
-    int fd,
-    int cmd,
-    ...
+	int fd,
+	int cmd,
+	...
 );
 ```
 
@@ -823,9 +823,9 @@ int fcntl(
 
 ```cpp
 fcntl(
-    fd,
-    F_SETFL,
-    O_NONBLOCK
+	fd,
+	F_SETFL,
+	O_NONBLOCK
 );
 ```
 
@@ -853,9 +853,9 @@ Surveille plusieurs descripteurs simultanément.
 
 ```cpp
 int poll(
-    struct pollfd *fds,
-    nfds_t nfds,
-    int timeout
+	struct pollfd *fds,
+	nfds_t nfds,
+	int timeout
 );
 ```
 
@@ -864,9 +864,9 @@ int poll(
 ```cpp
 struct pollfd
 {
-    int fd;
-    short events;
-    short revents;
+	int fd;
+	short events;
+	short revents;
 };
 ```
 
@@ -901,21 +901,21 @@ Fonction centrale des serveurs multi-clients non bloquants.
 
 ```text
 socket()
-    ↓
+	↓
 setsockopt()
-    ↓
+	↓
 bind()
-    ↓
+	↓
 listen()
-    ↓
+	↓
 poll()
-    ↓
+	↓
 accept()
-    ↓
+	↓
 recv()
-    ↓
+	↓
 send()
-    ↓
+	↓
 close()
 ```
 

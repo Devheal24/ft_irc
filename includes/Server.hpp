@@ -25,12 +25,12 @@
 
 class Server {
 private:
-	int                             _port;
-	std::string                     _pwd;
+	int							 _port;
+	std::string					 _pwd;
 	std::map<std::string, Channel>  _channels;
-	std::vector< Client >           _clients;
-	int                             _listen_fd;
-	std::vector<struct pollfd>      _fds;
+	std::vector< Client >		   _clients;
+	int							 _listen_fd;
+	std::vector<struct pollfd>	  _fds;
 
 	void CommandPrivMsg(std::istringstream &iss, std::string &token, size_t selfIdx, int clientFd);
 	void CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd);
@@ -42,34 +42,35 @@ private:
 	void CommandTopic(std::istringstream &iss, int clientFd);
 	void CommandClose(std::istringstream &iss, int clientFd);
 	void CommandMode(std::istringstream &iss, int clientFd);
+	void CommandQuit(std::istringstream &iss, int clientFd);
 	void kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason);
 	void invite(int clientFd, const std::string& targetNick, const std::string& channelName);
 	void topic(int clientFd, const std::string& channelName, std::string& newTopic);
 public:
 
 	Server() {};
-	void            SetPort (int port);
-	int             GetPort() const;
-	void            SetPwd (std::string pwd);
-	std::string     GetPwd() const;
+	void			SetPort (int port);
+	int			 GetPort() const;
+	void			SetPwd (std::string pwd);
+	std::string	 GetPwd() const;
 
-	void            display_status();
+	void			display_status();
 
-	bool            parse_data(char **av);
-	int             init_server();
-	void            run_event_loop();
-	bool            handleClientInput(int clientFd);
+	bool			parse_data(char **av);
+	int			 init_server();
+	void			run_event_loop();
+	bool			handleClientInput(int clientFd);
 
-	void            joinChannel(int clientFd, const std::string& name, const std::string& key);
-	void            removeClient(int clientFd);
+	void			joinChannel(int clientFd, const std::string& name, const std::string& key);
+	void			removeClient(int clientFd);
 
-	int             getClientFdByName(const std::string& name) const;
-	Client*         getClientByFd(int fd);
+	int			 getClientFdByName(const std::string& name) const;
+	Client*		 getClientByFd(int fd);
 	const Client*   getClientByFd(int fd) const;
-	std::string     getClientPrefix(int fd) const;
+	std::string	 getClientPrefix(int fd) const;
 };
 
-std::string         numRep(int code, const std::string& nick);
-std::string         numRepChannel(int code, const std::string& nick, const std::string& channel, const std::string& addon);
+std::string		 numRep(int code, const std::string& nick);
+std::string		 numRepChannel(int code, const std::string& nick, const std::string& channel, const std::string& addon);
 
 # endif

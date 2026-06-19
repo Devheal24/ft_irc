@@ -9,14 +9,26 @@ INCLUDES	:= -Iincludes
 
 # DIR
 SRCS_DIR	:= srcs/
+SRCS_CMD	:= $(SRCS_DIR)Commands/
+SRCS_OPE	:= $(SRCS_CMD)OperatorsCommands/
 OBJS_DIR	:= objs/
 
 SRCS		:= $(SRCS_DIR)main.cpp \
 				$(SRCS_DIR)Server.cpp \
 				$(SRCS_DIR)Client.cpp \
 				$(SRCS_DIR)Channel.cpp \
-				$(SRCS_DIR)Commands.cpp \
-				$(SRCS_DIR)NumericReplies.cpp
+				$(SRCS_DIR)NumericReplies.cpp \
+				$(SRCS_CMD)Pass.cpp \
+				$(SRCS_CMD)Nick.cpp \
+				$(SRCS_CMD)User.cpp \
+				$(SRCS_CMD)PrivMsg.cpp \
+				$(SRCS_CMD)Join.cpp \
+				$(SRCS_CMD)Close.cpp \
+				$(SRCS_CMD)Quit.cpp \
+				$(SRCS_OPE)Kick.cpp \
+				$(SRCS_OPE)Invite.cpp \
+				$(SRCS_OPE)Topic.cpp \
+				$(SRCS_OPE)Mode.cpp
 
 OBJS		:= $(SRCS:$(SRCS_DIR)%.cpp=$(OBJS_DIR)%.o)
 
