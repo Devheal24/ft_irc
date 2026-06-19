@@ -13,15 +13,16 @@
 class Client
 {
 	private:
-		std::string			 _name;
-		int					 _fd;
-		std::string			 _ip;
-		std::set<std::string>   _joinedChannels;
-		std::string			 _activeChannel;
+		std::string			 	_name;
+		std::string			 	_ip;
+		int					 	_fd;
 
-		std::string			 _username;
-		std::string			 _realname;
-		std::string			 _pass;
+		std::set<std::string>   _joinedChannels;
+		std::string			 	_activeChannel;
+
+		std::string				_username;
+		std::string				_realname;
+		std::string				_pass;
 		bool					_hasPass;
 		bool					_hasNick;
 		bool					_hasUser;
@@ -42,22 +43,22 @@ class Client
 		void setActiveChannel(const std::string& channelName);
 
 		// registration
-		void setNick(const std::string& nick);
-		void setUser(const std::string& user, const std::string& real);
-		void setPass(const std::string& pass);
-		void setRegistered(bool state);
-		void setFD(int fd);
-		bool isRegistered() const;
+		void 		setNick(const std::string& nick);
+		void 		setUser(const std::string& user, const std::string& real);
+		void 		setPass(const std::string& pass);
+		void 		setRegistered(bool state);
+		void 		setFD(int fd);
+		bool 		isRegistered() const;
 		std::string getPass() const;
-		bool hasPass() const;
+		bool 		hasPass() const;
 
-		std::string getActiveChannel() const;
-		bool isInChannel(const std::string& channelName) const;
-		const std::set<std::string>& getJoinedChannels() const;
+		std::string 					getActiveChannel() const;
+		bool							isInChannel(const std::string& channelName) const;
+		const std::set<std::string>&	getJoinedChannels() const;
 
 		std::string getName() const;
 		std::string getUsername() const;
-		int		 getFD() const;
+		int		 	getFD() const;
 		std::string getIP() const;
 };
 
