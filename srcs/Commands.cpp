@@ -473,13 +473,13 @@ void Server::CommandClose(std::istringstream &iss, int clientFd)
     std::map<std::string, Channel>::iterator cit = _channels.find(chans);
     cit->second.removeMember(clientFd);
     cit->second.removeOperator(clientFd);
+    std::string msg = ":" + _clients[j].getName() + "!" + _clients[j].getUsername() + "@localhost" + " PART " + cit->second.getName() + "\r\n";
+    send(clientFd, msg.c_str(), msg.size(), 0);
     if (cit->second.memberCount() == 0)
     {
         _channels.erase(cit);
         std::cout << "channel erase (0 member)"  << std::endl;
     }
-
-    //send
 }
 
 void Server::CommandMode(std::istringstream &iss, int clientFd)

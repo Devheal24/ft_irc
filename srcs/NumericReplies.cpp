@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   NumericReplies.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
+/*   By: mgarnier <mgarnier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/17 17:18:38 by jodone            #+#    #+#             */
-/*   Updated: 2026/06/18 16:35:27 by jodone           ###   ########.fr       */
+/*   Updated: 2026/06/19 10:08:19 by mgarnier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ std::string numRepChannel(int code, const std::string& nick, const std::string& 
 		break;
 	case 341:
 		msg = msg + " " + addon + "\r\n";
+		break;
 	case 353:
 		msg = ":server 353 " + nick + " = " + channel + " :" + addon + "\r\n";
 		break;
