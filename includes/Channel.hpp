@@ -77,7 +77,7 @@ public:
 	bool haslimit() const;
 
 	//bot
-	void botReply(int clientFd);
+	void botReply(const std::string& sender);
 
 	//member function
 	void broadcast(const std::string& msg);

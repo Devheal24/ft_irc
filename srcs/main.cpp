@@ -27,6 +27,7 @@ int main (int ac, char **av)
 	Server serv;
 	if (!serv.parse_data(av)) {return 1;};
 	if (serv.init_server() == 1) {return 1;};
+	serv.createBot();
 	serv.run_event_loop();
 	//test client joining channel
 	/*serv.joinChannel(4, "#general");

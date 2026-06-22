@@ -168,15 +168,19 @@ bool Channel::haslimit() const
 }
 
 //BOT
-void Channel::botReply(int clientFd)
+void Channel::botReply(const std::string& sender)
 {
 	if (_members.size() == 0)
 		return ;
 	
-	int r = rand() % _botMessages.size();
-	std::string msg = _botMessages[r];
+	size_t r = rand() % (_botMessages.size() + 1);
+	std::string msg;
+	if (r == _botMessages.size() + 1)
+		msg = "Tu devrais te taire " + sender + "...";
+	else
+		msg = _botMessages[r];
 	std::string full = ":BOT!bot@localhost PRIVMSG " + _name + " :" + msg + "\r\n";
-	broadcastExcept(clientFd, full);
+	broadcast(full);
 }
 
 /**

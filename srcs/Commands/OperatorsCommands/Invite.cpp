@@ -1,5 +1,6 @@
 #include "../../../includes/Server.hpp"
 #include <sstream>
+#include <iostream>
 
 void Server::CommandInvite(std::istringstream &iss, int clientFd)
 {
@@ -43,19 +44,30 @@ void Server::invite(int clientFd, const std::string& targetNick, const std::stri
 		return ;
 	}
 
-	// Verify if target exist
+	// Verify if target is already in channel
 	int targetFd = getClientFdByName(targetNick);
-	if (targetFd == -1)
+	if (ch.hasMember(targetFd))
 	{
-		std::string msg = numRepChannel(441, clientName, targetNick, "");
+		std::string msg = numRepChannel(443, clientName, targetNick, "");
 		send(clientFd, msg.c_str(), msg.size(), 0);
 		return ;
 	}
 
-	// Verify if target is already in channel
-	if (ch.hasMember(targetFd))
+	// Verify if target exist
+	if (targetFd == -1)
 	{
-		std::string msg = numRepChannel(443, clientName, targetNick, "");
+		Client* target = getClientbyName(targetNick);
+
+		// Verify if target is Bot
+		if (target->getIsBot())
+		{
+			ch.addMember(targetFd);
+			std::cout << "Bot joined" << channelName << std::endl;
+			sendNames(*client, ch, channelName);
+			return ;
+		}
+
+		std::string msg = numRepChannel(441, clientName, targetNick, "");
 		send(clientFd, msg.c_str(), msg.size(), 0);
 		return ;
 	}

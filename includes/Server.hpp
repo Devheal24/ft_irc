@@ -70,7 +70,13 @@ public:
 	int			 	getClientFdByName(const std::string& name) const;
 	Client*		 	getClientByFd(int fd);
 	const Client*   getClientByFd(int fd) const;
+	Client*			getClientbyName(const std::string& name);
 	std::string	 	getClientPrefix(int fd) const;
+
+	void			createBot();
+	Client*			getBot();
+
+	void			sendNames(Client& client, Channel& channel, const std::string & channelName);
 };
 
 std::string		 	numRep(int code, const std::string& nick);

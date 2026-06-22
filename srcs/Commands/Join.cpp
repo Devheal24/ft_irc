@@ -144,27 +144,5 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
 	}
 
 	// Send NAMES reply (353) and end of names (366)
-	std::ostringstream names;
-	for (size_t kk = 0; kk < _clients.size(); ++kk) {
-		int memberFd = _clients[kk].getFD();
-		if (!it->second.hasMember(memberFd))
-			continue;
-		std::string mname = _clients[kk].getName();
-		if (mname.empty()) mname = "*";
-		if (it->second.isOperator(memberFd))
-			mname = "@" + mname;
-		std::cout << "DEBUG NAMES member fd=" << memberFd << " name=[" << _clients[kk].getName() << "] usedName=[" << mname << "]" << std::endl;
-		names << mname;
-		// detect if more members exist after kk
-		bool more = false;
-		for (size_t kk2 = kk + 1; kk2 < _clients.size(); ++kk2) {
-			if (it->second.hasMember(_clients[kk2].getFD())) { more = true; break; }
-		}
-		if (more) names << ' ';
-	}
-	std::string r353s = numRepChannel(353, clientName, name, names.str());
-	send(clientFd, r353s.c_str(), r353s.size(), 0);
-
-	std::string r366s = numRepChannel(366, clientName, name, "");
-	send(clientFd, r366s.c_str(), r366s.size(), 0);
+	sendNames(*client, it->second, name);
 }
