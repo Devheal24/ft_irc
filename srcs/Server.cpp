@@ -94,6 +94,8 @@ void Server::display_status() {
  */
 int Server::init_server()
 {
+	srand(time(NULL));
+
 	int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (listen_fd < 0)
 	{
@@ -474,4 +476,75 @@ std::string Server::getClientPrefix(int fd) const
 		return "unknown!unknown@localhost";
 	
 	return client->getName() + "!" + client->getUsername() + "@localhost";
+}
+
+Client* Server::getClientbyName(const std::string& name)
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].getName() == name)
+			return &_clients[i];
+	}
+	return NULL;
+}
+
+void Server::createBot()
+{
+	Client bot("Bot", -1, "");
+	bot.setBot(true);
+
+	_clients.push_back(bot);
+}
+
+Client* Server::getBot()
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].getIsBot())
+			return &_clients[i];
+	}
+	return NULL;
+}
+
+void Server::sendNames(Client& client, Channel& channel, const std::string & channelName)
+{
+	std::ostringstream names;
+
+	for (size_t kk = 0; kk < _clients.size(); ++kk) 
+	{
+		int memberFd = _clients[kk].getFD();
+	
+		std::cout << "fd= " << memberFd << std::endl;
+		if (!channel.hasMember(memberFd))
+			continue;
+		
+		std::string mname = _clients[kk].getName();
+		if (mname.empty())
+			mname = "*";
+		
+		if (channel.isOperator(memberFd))
+			mname = "@" + mname;
+		
+		std::cout << "DEBUG NAMES member fd=" << memberFd << " name=[" << _clients[kk].getName() << "] usedName=[" << mname << "]" << std::endl;
+		names << mname;
+
+		// detect if more members exist after kk
+		bool more = false;
+		
+		for (size_t kk2 = kk + 1; kk2 < _clients.size(); ++kk2)
+		{
+			if (channel.hasMember(_clients[kk2].getFD()))
+			{
+				more = true;
+				break;
+			}
+		}
+		if (more)
+			names << ' ';
+	}
+	std::string r353s = numRepChannel(353, client.getName(), channelName, names.str());
+	send(client.getFD(), r353s.c_str(), r353s.size(), 0);
+
+	std::string r366s = numRepChannel(366, client.getName(), channelName, "");
+	send(client.getFD(), r366s.c_str(), r366s.size(), 0);
 }
