@@ -31,7 +31,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 	}
 
 	bool sign = (mode[0] == '+');
-	if (mode.size() != 2)
+	if (mode.size() > 2)
 	{
 		std::string msg = numRepChannel(472, clientName, mode, "");
 		send(clientFd, msg.c_str(), msg.size(), 0);
