@@ -22,6 +22,8 @@ void Server::CommandClose(std::istringstream &iss, int clientFd)
 		return;
 
 	const std::string& chans = _clients[j].getActiveChannel();
+	if (chans == "")
+		return;
 	std::map<std::string, Channel>::iterator cit = _channels.find(chans);
 	cit->second.removeMember(clientFd);
 	cit->second.removeOperator(clientFd);
