@@ -4,12 +4,12 @@
 #include "../includes/Client.hpp"
 #include <unistd.h>
 
-Client::Client(): _name(""), _fd(-1), _ip(0), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
+Client::Client(): _name(""), _ip(0), _fd(-1), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
 {
 	return;
 }
 
-Client::Client(std::string name, int fd, std::string ip): _name(name), _fd(fd), _ip(ip), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
+Client::Client(std::string name, int fd, std::string ip): _name(name), _ip(ip), _fd(fd), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false)
 {
 	return;
 }
