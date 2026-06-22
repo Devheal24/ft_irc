@@ -426,7 +426,7 @@ void Server::removeClient(int clientFd)
 		{
 			cit->second.removeMember(clientFd);
 			cit->second.removeOperator(clientFd);
-			if (cit->second.memberCount() == 0)
+			if (cit->second.shouldClose(-1))
 			{
 				_channels.erase(cit);
 				std::cout << "channel erase (0 member)"  << std::endl;

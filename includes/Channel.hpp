@@ -35,6 +35,7 @@ public:
 	Channel(const std::string& name);
 
 	const std::string& getName() const;
+	bool shouldClose(int botFd) const;
 
 	//member
 	void addMember(int fd);

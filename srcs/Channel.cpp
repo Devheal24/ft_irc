@@ -22,6 +22,13 @@ const std::string& Channel::getName() const
 	return _name;
 }
 
+bool Channel::shouldClose(int botFd) const
+{
+	if (_members.size() > 1)
+		return false;
+	return _members.find(botFd) != _members.end();
+}
+
 // MEMBERS
 
 void Channel::addMember(int fd)
@@ -175,7 +182,7 @@ void Channel::botReply(const std::string& sender)
 	
 	size_t r = rand() % (_botMessages.size() + 1);
 	std::string msg;
-	if (r == _botMessages.size() + 1)
+	if (r == _botMessages.size())
 		msg = "Tu devrais te taire " + sender + "...";
 	else
 		msg = _botMessages[r];
