@@ -13,9 +13,16 @@ This project is to create a server while the purpose is to allow a text-based ch
 
 `./ircserv <port> <password>`
 
-Launch Hexchat and connect with the ip of the server.
+	- Launch Hexchat and connect with the ip of the server and port used by the server.
+	- Set a password in profile if needed.
+	- `/join #channelname` to join a channel. If it not exist, the command create one and you'll be channel's operator .
+	- As operator, use `/invite nickname` to invite a user in channel, if channel is in invite only.
+	- As operator, use `/kick nickname` to kick a user from channel.
+	- As operator, if the channel is topic restricted, use `/topic exemple` to change the channel's topic. Use `/topic` to display actual topic.
+	- As operator, use `/mode +i` to set channel in invite only. Remove with `/mode -i`. Use `/mode +t` to set channel in topic restricted.
 
 <h1 align="center"><video src="images/hexchat.mp4" autoplay loop muted width="1000"></video></h1>
+
 
 
 # <span style="color:white">Resources</span>
