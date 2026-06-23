@@ -48,10 +48,10 @@ void Server::CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd)
 	{
 		std::string wmsg = numRep(001, _clients[selfIdx].getName());
 		send(clientFd, wmsg.c_str(), wmsg.size(), 0);
-		std::cout << "DEBUG REGISTERED fd=" << clientFd << " nick=" << _clients[selfIdx].getName() << std::endl;
+		std::cout << "REGISTERED fd=" << clientFd << " nick=" << _clients[selfIdx].getName() << std::endl;
 		_clients[selfIdx].setFirstRegistered(false);
 	}
 
-	std::cout << "DEBUG PASS fd=" << clientFd << " pass=[" << pass << "]" << std::endl;
+	std::cout << "PASS fd=" << clientFd << " pass=[" << pass << "]" << std::endl;
 	return;
 }

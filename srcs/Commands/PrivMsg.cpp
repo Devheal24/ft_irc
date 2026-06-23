@@ -28,7 +28,7 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
 		std::map<std::string, Channel>::iterator it = _channels.find(target);
 		if (it == _channels.end())
 		{
-			std::cout << "DEBUG ROUTE missing channel target=[" << target << "] fd=" << clientFd << std::endl;
+			std::cout << "ROUTE missing channel target=[" << target << "] fd=" << clientFd << std::endl;
 			return;
 		}
 		_clients[selfIdx].setActiveChannel(target);
