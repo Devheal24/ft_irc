@@ -160,6 +160,7 @@ void Server::run_event_loop()
 		int ready = poll(&_fds[0], _fds.size(), -1);
 		if (ready <= 0)
 		{
+			std::cout << "errno= " << errno << std::endl;
 			if (errno == EINTR)
 				continue;
 			std::cerr << "poll fail" << std::endl;
@@ -207,6 +208,7 @@ void Server::run_event_loop()
 		// events on client sockets
 		for (size_t i = 1; i < _fds.size(); ++i)
 		{
+			std::cout << "??????here?????????????????????" << std::endl;
 			short revents = _fds[i].revents;
 			if (revents == 0)
 				continue;
@@ -225,6 +227,7 @@ void Server::run_event_loop()
 			{
 				int clientFd = _fds[i].fd;
 				bool connected = handleClientInput(clientFd);
+				std::cout << "afterhandle" << std::endl;
 				if (!connected)
 				{
 					std::cout << "client disconnected POLLIN fd " << clientFd << std::endl;
@@ -262,7 +265,10 @@ bool Server::handleClientInput(int clientFd)
 	// 	n = std::strlen(buf);
 	_data[clientFd].append(buf, n);
 	if (_data[clientFd].find("\n") == std::string::npos)
+	{
+		std::cout << "here?????????????????????" << std::endl;
 		return true;
+	}
 	std::string data = _data[clientFd];
 	_data[clientFd] = "";
 	// debug: raw data received
