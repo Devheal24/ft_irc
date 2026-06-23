@@ -1,11 +1,8 @@
 #include "../../includes/Server.hpp"
-#include <sstream>
 #include <iostream>
 
 void Server::CommandClose(int clientFd)
 {
-	std::cerr << "close cmd used " << std::endl;
-
 	size_t j = 0;
 	while (j < _clients.size() && _clients[j].getFD() != clientFd)
 		++j;
