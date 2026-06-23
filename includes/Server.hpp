@@ -42,7 +42,7 @@ private:
 	void CommandJoin(std::istringstream &iss, int clientFd);
 	bool CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd);
 	bool CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd);
-	void CommandClose(std::istringstream &iss, int clientFd);
+	void CommandClose(int clientFd);
 	void CommandQuit(std::istringstream &iss, int clientFd);
 	// Operators Commands
 	void CommandKick(std::istringstream &iss, int clientFd);

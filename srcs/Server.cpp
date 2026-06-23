@@ -74,9 +74,6 @@ bool Server::parse_data(char **av) {
  */
 static int set_nonblocking(int fd)
 {
-	/*int flags = fcntl(fd, F_GETFL, 0);
-	if (flags == -1)
-		return -1;*/
 	return fcntl(fd, F_SETFL, O_NONBLOCK);
 }
 
@@ -257,8 +254,6 @@ bool Server::handleClientInput(int clientFd)
 	ssize_t n = recv(clientFd, buf, sizeof(buf), 0);
 	if (n <= 0)
 		return false;
-	// if (n < 0)
-	// 	n = std::strlen(buf);
 	_data[clientFd].append(buf, n);
 	if (_data[clientFd].find("\n") == std::string::npos)
 		return true;

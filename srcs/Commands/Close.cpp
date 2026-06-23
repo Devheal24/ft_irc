@@ -2,17 +2,8 @@
 #include <sstream>
 #include <iostream>
 
-void Server::CommandClose(std::istringstream &iss, int clientFd)
+void Server::CommandClose(int clientFd)
 {
-	/*std::string tmp;
-	iss >> tmp;
-	if (!tmp.empty())
-	{
-		std::cout << "close syntaxe error" << std::endl;
-		return;
-	}*/
-	(void)iss;
-
 	std::cerr << "close cmd used " << std::endl;
 
 	size_t j = 0;
