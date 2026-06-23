@@ -52,6 +52,9 @@ std::string numRep(int code, const std::string& nick)
 	case 004:
 		msg = ":server 004 " + nick + " yourmasterdomain ft_irc-1.42 iotkl\r\n";
 		break;
+	case 412:
+		msg = msg + "No text to send\r\n";
+		break;
 	case 433:
 		msg = msg + "Nickname is already in use\r\n";
 		break;
@@ -97,6 +100,9 @@ std::string numRepChannel(int code, const std::string& nick, const std::string& 
 		break;
 	case 403:
 		msg = msg + " :No such channel\r\n";
+		break;
+	case 404:
+		msg = msg + " :You are not in the channel\r\n";
 		break;
 	case 417:
 		msg = msg + " :Input line was too long\r\n";
