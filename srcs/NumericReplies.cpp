@@ -15,6 +15,17 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <ctime>
+
+static std::string getCurrentDate()
+{
+	std::time_t now = std::time(NULL);
+	std::tm *tm = std::localtime(&now);
+
+	char buffer[128];
+	std::strftime(buffer, sizeof(buffer), "%b %d %Y at %H:%M:%S", tm);
+	return std::string(buffer);
+}
 
 std::string numRep(int code, const std::string& nick)
 {
@@ -28,6 +39,18 @@ std::string numRep(int code, const std::string& nick)
 	{
 	case 001:
 		msg = msg + "Welcome to the IRC server, " + nick + "\r\n";
+		break;
+	case 002:
+		msg = msg + "Your host is yourmasterdomain, running version ft_irc-1.42\r\n";
+		break;
+	case 003:
+	{
+		std::string date = getCurrentDate();
+		msg = msg + "This server was created " + date + " UTC+01:00\r\n";
+		break;
+	}
+	case 004:
+		msg = ":server 004 " + nick + " yourmasterdomain ft_irc-1.42 iotkl\r\n";
 		break;
 	case 433:
 		msg = msg + "Nickname is already in use\r\n";
@@ -75,6 +98,9 @@ std::string numRepChannel(int code, const std::string& nick, const std::string& 
 	case 403:
 		msg = msg + " :No such channel\r\n";
 		break;
+	case 417:
+		msg = msg + " :Input line was too long\r\n";
+		break;
 	case 441:
 		msg = msg + " :No such nick on that channel\r\n";
 		break;
@@ -88,7 +114,7 @@ std::string numRepChannel(int code, const std::string& nick, const std::string& 
 		msg = msg + " :Cannot join, channel is full (+l)\r\n";
 		break;
 	case 472:
-		msg = msg + " :is unknown mode char" + channel + "\r\n";
+		msg = msg + " :is unknown mode char " + channel + "\r\n";
 		break;
 	case 473:
 		msg = msg + " :Cannot join, channel is in invite only (+i)\r\n";

@@ -1,6 +1,7 @@
 #include "../../../includes/Server.hpp"
 #include <sstream>
 #include <cstdlib>
+#include <iostream>
 
 void Server::CommandMode(std::istringstream &iss, int clientFd)
 {
@@ -30,27 +31,45 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 		return ;
 	}
 
-	bool sign = (mode[0] == '+');
-	if (mode.size() > 2)
+	int		count[3] = {0, 0, 0};
+	bool	sign;
+	switch (mode[0])
 	{
+	case '+':
+		sign = true;
+		break;
+	case '-':
+		sign = false;
+		break;
+	default:
 		std::string msg = numRepChannel(472, clientName, mode, "");
 		send(clientFd, msg.c_str(), msg.size(), 0);
-		return ;
+		return;
 	}
+
 	for (size_t i = 1; i < mode.size(); i++)
 	{
 		switch (mode[i])
 		{
 		case 'i':
-			ch.setInviteOnly(sign);
-			ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode + "\r\n");
+			if ((!ch.isInviteOnly() && sign) || (ch.isInviteOnly() && !sign))
+			{
+				ch.setInviteOnly(sign);
+				ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode[0] + mode[i] + "\r\n");
+			}
 			break;
 		case 't':
-			ch.setTopicRestricted(sign);
-			ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode + "\r\n");
+			if ((!ch.isTopicRestricted() && sign) || (ch.isTopicRestricted() && !sign))
+			{
+				ch.setTopicRestricted(sign);
+				ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode[0] + mode[i] + "\r\n");
+			}
 			break;
 		case 'k':
 		{
+			if (count[0] > 0)
+				break;
+			count[0]++;
 			std::string key;
 			iss >> key;
 			if (key.empty())
@@ -64,7 +83,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 				if (ch.getKey().empty())
 				{
 					ch.setKey(key);
-					ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode + " " + key + "\r\n");	
+					ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode[0] + mode[i] + " " + key + "\r\n");	
 					break;
 				}
 			}
@@ -73,7 +92,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 				if (ch.getKey() == key)
 				{
 					ch.removeKey();
-					ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode + "\r\n");
+					ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode[0] + mode[i] + "\r\n");
 					break;
 				}
 			}
@@ -83,6 +102,9 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 		}
 		case 'o':
 		{
+			if (count[1] > 0)
+				break;
+			count[1]++;
 			std::string targetName;
 			iss >> targetName;
 
@@ -103,11 +125,14 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 				ch.addOperator(targetFd);
 			else
 				ch.removeOperator(targetFd);
-			ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode + " " + targetName + "\r\n");
+			ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode[0] + mode[i] + " " + targetName + "\r\n");
 			break;
 		}
 		case 'l':
 		{
+			if (count[2] > 0)
+				break;
+			count[2]++;
 			if (sign == true)
 			{
 				std::string param;
@@ -126,7 +151,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 					return ;
 				ch.setLimit(static_cast<size_t>(limit));
 				std::ostringstream oss;
-				oss << ":" << getClientPrefix(clientFd) << " MODE " << channel << " " << mode << " " << limit << "\r\n";
+				oss << ":" << getClientPrefix(clientFd) << " MODE " << channel << " " << mode[0] << mode[i] << " " << limit << "\r\n";
 				std::string s = oss.str();
 				ch.broadcast(s);
 			}
@@ -135,7 +160,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 				if (ch.haslimit())
 				{
 					ch.removeLimit();
-					ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode + "\r\n");	
+					ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode[0] + mode[i] + "\r\n");	
 				}
 			}
 			break;

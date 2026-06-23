@@ -7,7 +7,7 @@ void Server::CommandTopic(std::istringstream &iss, int clientFd)
 	std::string NewTopic;
 
 	iss >> channel;
-	iss >> NewTopic;
+	std::getline(iss, NewTopic);
 	topic(clientFd, channel, NewTopic);
 }
 
@@ -58,11 +58,16 @@ void Server::topic(int clientFd, const std::string& channelName, std::string& ne
 		send(clientFd, msg.c_str(), msg.size(), 0);
 		return ;
 	}
-
 	if (newTopic[0] == ' ')
 		newTopic.erase(0, 1);
 	if (newTopic[0] == ':')
 		newTopic.erase(0, 1);
+	if (newTopic.size() > 512)
+	{
+		std::string msg = numRepChannel(417, clientName, "TOPIC", "");
+		send(clientFd, msg.c_str(), msg.size(), 0);
+		return ;
+	}
 	ch.setTopic(newTopic);
 	std::string msg = ":" + getClientPrefix(clientFd) + " TOPIC " + channelName + " :" + newTopic + "\r\n";
 	ch.broadcast(msg);
