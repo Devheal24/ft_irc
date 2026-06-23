@@ -29,6 +29,9 @@ std::string numRep(int code, const std::string& nick)
 	case 001:
 		msg = msg + "Welcome to the IRC server, " + nick + "\r\n";
 		break;
+	case 412:
+		msg = msg + "No text to send\r\n";
+		break;
 	case 433:
 		msg = msg + "Nickname is already in use\r\n";
 		break;
@@ -74,6 +77,9 @@ std::string numRepChannel(int code, const std::string& nick, const std::string& 
 		break;
 	case 403:
 		msg = msg + " :No such channel\r\n";
+		break;
+	case 404:
+		msg = msg + " :You are not in the channel\r\n";
 		break;
 	case 441:
 		msg = msg + " :No such nick on that channel\r\n";

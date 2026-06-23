@@ -19,6 +19,12 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
 	if (!message.empty() && message[0] == ':')
 		message.erase(0, 1);
 
+	if (message.empty())
+	{
+		std::string msg = numRep(412, _clients[selfIdx].getName());
+		send(clientFd, msg.c_str(), msg.size(), 0);
+		return;
+	}
 	std::string nick = _clients[selfIdx].getName();
 	if (nick.empty())
 		nick = "client";
@@ -26,9 +32,11 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
 	if (!target.empty() && (target[0] == '#' || target[0] == '&'))
 	{
 		std::map<std::string, Channel>::iterator it = _channels.find(target);
-		if (it == _channels.end())
+		if (it == _channels.end() || !it->second.hasMember(clientFd))
 		{
 			std::cout << "ROUTE missing channel target=[" << target << "] fd=" << clientFd << std::endl;
+			std::string msg = numRepChannel(404, _clients[selfIdx].getName(), target, "");
+			send(clientFd, msg.c_str(), msg.size(), 0);
 			return;
 		}
 		_clients[selfIdx].setActiveChannel(target);
@@ -41,25 +49,18 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
 		return;
 	}
 
-	bool delivered = false;
 	for (size_t k = 0; k < _clients.size(); ++k)
 	{
-		if (_clients[k].getFD() == clientFd)
-			continue;
 		if (_clients[k].getName() == target)
 		{
 			std::ostringstream prefixMsg;
 			prefixMsg << ":" << nick << "!" << _clients[selfIdx].getUsername() << "@localhost " << token << " " << target << " :" << message << "\r\n";
 			std::string formatted = prefixMsg.str();
 			send(_clients[k].getFD(), formatted.c_str(), formatted.size(), 0);
-			delivered = true;
-			break;
+			return;
 		}
 	}
-	if (!delivered)
-	{
-		std::string msg = numRepChannel(401, nick, target, "");
-		send(clientFd, msg.c_str(), msg.size(), 0);
-	}
+	std::string msg = numRepChannel(401, nick, target, "");
+	send(clientFd, msg.c_str(), msg.size(), 0);
 	return;
 }
