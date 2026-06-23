@@ -4,12 +4,12 @@
 #include "../includes/Client.hpp"
 #include <unistd.h>
 
-Client::Client(): _name(""), _ip(0), _fd(-1), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false), _isBot(false), _firstregistered(false)
+Client::Client(): _name(""), _ip(0), _fd(-1), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false), _isBot(false), _firstregistered(true)
 {
 	return;
 }
 
-Client::Client(std::string name, int fd, std::string ip): _name(name), _ip(ip), _fd(fd), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false), _isBot(false), _firstregistered(false)
+Client::Client(std::string name, int fd, std::string ip): _name(name), _ip(ip), _fd(fd), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false), _isBot(false), _firstregistered(true)
 {
 	return;
 }
@@ -87,7 +87,7 @@ void Client::setNick(const std::string& nick)
 	if (_hasUser && _hasNick && _hasPass)
 	{
 		this->setRegistered(true);
-		this->setFirstRegistered(true);
+		//this->setFirstRegistered(true);
 	}
 }
 
@@ -99,7 +99,7 @@ void Client::setUser(const std::string& user, const std::string& real)
 	if (_hasUser && _hasNick && _hasPass)
 	{
 		this->setRegistered(true);
-		this->setFirstRegistered(true);
+		//this->setFirstRegistered(true);
 	}
 }
 
@@ -115,7 +115,7 @@ void Client::setPass(const std::string& pass)
 	if (_hasUser && _hasNick && _hasPass)
 	{
 		this->setRegistered(true);
-		this->setFirstRegistered(true);
+		//this->setFirstRegistered(true);
 	}
 }
 

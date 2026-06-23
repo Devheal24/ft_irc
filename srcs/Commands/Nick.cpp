@@ -37,7 +37,7 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 	}
 	
 	_clients[selfIdx].setNick(nick);
-	if (_clients[selfIdx].getFirstRegistered() == true)
+	if (_clients[selfIdx].getFirstRegistered() == true && _clients[selfIdx].isRegistered())
 	{
 		std::string wmsg = numRep(001, _clients[selfIdx].getName());
 		send(clientFd, wmsg.c_str(), wmsg.size(), 0);
