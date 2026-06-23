@@ -324,31 +324,14 @@ bool Server::handleClientInput(int clientFd)
 			if (CommandUser(iss, selfIdx, clientFd) == false)
 				return false;
 			continue;
+        }
+        if (token == "QUIT" || token == "/QUIT")
+		{
+			CommandQuit(iss, clientFd);
+			close(clientFd);
+			continue;
 		}
-		//check if nick+user set (pwd optional)
-		// int i;
-		// for (i = 0; i < (int)_clients.size(); ++i)
-		// {
-		//	 if (_clients[i].getFD() == clientFd)
-		//	 {
-		//		 if (_clients[i].getFullLog() == false)
-		//		 {
-		//			 std::cout << _clients[i].getName() << std::endl;
-		//			 std::cout << _clients[i].getUsername() << std::endl;
-		//			 if (_clients[i].getName().empty() || _clients[i].getUsername().empty())
-		//			 {
-		//				 std::cerr << "client is not fully logged-in" << std::endl;
-		//				 break;
-		//			 }
-		//			 else
-						// _clients[i].setFullLog(true);
-		//			 break;
-		//		 }
-		//	 }
-		// }
-		// if (!_clients[i].getFullLog())
-		//	 break;
-
+    
 		//check if nick+user set (pwd optional)
 		int i;
 		for (i = 0; i < (int)_clients.size(); ++i)
@@ -357,14 +340,8 @@ bool Server::handleClientInput(int clientFd)
 				break;
 			std::cout << "test" << std::endl;
 		}
-		if (token == "QUIT" || token == "/QUIT")
-		{
-			CommandQuit(iss, clientFd);
-			close(clientFd);
-			continue;
-		}
 		std::cout << "is client registered = " << _clients[i].isRegistered() << std::endl;
-		if (!_clients[i].isRegistered())
+		if (!_clients[i].isRegistered() || _clients[i].getPass() != _pwd)
 		{
 			std::cout << _clients[i].getName() << std::endl;
 			std::cout << _clients[i].getUsername() << std::endl;

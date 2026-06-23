@@ -32,7 +32,7 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 		}
 	}
 	
-	bool wasRegistered = _clients[selfIdx].isRegistered();
+	//bool wasRegistered = _clients[selfIdx].isRegistered();
 	_clients[selfIdx].setNick(nick);
 
 	size_t j = -1;
@@ -49,7 +49,7 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 
 	std::cout << "DEBUG NICK fd=" << clientFd << " nick=[" << nick << "] registered=" << _clients[selfIdx].isRegistered() << std::endl;
 
-	if (!wasRegistered && _clients[selfIdx].isRegistered())
+	/*if (!wasRegistered && _clients[selfIdx].isRegistered())
 	{
 		bool needPass = !_pwd.empty();
 		bool hasPass = !_clients[selfIdx].getPass().empty();
@@ -66,6 +66,6 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 			send(clientFd, wmsg.c_str(), wmsg.size(), 0);
 			std::cout << "DEBUG REGISTERED fd=" << clientFd << " nick=" << nick << std::endl;
 		}
-	}
+	}*/
 	return true;
 }

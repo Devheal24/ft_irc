@@ -38,7 +38,7 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 		}
 	}
 
-	bool wasRegistered = _clients[selfIdx].isRegistered();
+	//bool wasRegistered = _clients[selfIdx].isRegistered();
 	_clients[selfIdx].setUser(user, real);
 
 	size_t j = -1;
@@ -52,7 +52,7 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 
 	std::cout << "DEBUG USER fd=" << clientFd << " user=[" << user << "] real=[" << real << "] registered=" << _clients[selfIdx].isRegistered() << std::endl;
 
-	if (!wasRegistered && _clients[selfIdx].isRegistered())
+	/*if (!wasRegistered && _clients[selfIdx].isRegistered())
 	{
 		std::string nick = _clients[selfIdx].getName();
 		bool needPass = !_pwd.empty();
@@ -72,6 +72,6 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 			send(clientFd, wmsg.c_str(), wmsg.size(), 0);
 			std::cout << "DEBUG REGISTERED fd=" << clientFd << " nick=" << nick << std::endl;
 		}
-	}
+	}*/
 	return true;
 }

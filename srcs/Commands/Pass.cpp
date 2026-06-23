@@ -29,11 +29,13 @@ void Server::CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd)
 		}
 	}
 
-	/*if (pass != _pwd)
+	if (pass != _pwd)
 	{
-		std::cout << "passeword doesnt match server pwd" << pass << std::endl;
+		//std::cout << "passeword doesnt match server pwd" << pass << std::endl;
+		/*std::string msg ="password doesnt match server pwd\r\n";
+		send(clientFd, msg.c_str(), msg.length(), 0);*/
 		return;
-	}*/
+	}
 
 	_clients[selfIdx].setPass(pass);
 
