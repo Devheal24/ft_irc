@@ -31,6 +31,7 @@ private:
 	std::vector< Client >			_clients;
 	std::vector<struct pollfd>		_fds;
 	std::map<std::string, Channel>	_channels;
+	std::map<int, std::string>		_data;
 
 	// Users Commands
 	void CommandPrivMsg(std::istringstream &iss, std::string &token, size_t selfIdx, int clientFd);
