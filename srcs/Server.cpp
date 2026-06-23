@@ -1,14 +1,14 @@
 /**
  * @include <iostream> : (std::cout / std::cerr)
- * @include <unistd.h> : fonctions POSIX (close, read, write, etc.)
- * @include <netinet/in.h> : structures d'adressage réseau (sockaddr_in) for bind/accept
+ * @include <unistd.h> : functions POSIX (close, read, write, etc.)
+ * @include <netinet/in.h> : (sockaddr_in) for bind/accept
  * @include <cstdlib> : atoi
- * @include <fcntl.h> : contrôle des fichiers (fcntl) pour set non-blocking
- * @include <vector> : conteneur pour la liste des pollfd
- * @include <cerrno> : codes d'erreur POSIX (errno) for accept() or revents
- * @include <cstring> : C manipulation mémoire/chaînes
- * @include <arpa/inet.h> : conversions d'adresses réseau (htons, inet_*) for addr_in (port
- * @include <sstream> : flux sur chaînes/string
+ * @include <fcntl.h> : set files (fcntl) for setting non-blocking
+ * @include <vector> : contenor for pollfd lst
+ * @include <cerrno> : error code POSIX (errno) for accept() or revents
+ * @include <cstring> : C memorie manipulation
+ * @include <arpa/inet.h> : addr web conversion(htons, inet_*) for addr_in (port
+ * @include <sstream> : flux for string
  * @include <sys/socket.h> : API sockets (socket, bind, listen, accept, send)
  */
 #include "../includes/Server.hpp"

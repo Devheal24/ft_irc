@@ -3,8 +3,8 @@
 # define CLIENT_HPP
 
 /**
- * @include <string> : stockage des noms et opérations sur chaînes check
- * @include <set> : structure pour membres/operateurs/invitations sans doublons check
+ * @include <string> : store labels
+ * @include <set> : structure for member/operators/invitations
  */
 #include <arpa/inet.h>
 #include <string>
