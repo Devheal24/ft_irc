@@ -1,6 +1,6 @@
 #include "../../includes/Server.hpp"
 
-void Server::CommandQuit(std::istringstream &iss, int clientFd)
+void Server::CommandQuit(int clientFd)
 {
 	Client* client = getClientByFd(clientFd);
 	
@@ -13,7 +13,7 @@ void Server::CommandQuit(std::istringstream &iss, int clientFd)
 		{
 			client->setActiveChannel(it->second.getName());
 			++it;
-			CommandClose(iss, clientFd);
+			CommandClose(clientFd);
 
 		}
 		else

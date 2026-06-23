@@ -3,9 +3,9 @@
 # define SERVER_HPP
 
 /**
- * @include <vector> : conteneur séquentiel utilisé pour clients
- * @include <map> : table (key->value) utilisée pour channels par nom
- * @include <poll.h> : interface poll() pour multiplexage
+ * @include <vector> : conteneur séquentiel utilisé pour clients check
+ * @include <map> : table (key->value) utilisée pour channels par nom check
+ * @include <poll.h> : interface poll() pour multiplexage check
  */
 #include "../includes/Channel.hpp"
 #include "../includes/Client.hpp"
@@ -43,7 +43,7 @@ private:
 	bool CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd);
 	bool CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd);
 	void CommandClose(int clientFd);
-	void CommandQuit(std::istringstream &iss, int clientFd);
+	void CommandQuit(int clientFd);
 	// Operators Commands
 	void CommandKick(std::istringstream &iss, int clientFd);
 	void CommandInvite(std::istringstream &iss, int clientFd);

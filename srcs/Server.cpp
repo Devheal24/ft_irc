@@ -312,7 +312,7 @@ bool Server::handleClientInput(int clientFd)
         }
         if (token == "QUIT" || token == "/QUIT")
 		{
-			CommandQuit(iss, clientFd);
+			CommandQuit(clientFd);
 			close(clientFd);
 			continue;
 		}
@@ -367,7 +367,7 @@ bool Server::handleClientInput(int clientFd)
 		}
 		if (token == "PART" || token == "/PART")
 		{
-			CommandClose(iss, clientFd);
+			CommandClose(clientFd);
 			continue;
 		}
 		std::cout << "IGNORED fd=" << clientFd << " line=[" << line << std::endl << std::endl;
