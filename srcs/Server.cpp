@@ -208,27 +208,28 @@ void Server::run_event_loop()
 			if (revents == 0)
 				continue;
 
+			int clientFd = _fds[i].fd;
 			if (revents & (POLLHUP | POLLERR | POLLNVAL))
 			{
-				std::cout << "client disconnected POLLHUP fd " << _fds[i].fd << std::endl;
-				removeClient(_fds[i].fd);
-				close(_fds[i].fd);
-				_fds.erase(_fds.begin() + i);
-				--i;
-				continue;
+				std::cout << "client disconnected POLLHUP fd " << clientFd << std::endl;
+				// removeClient(clientFd);
+				CommandQuit(clientFd, 1);
+				// _fds.erase(_fds.begin() + i);
+				// --i;
+				break;
 			}
 			// if a client have send something we handle what we received
 			if (revents & POLLIN)
 			{
-				int clientFd = _fds[i].fd;
 				bool connected = handleClientInput(clientFd);
 				if (!connected)
 				{
 					std::cout << "client disconnected POLLIN fd " << clientFd << std::endl;
-					removeClient(clientFd);
-					close(clientFd);
-					_fds.erase(_fds.begin() + i);
-					--i;
+					// removeClient(clientFd);
+					CommandQuit(clientFd, 1);
+					// _fds.erase(_fds.begin() + i);
+					// --i;
+					break;
 				}
 			}
 		}
@@ -312,8 +313,7 @@ bool Server::handleClientInput(int clientFd)
         }
         if (token == "QUIT" || token == "/QUIT")
 		{
-			CommandQuit(clientFd);
-			close(clientFd);
+			CommandQuit(clientFd, 0);
 			continue;
 		}
 
@@ -324,7 +324,6 @@ bool Server::handleClientInput(int clientFd)
 			if (_clients[i].getFD() == clientFd)
 				break;
 		}
-		std::cout << "is client registered = " << _clients[i].isRegistered() << std::endl;
 		if (!_clients[i].isRegistered())
 		{
 			std::cout << _clients[i].getName() << std::endl;

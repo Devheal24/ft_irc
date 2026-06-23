@@ -48,8 +48,11 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 		}
 	}
 
-	std::string msg = ":" + _clients[selfIdx].getName() + "!" + _clients[selfIdx].getUsername() + " NICK " + nick + "\r\n";
-	send(clientFd, msg.c_str(), msg.size(), 0);
+	if (_clients[selfIdx].getFirstRegistered() == false && nick != _clients[selfIdx].getName())
+	{
+		std::string msg = ":" + _clients[selfIdx].getName() + "!" + _clients[selfIdx].getUsername() + " NICK " + nick + "\r\n";
+		send(clientFd, msg.c_str(), msg.size(), 0);
+	}
 
 	_clients[selfIdx].setNick(nick);
 	if (_clients[selfIdx].getHasName() && _clients[selfIdx].getHasNick() && (_clients[selfIdx].getHasPass() || _pwd.empty()))
