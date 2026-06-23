@@ -28,6 +28,7 @@ class Client
 		bool					_hasUser;
 		bool					_registered;
 		bool					_isBot;
+		bool					_firstregistered;
 	
 	public:
 		Client();
@@ -48,9 +49,11 @@ class Client
 		void 		setUser(const std::string& user, const std::string& real);
 		void 		setPass(const std::string& pass);
 		void 		setRegistered(bool state);
+		void		setFirstRegistered(bool state);
 		void 		setFD(int fd);
 		bool 		isRegistered() const;
 		std::string getPass() const;
+		bool		getFirstRegistered();
 		bool 		hasPass() const;
 
 		std::string 					getActiveChannel() const;

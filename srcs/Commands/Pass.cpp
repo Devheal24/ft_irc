@@ -18,26 +18,37 @@ void Server::CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd)
 	if (!pass.empty() && (pass.length() < PWD_MINXL || pass.length() > PWD_MAXL))
 	{
 		std::cout << "invalid length of pass (64> || <8)" << pass << std::endl;
+		std::string msg =":server NOTICE :invalid length of pass (64> || <8)\r\n";
+		send(clientFd, msg.c_str(), msg.length(), 0);
 		return;
 	}
 	for (size_t i = 0; i < pass.length(); i++)
 	{
 		if (!isprint(pass[i]) && pass[i] != '_' && pass[i] != '-')
 		{
-			std::cout << "invalid character in passname" << pass << std::endl;
+			std::cout << "invalid character in password" << pass << std::endl;
+			std::string msg =":server NOTICE :invalid character in password\r\n";
+			send(clientFd, msg.c_str(), msg.length(), 0);
 			return;
 		}
 	}
 
 	if (pass != _pwd)
 	{
-		//std::cout << "passeword doesnt match server pwd" << pass << std::endl;
-		/*std::string msg ="password doesnt match server pwd\r\n";
-		send(clientFd, msg.c_str(), msg.length(), 0);*/
+		std::cout << "passeword doesnt match server pwd" << pass << std::endl;
+		std::string msg =":server NOTICE :password doesnt match server pwd\r\n";
+		send(clientFd, msg.c_str(), msg.length(), 0);
 		return;
 	}
 
 	_clients[selfIdx].setPass(pass);
+	if (_clients[selfIdx].getFirstRegistered() == true)
+	{
+		std::string wmsg = numRep(001, _clients[selfIdx].getName());
+		send(clientFd, wmsg.c_str(), wmsg.size(), 0);
+		std::cout << "DEBUG REGISTERED fd=" << clientFd << " nick=" << _clients[selfIdx].getName() << std::endl;
+		_clients[selfIdx].setFirstRegistered(false);
+	}
 
 	std::cout << "DEBUG PASS fd=" << clientFd << " pass=[" << pass << "]" << std::endl;
 	return;

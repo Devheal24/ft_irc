@@ -341,14 +341,15 @@ bool Server::handleClientInput(int clientFd)
 			std::cout << "test" << std::endl;
 		}
 		std::cout << "is client registered = " << _clients[i].isRegistered() << std::endl;
-		if (!_clients[i].isRegistered() || _clients[i].getPass() != _pwd)
+		if (!_clients[i].isRegistered())
 		{
 			std::cout << _clients[i].getName() << std::endl;
 			std::cout << _clients[i].getUsername() << std::endl;
 			std::cerr << "client is not fully logged-in" << std::endl;
+            std::string msg =":server NOTICE :you are not fully logged in (PASS/USER/NICK)\r\n";
+			send(clientFd, msg.c_str(), msg.length(), 0);
 			continue;
 		}
-
 
 		if (token == "JOIN" || token == "/JOIN")
 		{

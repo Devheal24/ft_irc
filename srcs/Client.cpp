@@ -4,12 +4,12 @@
 #include "../includes/Client.hpp"
 #include <unistd.h>
 
-Client::Client(): _name(""), _ip(0), _fd(-1), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false), _isBot(false)
+Client::Client(): _name(""), _ip(0), _fd(-1), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false), _isBot(false), _firstregistered(false)
 {
 	return;
 }
 
-Client::Client(std::string name, int fd, std::string ip): _name(name), _ip(ip), _fd(fd), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false), _isBot(false)
+Client::Client(std::string name, int fd, std::string ip): _name(name), _ip(ip), _fd(fd), _joinedChannels(), _activeChannel(""), _username(""), _realname(""), _pass(""), _hasPass(false), _hasNick(false), _hasUser(false), _registered(false), _isBot(false), _firstregistered(false)
 {
 	return;
 }
@@ -42,6 +42,7 @@ Client &Client::operator=(const Client &base)
 		this->_hasUser = base._hasUser;
 		this->_registered = base._registered;
 		this->_isBot = base._isBot;
+		this->_firstregistered = base._firstregistered;
 	}
 	return (*this);
 }
@@ -83,8 +84,11 @@ void Client::setNick(const std::string& nick)
 {
 	_name = nick;
 	_hasNick = true;
-	if (_hasUser && _hasNick)
+	if (_hasUser && _hasNick && _hasPass)
+	{
 		this->setRegistered(true);
+		this->setFirstRegistered(true);
+	}
 }
 
 void Client::setUser(const std::string& user, const std::string& real)
@@ -92,8 +96,11 @@ void Client::setUser(const std::string& user, const std::string& real)
 	_username = user;
 	_realname = real;
 	_hasUser = true;
-	if (_hasUser && _hasNick)
+	if (_hasUser && _hasNick && _hasPass)
+	{
 		this->setRegistered(true);
+		this->setFirstRegistered(true);
+	}
 }
 
 void Client::setRegistered(bool state) {
@@ -105,6 +112,19 @@ void Client::setPass(const std::string& pass)
 {
 	_pass = pass;
 	_hasPass = true;
+	if (_hasUser && _hasNick && _hasPass)
+	{
+		this->setRegistered(true);
+		this->setFirstRegistered(true);
+	}
+}
+
+void Client::setFirstRegistered(bool state)
+{
+	_firstregistered = state;
+}
+bool Client::getFirstRegistered(){
+	return _firstregistered;
 }
 
 bool Client::isRegistered() const
