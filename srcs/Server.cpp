@@ -158,7 +158,7 @@ void Server::run_event_loop()
 	while (!g_sig)
 	{
 		int ready = poll(&_fds[0], _fds.size(), -1);
-		if (ready < 0)
+		if (ready <= 0)
 		{
 			if (errno == EINTR)
 				continue;
@@ -253,32 +253,24 @@ void Server::run_event_loop()
 bool Server::handleClientInput(int clientFd)
 {
 	char buf[1024];
-	std::string data;
-	while (true)
-	{
-		std::memset(buf, 0, sizeof(buf));
-		ssize_t n = recv(clientFd, buf, sizeof(buf), 0);
-		if (n == 0)
-			return false;
-		if (n < 0)
-			n = std::strlen(buf);
-		data.append(buf, n);
-		if (data.find("\n") != std::string::npos)
-			break;
-	}
-
+	std::memset(buf, 0, sizeof(buf));
+	ssize_t n = recv(clientFd, buf, sizeof(buf), 0);
+	std::cout << "n= " << n << std::endl;
+	if (n <= 0)
+		return false;
+	// if (n < 0)
+	// 	n = std::strlen(buf);
+	_data[clientFd].append(buf, n);
+	if (_data[clientFd].find("\n") == std::string::npos)
+		return true;
+	std::string data = _data[clientFd];
+	_data[clientFd] = "";
 	// debug: raw data received
 	std::cout << "DEBUG RECV fd=" << clientFd << " ->[" << data << std::endl;
 
 	size_t selfIdx = 0;
 	while (selfIdx < _clients.size() && _clients[selfIdx].getFD() != clientFd)
 		++selfIdx;
-
-	// ensure we have a client placeholder
-	// if (selfIdx == _clients.size()) {
-	//	 _clients.push_back(Client(std::string(""), clientFd));
-	//	 selfIdx = _clients.size() - 1;
-	// }
 
 	// split data into lines by LF, trim CR, and process each line
 	std::vector<std::string> lines;
@@ -325,31 +317,7 @@ bool Server::handleClientInput(int clientFd)
 				return false;
 			continue;
 		}
-		//check if nick+user set (pwd optional)
-		// int i;
-		// for (i = 0; i < (int)_clients.size(); ++i)
-		// {
-		//	 if (_clients[i].getFD() == clientFd)
-		//	 {
-		//		 if (_clients[i].getFullLog() == false)
-		//		 {
-		//			 std::cout << _clients[i].getName() << std::endl;
-		//			 std::cout << _clients[i].getUsername() << std::endl;
-		//			 if (_clients[i].getName().empty() || _clients[i].getUsername().empty())
-		//			 {
-		//				 std::cerr << "client is not fully logged-in" << std::endl;
-		//				 break;
-		//			 }
-		//			 else
-						// _clients[i].setFullLog(true);
-		//			 break;
-		//		 }
-		//	 }
-		// }
-		// if (!_clients[i].getFullLog())
-		//	 break;
 
-		//check if nick+user set (pwd optional)
 		int i;
 		for (i = 0; i < (int)_clients.size(); ++i)
 		{
@@ -441,6 +409,7 @@ void Server::removeClient(int clientFd)
 		}
 	}
 
+	_data.erase(clientFd);
 	_clients.erase(_clients.begin() + j);
 	display_status();
 }

@@ -9,6 +9,4 @@
 comprendre l'utilisation de errno apres le poll (pour le sujet de correction)
 Enlever les debugs.
 Co^Dmm^Dand^D
-bot.
- :is unknown mode char apparait au debut
 # end
