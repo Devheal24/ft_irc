@@ -260,7 +260,6 @@ bool Server::handleClientInput(int clientFd)
 		return true;
 	std::string data = _data[clientFd];
 	_data[clientFd] = "";
-	// debug: raw data received
 
 	size_t selfIdx = 0;
 	while (selfIdx < _clients.size() && _clients[selfIdx].getFD() != clientFd)

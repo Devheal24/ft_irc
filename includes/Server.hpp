@@ -3,9 +3,9 @@
 # define SERVER_HPP
 
 /**
- * @include <vector> : conteneur séquentiel utilisé pour clients check
- * @include <map> : table (key->value) utilisée pour channels par nom check
- * @include <poll.h> : interface poll() pour multiplexage check
+ * @include <vector> : container use for client check
+ * @include <map> : table (key->value) use for check channel's name
+ * @include <poll.h> : interface poll() for multiplexage check
  */
 #include "../includes/Channel.hpp"
 #include "../includes/Client.hpp"
