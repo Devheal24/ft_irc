@@ -160,7 +160,6 @@ void Server::run_event_loop()
 		int ready = poll(&_fds[0], _fds.size(), -1);
 		if (ready <= 0)
 		{
-			std::cout << "errno= " << errno << std::endl;
 			if (errno == EINTR)
 				continue;
 			std::cerr << "poll fail" << std::endl;
