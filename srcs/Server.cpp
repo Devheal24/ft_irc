@@ -50,7 +50,6 @@ bool Server::parse_data(char **av) {
 		std::cerr << "Error\n -> port parsing : " << av[1] << std::endl;
 		return false;  
 	}
-	std::cout << "Debug _port : " << GetPort() << std::endl;
 
 	//pwd parsing
 	this->SetPwd(static_cast<std::string>(av[2]));
@@ -67,7 +66,6 @@ bool Server::parse_data(char **av) {
 			return false;
 		}
 	}
-	std::cout << "Debug _pwd: " << GetPwd() << std::endl;
 	return true;
 };
 
@@ -153,7 +151,9 @@ void Server::run_event_loop()
 	listen_pollfd.revents = 0;
 	_fds.push_back(listen_pollfd);
 
-	std::cout << "Server listening (event loop)" << std::endl;
+	std::cout << "Server port: " << _port << std::endl;
+	std::cout << "Server password: " << _pwd << std::endl;
+	std::cout << "Server listening ..." << std::endl;
 
 	while (!g_sig)
 	{
@@ -208,7 +208,6 @@ void Server::run_event_loop()
 		// events on client sockets
 		for (size_t i = 1; i < _fds.size(); ++i)
 		{
-			std::cout << "??????here?????????????????????" << std::endl;
 			short revents = _fds[i].revents;
 			if (revents == 0)
 				continue;
@@ -227,7 +226,6 @@ void Server::run_event_loop()
 			{
 				int clientFd = _fds[i].fd;
 				bool connected = handleClientInput(clientFd);
-				std::cout << "afterhandle" << std::endl;
 				if (!connected)
 				{
 					std::cout << "client disconnected POLLIN fd " << clientFd << std::endl;
@@ -258,21 +256,16 @@ bool Server::handleClientInput(int clientFd)
 	char buf[1024];
 	std::memset(buf, 0, sizeof(buf));
 	ssize_t n = recv(clientFd, buf, sizeof(buf), 0);
-	std::cout << "n= " << n << std::endl;
 	if (n <= 0)
 		return false;
 	// if (n < 0)
 	// 	n = std::strlen(buf);
 	_data[clientFd].append(buf, n);
 	if (_data[clientFd].find("\n") == std::string::npos)
-	{
-		std::cout << "here?????????????????????" << std::endl;
 		return true;
-	}
 	std::string data = _data[clientFd];
 	_data[clientFd] = "";
 	// debug: raw data received
-	std::cout << "DEBUG RECV fd=" << clientFd << " ->[" << data << std::endl;
 
 	size_t selfIdx = 0;
 	while (selfIdx < _clients.size() && _clients[selfIdx].getFD() != clientFd)
@@ -336,7 +329,6 @@ bool Server::handleClientInput(int clientFd)
 		{
 			if (_clients[i].getFD() == clientFd)
 				break;
-			std::cout << "test" << std::endl;
 		}
 		std::cout << "is client registered = " << _clients[i].isRegistered() << std::endl;
 		if (!_clients[i].isRegistered())
@@ -384,7 +376,7 @@ bool Server::handleClientInput(int clientFd)
 			CommandClose(iss, clientFd);
 			continue;
 		}
-		std::cout << "DEBUG IGNORED fd=" << clientFd << " line=[" << line << std::endl << std::endl;
+		std::cout << "IGNORED fd=" << clientFd << " line=[" << line << std::endl << std::endl;
 	}
 	return true;
 }
@@ -509,7 +501,7 @@ void Server::sendNames(Client& client, Channel& channel, const std::string & cha
 		if (channel.isOperator(memberFd))
 			mname = "@" + mname;
 		
-		std::cout << "DEBUG NAMES member fd=" << memberFd << " name=[" << _clients[kk].getName() << "] usedName=[" << mname << "]" << std::endl;
+		std::cout << "NAMES member fd=" << memberFd << " name=[" << _clients[kk].getName() << "] usedName=[" << mname << "]" << std::endl;
 		names << mname;
 
 		// detect if more members exist after kk

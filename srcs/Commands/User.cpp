@@ -47,7 +47,7 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 	{
 		std::string wmsg = numRep(001, _clients[selfIdx].getName());
 		send(clientFd, wmsg.c_str(), wmsg.size(), 0);
-		std::cout << "DEBUG REGISTERED fd=" << clientFd << " nick=" << _clients[selfIdx].getName() << std::endl;
+		std::cout << "REGISTERED fd=" << clientFd << " nick=" << _clients[selfIdx].getName() << std::endl;
 		_clients[selfIdx].setFirstRegistered(false);
 	}
 
@@ -62,6 +62,6 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 		}
 	}
 
-	std::cout << "DEBUG USER fd=" << clientFd << " user=[" << user << "] real=[" << real << "] registered=" << _clients[selfIdx].isRegistered() << std::endl;
+	std::cout << "USER fd=" << clientFd << " user=[" << user << "] real=[" << real << "] registered=" << _clients[selfIdx].isRegistered() << std::endl;
 	return true;
 }
