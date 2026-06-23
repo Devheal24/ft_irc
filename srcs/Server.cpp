@@ -253,15 +253,22 @@ void Server::run_event_loop()
 bool Server::handleClientInput(int clientFd)
 {
 	char buf[1024];
-	ssize_t n = recv(clientFd, buf, sizeof(buf), 0);
-	if (n <= 0)
-		return false;
-	/*if (n==0)
-		return true;*/
-	std::string data(buf, (size_t)n);
+	std::string data;
+	while (true)
+	{
+		std::memset(buf, 0, sizeof(buf));
+		ssize_t n = recv(clientFd, buf, sizeof(buf), 0);
+		if (n == 0)
+			return false;
+		if (n < 0)
+			n = std::strlen(buf);
+		data.append(buf, n);
+		if (data.find("\n") != std::string::npos)
+			break;
+	}
 
 	// debug: raw data received
-	std::cout << "DEBUG RECV fd=" << clientFd << " ->[" << data;
+	std::cout << "DEBUG RECV fd=" << clientFd << " ->[" << data << std::endl;
 
 	size_t selfIdx = 0;
 	while (selfIdx < _clients.size() && _clients[selfIdx].getFD() != clientFd)
