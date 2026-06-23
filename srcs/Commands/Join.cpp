@@ -25,7 +25,7 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
 
 	if (!chan.empty() && chan[0] == '#')
 	{
-		if (chan.length() >= CHNL_MAXL)
+		if (chan.length() >= CHNL_MAXL || chan.length() < CHNL_MINL)
 		{
 			std::cout << "invalid length of channel name (>20)" << chan << std::endl;
 			return;

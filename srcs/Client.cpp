@@ -84,11 +84,6 @@ void Client::setNick(const std::string& nick)
 {
 	_name = nick;
 	_hasNick = true;
-	if (_hasUser && _hasNick && _hasPass)
-	{
-		this->setRegistered(true);
-		//this->setFirstRegistered(true);
-	}
 }
 
 void Client::setUser(const std::string& user, const std::string& real)
@@ -96,11 +91,6 @@ void Client::setUser(const std::string& user, const std::string& real)
 	_username = user;
 	_realname = real;
 	_hasUser = true;
-	if (_hasUser && _hasNick && _hasPass)
-	{
-		this->setRegistered(true);
-		//this->setFirstRegistered(true);
-	}
 }
 
 void Client::setRegistered(bool state) {
@@ -112,11 +102,6 @@ void Client::setPass(const std::string& pass)
 {
 	_pass = pass;
 	_hasPass = true;
-	if (_hasUser && _hasNick && _hasPass)
-	{
-		this->setRegistered(true);
-		//this->setFirstRegistered(true);
-	}
 }
 
 void Client::setFirstRegistered(bool state)
@@ -136,6 +121,16 @@ std::string Client::getPass() const
 {
 	return _pass;
 }
+
+bool		Client::getHasNick() const {
+	return _hasNick;
+};
+bool		Client::getHasName() const{
+	return _hasUser;
+};
+bool		Client::getHasPass() const{
+	return _hasPass;
+};
 
 bool Client::hasPass() const
 {

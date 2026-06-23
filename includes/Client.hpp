@@ -29,6 +29,7 @@ class Client
 		bool					_registered;
 		bool					_isBot;
 		bool					_firstregistered;
+
 	
 	public:
 		Client();
@@ -64,6 +65,9 @@ class Client
 		std::string getUsername() const;
 		int		 	getFD() const;
 		std::string getIP() const;
+		bool		getHasNick() const;
+		bool		getHasName() const;
+		bool		getHasPass() const;
 
 		bool		getIsBot() const;
 		void		setBot(bool value);

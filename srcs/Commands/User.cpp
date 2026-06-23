@@ -24,7 +24,7 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 
 	
 	//test norm
-	if (user.length() >= USR_MAXL)
+	if (user.length() >= USR_MAXL || user.length() < USR_MINL)
 	{
 		std::cout << "invalid length of username (>20)" << user << std::endl;
 		std::string msg =":server NOTICE :invalid length of username (>20)\r\n";
@@ -43,6 +43,8 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 	}
 
 	_clients[selfIdx].setUser(user, real);
+	if (_clients[selfIdx].getHasName() && _clients[selfIdx].getHasNick() && (_clients[selfIdx].getHasPass() || _pwd.empty()))
+			_clients[selfIdx].setRegistered(true);
 	if (_clients[selfIdx].getFirstRegistered() == true  && _clients[selfIdx].isRegistered())
 	{
 		std::string wmsg = numRep(001, _clients[selfIdx].getName());

@@ -54,7 +54,7 @@ bool Server::parse_data(char **av) {
 
 	//pwd parsing
 	this->SetPwd(static_cast<std::string>(av[2]));
-	if (!_pwd.empty() && (_pwd.length() < PWD_MINXL || _pwd.length() > PWD_MAXL))
+	if (!_pwd.empty() && (_pwd.length() < PWD_MINL || _pwd.length() > PWD_MAXL))
 	{
 		std::cout << "invalid length of pass (64> || <8)" << _pwd << std::endl;
 		return false;
@@ -329,7 +329,7 @@ bool Server::handleClientInput(int clientFd)
 			close(clientFd);
 			continue;
 		}
-    
+
 		//check if nick+user set (pwd optional)
 		int i;
 		for (i = 0; i < (int)_clients.size(); ++i)

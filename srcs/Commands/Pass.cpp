@@ -15,7 +15,7 @@ void Server::CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd)
 			(pass[pass.size() - 1] == '\r' || pass[pass.size() - 1] == '\n'))
 		pass.resize(pass.size() - 1);
 
-	if (!pass.empty() && (pass.length() < PWD_MINXL || pass.length() > PWD_MAXL))
+	if (!pass.empty() && (pass.length() < PWD_MINL || pass.length() > PWD_MAXL))
 	{
 		std::cout << "invalid length of pass (64> || <8)" << pass << std::endl;
 		std::string msg =":server NOTICE :invalid length of pass (64> || <8)\r\n";
@@ -42,6 +42,8 @@ void Server::CommandPass(std::istringstream &iss, size_t selfIdx, int clientFd)
 	}
 
 	_clients[selfIdx].setPass(pass);
+	if (_clients[selfIdx].getHasName() && _clients[selfIdx].getHasNick() && (_clients[selfIdx].getHasPass() || _pwd.empty()))
+			_clients[selfIdx].setRegistered(true);
 	if (_clients[selfIdx].getFirstRegistered() == true  && _clients[selfIdx].isRegistered())
 	{
 		std::string wmsg = numRep(001, _clients[selfIdx].getName());
