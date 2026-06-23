@@ -47,8 +47,12 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 			_clients[selfIdx].setRegistered(true);
 	if (_clients[selfIdx].getFirstRegistered() == true  && _clients[selfIdx].isRegistered())
 	{
-		std::string wmsg = numRep(001, _clients[selfIdx].getName());
-		send(clientFd, wmsg.c_str(), wmsg.size(), 0);
+		std::string wmsg;
+		for (int i = 1; i <= 4; i++)
+		{
+			wmsg = numRep(i, _clients[selfIdx].getName());
+			send(clientFd, wmsg.c_str(), wmsg.size(), 0);
+		}
 		std::cout << "REGISTERED fd=" << clientFd << " nick=" << _clients[selfIdx].getName() << std::endl;
 		_clients[selfIdx].setFirstRegistered(false);
 	}
