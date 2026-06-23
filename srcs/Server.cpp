@@ -158,8 +158,9 @@ void Server::run_event_loop()
 	while (!g_sig)
 	{
 		int ready = poll(&_fds[0], _fds.size(), -1);
-		if (ready < 0)
+		if (ready <= 0)
 		{
+			std::cout << "errno= " << errno << std::endl;
 			if (errno == EINTR)
 				continue;
 			std::cerr << "poll fail" << std::endl;
@@ -207,6 +208,7 @@ void Server::run_event_loop()
 		// events on client sockets
 		for (size_t i = 1; i < _fds.size(); ++i)
 		{
+			std::cout << "??????here?????????????????????" << std::endl;
 			short revents = _fds[i].revents;
 			if (revents == 0)
 				continue;
@@ -225,6 +227,7 @@ void Server::run_event_loop()
 			{
 				int clientFd = _fds[i].fd;
 				bool connected = handleClientInput(clientFd);
+				std::cout << "afterhandle" << std::endl;
 				if (!connected)
 				{
 					std::cout << "client disconnected POLLIN fd " << clientFd << std::endl;
@@ -253,32 +256,27 @@ void Server::run_event_loop()
 bool Server::handleClientInput(int clientFd)
 {
 	char buf[1024];
-	std::string data;
-	while (true)
+	std::memset(buf, 0, sizeof(buf));
+	ssize_t n = recv(clientFd, buf, sizeof(buf), 0);
+	std::cout << "n= " << n << std::endl;
+	if (n <= 0)
+		return false;
+	// if (n < 0)
+	// 	n = std::strlen(buf);
+	_data[clientFd].append(buf, n);
+	if (_data[clientFd].find("\n") == std::string::npos)
 	{
-		std::memset(buf, 0, sizeof(buf));
-		ssize_t n = recv(clientFd, buf, sizeof(buf), 0);
-		if (n == 0)
-			return false;
-		if (n < 0)
-			n = std::strlen(buf);
-		data.append(buf, n);
-		if (data.find("\n") != std::string::npos)
-			break;
+		std::cout << "here?????????????????????" << std::endl;
+		return true;
 	}
-
+	std::string data = _data[clientFd];
+	_data[clientFd] = "";
 	// debug: raw data received
 	std::cout << "DEBUG RECV fd=" << clientFd << " ->[" << data << std::endl;
 
 	size_t selfIdx = 0;
 	while (selfIdx < _clients.size() && _clients[selfIdx].getFD() != clientFd)
 		++selfIdx;
-
-	// ensure we have a client placeholder
-	// if (selfIdx == _clients.size()) {
-	//	 _clients.push_back(Client(std::string(""), clientFd));
-	//	 selfIdx = _clients.size() - 1;
-	// }
 
 	// split data into lines by LF, trim CR, and process each line
 	std::vector<std::string> lines;
@@ -419,6 +417,7 @@ void Server::removeClient(int clientFd)
 		}
 	}
 
+	_data.erase(clientFd);
 	_clients.erase(_clients.begin() + j);
 	display_status();
 }
