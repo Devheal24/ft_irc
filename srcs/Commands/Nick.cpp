@@ -35,15 +35,6 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 			return (true);
 		}
 	}
-	
-	_clients[selfIdx].setNick(nick);
-	if (_clients[selfIdx].getFirstRegistered() == true && _clients[selfIdx].isRegistered())
-	{
-		std::string wmsg = numRep(001, _clients[selfIdx].getName());
-		send(clientFd, wmsg.c_str(), wmsg.size(), 0);
-		std::cout << "REGISTERED fd=" << clientFd << " nick=" << _clients[selfIdx].getName() << std::endl;
-		_clients[selfIdx].setFirstRegistered(false);
-	}
 
 	size_t j = -1;
 	while (++j < _clients.size())
@@ -55,6 +46,18 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 			send(clientFd, msg.c_str(), msg.size(), 0);
 			return false;
 		}
+	}
+
+	std::string msg = ":" + _clients[selfIdx].getName() + "!" + _clients[selfIdx].getUsername() + " NICK " + nick + "\r\n";
+	send(clientFd, msg.c_str(), msg.size(), 0);
+
+	_clients[selfIdx].setNick(nick);
+	if (_clients[selfIdx].getFirstRegistered() == true && _clients[selfIdx].isRegistered())
+	{
+		std::string wmsg = numRep(001, _clients[selfIdx].getName());
+		send(clientFd, wmsg.c_str(), wmsg.size(), 0);
+		std::cout << "REGISTERED fd=" << clientFd << " nick=" << _clients[selfIdx].getName() << std::endl;
+		_clients[selfIdx].setFirstRegistered(false);
 	}
 
 	std::cout << "NICK fd=" << clientFd << " nick=[" << nick << "] registered=" << _clients[selfIdx].isRegistered() << std::endl;
