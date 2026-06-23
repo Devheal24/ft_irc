@@ -28,6 +28,8 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
 		if (chan.length() >= CHNL_MAXL || chan.length() < CHNL_MINL)
 		{
 			std::cout << "invalid length of channel name (>20)" << chan << std::endl;
+			std::string msg =":server NOTICE :invalid length of channel name (>20)\r\n";
+			send(clientFd, msg.c_str(), msg.length(), 0);
 			return;
 		}
 		for (size_t i = 1; i < chan.length(); i++)
