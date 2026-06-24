@@ -28,7 +28,7 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 	}
 	for (size_t i = 0; i < nick.length(); i++)
 	{
-		if (!std::isprint(nick[i]) || nick[i] == '$' || nick[i] == ',')
+		if (!std::isprint(nick[i]) || nick[i] == '$' || nick[i] == ',' || nick[i] == '#')
 		{
 			std::cout << "invalid character in nickname" << nick << std::endl;
 			std::string msg =":server NOTICE :invalid character in nickname\r\n";

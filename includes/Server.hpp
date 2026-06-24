@@ -68,7 +68,7 @@ public:
 	void			run_event_loop();
 	bool			handleClientInput(int clientFd);
 
-	void			joinChannel(int clientFd, const std::string& name, const std::string& key);
+	void			joinChannel(int clientFd, std::string& name, const std::string& key);
 	void			removeClient(int clientFd);
 
 	int			 	getClientFdByName(const std::string& name) const;

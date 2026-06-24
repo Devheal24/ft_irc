@@ -75,7 +75,7 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
 	return;
 }
 
-void Server::joinChannel(int clientFd, const std::string& name, const std::string& key)
+void Server::joinChannel(int clientFd, std::string& name, const std::string& key)
 {
 	std::map<std::string, Channel>::iterator it;
 	Client* client = getClientByFd(clientFd);
@@ -84,23 +84,23 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
 	std::string lower_name = name;
 	std::string lower_name_chan;
 	std::transform(lower_name.begin(), lower_name.end(), lower_name.begin(), ::tolower);
-	for (std::map<std::string, Channel>::iterator lower_chan = _channels.begin(); lower_chan !=  _channels.end(); it++) {
+	std::map<std::string, Channel>::iterator lower_chan = _channels.begin();
+
+	for (lower_chan = _channels.begin(); lower_chan !=  _channels.end(); ++lower_chan)
+	{
 		lower_name_chan = lower_chan->first;
 		std::transform(lower_name_chan.begin(), lower_name_chan.end(), lower_name_chan.begin(), ::tolower);
-		if (lower_name == lower_chan->first)
+		if (lower_name == lower_name_chan)
 		{
-			std::cerr << "chan name already in use" << std::endl;
-			return;
+			std::cout << "attempting to join channel : " << name << std::endl;
+			it = lower_chan;
+			name = lower_chan->first;
+			break;
 		}
 	}
 
-
-	std::cout << "attempting to join channel : " << name << std::endl;
-	//std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-	it = _channels.find(name);
-
-	//std::cout << it->first << "   " << name << std::endl;
-	if (it == _channels.end())//&& it->first == name
+	// if channel not exist
+	if (lower_chan == _channels.end())
 	{
 		_channels.insert(std::make_pair(name, Channel(name)));
 		it = _channels.find(name);
@@ -108,6 +108,7 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
 	}
 	
 	// if client already member, just set active channel
+	std::cout << it->first << "  hwiufhwq;efh;hfe" << std::endl;
 	if (it->second.hasMember(clientFd))
 	{
 		size_t j = 0;
