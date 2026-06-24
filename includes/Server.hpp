@@ -23,7 +23,7 @@
 #define NICK_MAXL 20
 #define NICK_MINL 1
 #define CHNL_MAXL 20
-#define CHNL_MINL 2
+#define CHNL_MINL 1
 
 
 class Server {

@@ -26,8 +26,8 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 	//test norm
 	if (user.length() >= USR_MAXL || user.length() < USR_MINL)
 	{
-		std::cout << "invalid length of username (>20)" << user << std::endl;
-		std::string msg =":server NOTICE :invalid length of username (>20)\r\n";
+		std::cout << "invalid length of username (" << USR_MAXL << ">"<< user << "|>" << USR_MINL << ")" << std::endl;
+		std::string msg =":server NOTICE :invalid length of username (20> x <1)\r\n";
 		send(clientFd, msg.c_str(), msg.length(), 0);
 		return (true);
 	}
