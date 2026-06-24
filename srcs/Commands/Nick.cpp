@@ -1,6 +1,7 @@
 #include "../../includes/Server.hpp"
 #include <sstream>
 #include <iostream>
+#include <set>
 
 /**
  * @brief handler for NICK flag recv() from hexchat.
@@ -55,18 +56,19 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 	}
 
 
-	// std::set<std::string>::const_iterator it = _clients[selfIdx].getJoinedChannels().begin();
-	// for (it; it != _clients[selfIdx].getJoinedChannels().end() ; it ++)
-    // {
-	// 	std::cout << "nickname changed from" << _clients[selfIdx].getName() << "to -> " << nick << std::endl;
-	// 	std::string msg =":server NOTICE : user:" + _clients[selfIdx].getName() + "to " + nick + "\r\n";
-	// 	//_clients[selfIdx].getName()
-	// 	//broadcast..
-	// 	_channels[*it].broadcast(msg);
-	// 	//ii.broadcast
+	
+	for (std::set<std::string>::const_iterator it = _clients[selfIdx].getJoinedChannels().begin(); it != _clients[selfIdx].getJoinedChannels().end() ; it ++)
+    {
+		std::cout << "nickname changed from" << _clients[selfIdx].getName() << "to -> " << nick << std::endl;
+		std::string msg =":server NOTICE : user:" + _clients[selfIdx].getName() + "to " + nick + "\r\n";
+		//_clients[selfIdx].getName()
+		//broadcast..
+		_channels.find(*it)->second.broadcast(msg);
+		//if (*it == _channels->fir)
+		//ii.broadcast
 
-	// 	sendNames(_clients[selfIdx],_channels[*it], *it);
-	// 	//ii.sendname
+		sendNames(_clients[selfIdx],_channels.find(*it)->second, *it);
+		//ii.sendname
 
     //     return false ;
     // }
