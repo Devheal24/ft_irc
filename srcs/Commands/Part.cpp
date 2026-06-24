@@ -12,13 +12,15 @@ void Server::CommandPart(std::string chan, int clientFd, bool sigquit)
 		++j;
 	if (j == _clients.size())
 		return;
+	
 
 	std::vector<std::string> tmp = splitComma(chan);
 
 	for (size_t i = 0; i < tmp.size(); ++i)
 	{
 		chan = tmp[i];
-		std::map<std::string, Channel>::iterator cit = _channels.find(chan);
+		std::map<std::string, Channel>::iterator cit;
+		printComparativeChannel(chan, cit, _channels);
 		if (cit == _channels.end())
 		{
 			std::string msg = numRepChannel(403, _clients[j].getName(), chan, "");

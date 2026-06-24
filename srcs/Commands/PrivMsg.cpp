@@ -37,7 +37,8 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
 
 	if (!target.empty() && (target[0] == '#' || target[0] == '&'))
 	{
-		std::map<std::string, Channel>::iterator it = _channels.find(target);
+		std::map<std::string, Channel>::iterator it;
+		printComparativeChannel(target, it, _channels);
 		if (it == _channels.end() || !it->second.hasMember(clientFd))
 		{
 			std::cout << "ROUTE missing channel target=[" << target << "] fd=" << clientFd << std::endl;
