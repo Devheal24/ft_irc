@@ -1,6 +1,7 @@
 #include "../../includes/Server.hpp"
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 /**
  * @brief handler for JOIN cmd recv() from hexchat.
@@ -36,6 +37,7 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
 		chan.resize(chan.size() - 1);
 
 	std::vector<std::string> tmp = splitComma(chan);
+
 
 	for (size_t i = 0; i < tmp.size(); ++i)
 	{
@@ -78,8 +80,23 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
 	std::map<std::string, Channel>::iterator it;
 	Client* client = getClientByFd(clientFd);
 	std::string clientName = client->getName();
+	
+	std::string lower_name = name;
+	std::string lower_name_chan;
+	std::transform(lower_name.begin(), lower_name.end(), lower_name.begin(), ::tolower);
+	for (std::map<std::string, Channel>::iterator lower_chan = _channels.begin(); lower_chan !=  _channels.end(); it++) {
+		lower_name_chan = lower_chan->first;
+		std::transform(lower_name_chan.begin(), lower_name_chan.end(), lower_name_chan.begin(), ::tolower);
+		if (lower_name == lower_chan->first)
+		{
+			std::cerr << "chan name already in use" << std::endl;
+			return;
+		}
+	}
+
 
 	std::cout << "attempting to join channel : " << name << std::endl;
+	//std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 	it = _channels.find(name);
 
 	//std::cout << it->first << "   " << name << std::endl;
