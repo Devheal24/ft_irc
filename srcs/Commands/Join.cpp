@@ -54,7 +54,7 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
 			}
 			for (size_t i = 1; i < chan.length(); i++)
 			{
-				if (!std::isprint(chan[i]) && chan[i] == '$' && chan[i] == ',')
+				if (!std::isprint(chan[i]) || chan[i] == '$' || chan[i] == ',')
 				{
 					std::cout << "invalid character in channel's name" << chan << std::endl;
 					std::string msg =":server NOTICE : invalid character in channel's name\r\n";
