@@ -16,7 +16,13 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
 
 	if (!message.empty() && message[0] == ' ')
 		message.erase(0, 1);
-	if (!message.empty() && message[0] == ':')
+	if (message.empty() || message[0] != ':')
+	{
+		std::string msg = numRep(461, _clients[selfIdx].getName());
+		send(clientFd, msg.c_str(), msg.size(), 0);
+		return;
+	}
+	else if (!message.empty() && message[0] == ':')
 		message.erase(0, 1);
 
 	if (message.empty())
