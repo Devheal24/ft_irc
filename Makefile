@@ -23,7 +23,7 @@ SRCS		:= $(SRCS_DIR)main.cpp \
 				$(SRCS_CMD)User.cpp \
 				$(SRCS_CMD)PrivMsg.cpp \
 				$(SRCS_CMD)Join.cpp \
-				$(SRCS_CMD)Close.cpp \
+				$(SRCS_CMD)Part.cpp \
 				$(SRCS_CMD)Quit.cpp \
 				$(SRCS_OPE)Kick.cpp \
 				$(SRCS_OPE)Invite.cpp \

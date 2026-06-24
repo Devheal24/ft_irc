@@ -364,7 +364,9 @@ bool Server::handleClientInput(int clientFd)
 		}
 		if (token == "PART" || token == "/PART")
 		{
-			CommandClose(clientFd);
+			std::string command;
+			iss >> command;
+			CommandPart(command, clientFd, 0);
 			continue;
 		}
 		std::cout << "IGNORED fd=" << clientFd << " line=[" << line << std::endl << std::endl;
