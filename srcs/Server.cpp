@@ -364,7 +364,9 @@ bool Server::handleClientInput(int clientFd)
 		}
 		if (token == "PART" || token == "/PART")
 		{
-			CommandClose(clientFd);
+			std::string command;
+			iss >> command;
+			CommandPart(command, clientFd, 0);
 			continue;
 		}
 		std::cout << "IGNORED fd=" << clientFd << " line=[" << line << std::endl << std::endl;
@@ -512,5 +514,5 @@ void Server::sendNames(Client& client, Channel& channel, const std::string& chan
 	send(client.getFD(), r353s.c_str(), r353s.size(), 0);
 
 	std::string r366s = numRepChannel(366, client.getName(), channelName, "");
-	send(client.getFD(), r366s.c_str(), r366s.size(), 0);
+	send(client.getFD(), r366s.c_str(), r366s.size(), 0);	
 }
