@@ -77,7 +77,8 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
 	std::cout << "attempting to join channel : " << name << std::endl;
 	it = _channels.find(name);
 
-	if (it == _channels.end())
+	//std::cout << it->first << "   " << name << std::endl;
+	if (it == _channels.end())//&& it->first == name
 	{
 		_channels.insert(std::make_pair(name, Channel(name)));
 		it = _channels.find(name);

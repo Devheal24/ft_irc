@@ -87,7 +87,7 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 	// 	//broadcast..
 	// 	_channels[*it].broadcast(msg);
 	// 	//ii.broadcast
-		std::string bmsg = old_name + " is now known as " + nick;
+		std::string bmsg = ":server NOTICE " + *it + " :" + old_name + " is now known as " + nick + "\r\n";
 		_channels.find(*it)->second.broadcast(bmsg);
 		for (std::vector<Client>::iterator ite = _clients.begin(); ite != _clients.end(); ite++)
 		{
