@@ -9,9 +9,9 @@ void Server::CommandQuit(int clientFd, bool sigquit)
 	{
 		if (it->second.hasMember(clientFd))
 		{
-			client->setActiveChannel(it->second.getName());
+			std::string tmp = it->second.getName();
 			++it;
-			CommandClose(clientFd);
+			CommandPart(tmp, clientFd, sigquit);
 		}
 		else
 			++it;

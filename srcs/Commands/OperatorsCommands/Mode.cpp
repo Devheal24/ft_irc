@@ -42,7 +42,6 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 		sign = false;
 		break;
 	default:
-		std::cout << "tetwagawsdfgasdfgasdfwasfas" << std::endl;
 		std::string msg = numRepChannel(472, clientName, mode, "");
 		send(clientFd, msg.c_str(), msg.size(), 0);
 		return;
