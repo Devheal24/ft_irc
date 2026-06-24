@@ -473,7 +473,7 @@ Client* Server::getBot()
 	return NULL;
 }
 
-void Server::sendNames(Client& client, Channel& channel, const std::string & channelName)
+void Server::sendNames(Client& client, Channel& channel, const std::string& channelName)
 {
 	std::ostringstream names;
 
