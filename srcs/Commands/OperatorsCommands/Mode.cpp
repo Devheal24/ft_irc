@@ -42,6 +42,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 		sign = false;
 		break;
 	default:
+		std::cout << "tetwagawsdfgasdfgasdfwasfas" << std::endl;
 		std::string msg = numRepChannel(472, clientName, mode, "");
 		send(clientFd, msg.c_str(), msg.size(), 0);
 		return;
@@ -108,7 +109,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 			std::string targetName;
 			iss >> targetName;
 
-			 if (targetName.empty())
+			if (targetName.empty())
 			{
 				std::string msg = numRep(461, clientName);
 				send(clientFd, msg.c_str(), msg.size(), 0);
