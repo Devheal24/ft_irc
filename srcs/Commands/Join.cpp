@@ -40,12 +40,13 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
 	for (size_t i = 0; i < tmp.size(); ++i)
 	{
 		chan = tmp[i];
+		bool wrongChar = 0;
 		if (!chan.empty() && chan[0] == '#')
 		{
 			if (chan.length() >= CHNL_MAXL || chan.length() < CHNL_MINL)
 			{
-				std::cout << "invalid length of channel name (>20)" << chan << std::endl;
-				std::string msg =":server NOTICE :invalid length of channel name (20> x <1)\r\n";
+				std::cout << "invalid length of channel's name (>20)" << chan << std::endl;
+				std::string msg =":server NOTICE : invalid length of channel's name (20> x <1)\r\n";
 				send(clientFd, msg.c_str(), msg.length(), 0);
 				continue;
 			}
@@ -53,11 +54,15 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
 			{
 				if (!isdigit(chan[i]) && !isalnum(chan[i]) && chan[i] != '_' && chan[i] != '-')
 				{
-					std::cout << "invalid character in channel name" << chan << std::endl;
-					continue;
+					std::cout << "invalid character in channel's name" << chan << std::endl;
+					std::string msg =":server NOTICE : invalid character in channel's name\r\n";
+					send(clientFd, msg.c_str(), msg.length(), 0);
+					wrongChar = 1;
+					break;
 				}
 			}
-			joinChannel(clientFd, chan, key);
+			if (!wrongChar)
+				joinChannel(clientFd, chan, key);
 		}
 		else
 		{
