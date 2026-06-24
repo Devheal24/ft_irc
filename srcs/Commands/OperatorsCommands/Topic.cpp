@@ -11,13 +11,14 @@ void Server::CommandTopic(std::istringstream &iss, int clientFd)
 	topic(clientFd, channel, NewTopic);
 }
 
-void Server::topic(int clientFd, const std::string& channelName, std::string& newTopic)
+void Server::topic(int clientFd, std::string& channelName, std::string& newTopic)
 {
-	std::map<std::string, Channel>::iterator it = _channels.find(channelName);
+	std::map<std::string, Channel>::iterator it;
 	Client* client = getClientByFd(clientFd);
 	std::string clientName = client->getName();
 
 	//verify if channel exist
+	printComparativeChannel(channelName, it, _channels);
 	if (it == _channels.end())
 	{
 		std::string msg = numRepChannel(403, clientName, channelName, "");

@@ -12,7 +12,7 @@ void Server::CommandInvite(std::istringstream &iss, int clientFd)
 	invite(clientFd, target, channel);
 }
 
-void Server::invite(int clientFd, const std::string& targetNick, const std::string& channelName)
+void Server::invite(int clientFd, std::string& targetNick, std::string& channelName)
 {
 	std::map<std::string, Channel>::iterator it = _channels.find(channelName);
 	Client* client = getClientByFd(clientFd);

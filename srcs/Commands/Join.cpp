@@ -1,7 +1,6 @@
 #include "../../includes/Server.hpp"
 #include <sstream>
 #include <iostream>
-#include <algorithm>
 
 /**
  * @brief handler for JOIN cmd recv() from hexchat.
@@ -81,26 +80,11 @@ void Server::joinChannel(int clientFd, std::string& name, const std::string& key
 	Client* client = getClientByFd(clientFd);
 	std::string clientName = client->getName();
 	
-	std::string lower_name = name;
-	std::string lower_name_chan;
-	std::transform(lower_name.begin(), lower_name.end(), lower_name.begin(), ::tolower);
-	std::map<std::string, Channel>::iterator lower_chan = _channels.begin();
-
-	for (lower_chan = _channels.begin(); lower_chan !=  _channels.end(); ++lower_chan)
-	{
-		lower_name_chan = lower_chan->first;
-		std::transform(lower_name_chan.begin(), lower_name_chan.end(), lower_name_chan.begin(), ::tolower);
-		if (lower_name == lower_name_chan)
-		{
-			std::cout << "attempting to join channel : " << name << std::endl;
-			it = lower_chan;
-			name = lower_chan->first;
-			break;
-		}
-	}
+	std::cout << "attempting to join channel : " << name << std::endl;
+	printComparativeChannel(name, it, _channels);
 
 	// if channel not exist
-	if (lower_chan == _channels.end())
+	if (it == _channels.end())
 	{
 		_channels.insert(std::make_pair(name, Channel(name)));
 		it = _channels.find(name);

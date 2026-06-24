@@ -17,7 +17,7 @@ void Server::CommandKick(std::istringstream &iss, int clientFd)
 	kick(clientFd, channel, target, reason);
 }
 
-void Server::kick(int clientFd, const std::string& channelName, const std::string& targetName, const std::string& reason)
+void Server::kick(int clientFd, std::string& channelName, std::string& targetName, const std::string& reason)
 {
 	std::map<std::string, Channel>::iterator it = _channels.find(channelName);
 	Client* client = getClientByFd(clientFd);
