@@ -13,6 +13,7 @@
 #include <map>
 #include <poll.h>
 #include <algorithm>
+#include <iostream>
 
 /**
  * @brief all user data "inputs" max length.
@@ -55,6 +56,7 @@ private:
 	void topic(int clientFd, std::string& channelName, std::string& newTopic);
 	// Utilities functions
 	std::vector<std::string> splitComma(const std::string &name);
+	static char	normalize(char s);
 
 public:
 	Server() {};
@@ -91,19 +93,20 @@ public:
 	{
 		std::string lower_name = name;
 		std::string lower_name_target;
-		std::transform(lower_name.begin(), lower_name.end(), lower_name.begin(), ::tolower);
+		std::transform(lower_name.begin(), lower_name.end(), lower_name.begin(), Server::normalize);
 	
 		T lower_target;
 
 		for (lower_target = list.begin(); lower_target !=  list.end(); ++lower_target)
 		{
 			lower_name_target = lower_target->first;
-			std::transform(lower_name_target.begin(), lower_name_target.end(), lower_name_target.begin(), ::tolower);
+			std::transform(lower_name_target.begin(), lower_name_target.end(), lower_name_target.begin(), Server::normalize);
 		
 			if (lower_name == lower_name_target)
 			{
 				it = lower_target;
 				name = lower_target->first;
+				std::cout << name << std::endl;
 				return;
 			}
 		}
