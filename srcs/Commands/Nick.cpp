@@ -54,6 +54,24 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 		send(clientFd, msg.c_str(), msg.size(), 0);
 	}
 
+
+	std::set<std::string>::const_iterator it = _clients[selfIdx].getJoinedChannels().begin();
+	for (it; it != _clients[selfIdx].getJoinedChannels().end() ; it ++)
+    {
+		std::cout << "nickname changed from" << _clients[selfIdx].getName() << "to -> " << nick << std::endl;
+		std::string msg =":server NOTICE : user:" + _clients[selfIdx].getName() + "to " + nick + "\r\n";
+		//_clients[selfIdx].getName()
+		//broadcast..
+		_channels[*it].broadcast(msg);
+		//ii.broadcast
+
+		sendNames(_clients[selfIdx],_channels[*it], *it);
+		//ii.sendname
+
+        return false ;
+    }
+
+
 	_clients[selfIdx].setNick(nick);
 	if (_clients[selfIdx].getHasName() && _clients[selfIdx].getHasNick() && (_clients[selfIdx].getHasPass() || _pwd.empty()))
 			_clients[selfIdx].setRegistered(true);
