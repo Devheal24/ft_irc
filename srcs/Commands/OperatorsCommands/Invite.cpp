@@ -14,11 +14,12 @@ void Server::CommandInvite(std::istringstream &iss, int clientFd)
 
 void Server::invite(int clientFd, std::string& targetNick, std::string& channelName)
 {
-	std::map<std::string, Channel>::iterator it = _channels.find(channelName);
+	std::map<std::string, Channel>::iterator it;
 	Client* client = getClientByFd(clientFd);
 	std::string clientName = client->getName();
 
 	//verify if channel exist
+	printComparativeChannel(channelName, it, _channels);
 	if (it == _channels.end())
 	{
 		std::string msg = numRepChannel(403, clientName, channelName, "");
@@ -44,6 +45,16 @@ void Server::invite(int clientFd, std::string& targetNick, std::string& channelN
 		return ;
 	}
 
+	// Verify if target exist
+	std::vector<Client>::iterator ite;
+	printComparativeClient(targetNick, ite, _clients);
+	if (ite == _clients.end())
+	{
+		std::string msg = numRepChannel(401, clientName, targetNick, "");
+		send(clientFd, msg.c_str(), msg.size(), 0);
+		return ;
+	}
+
 	// Verify if target is already in channel
 	int targetFd = getClientFdByName(targetNick);
 	if (ch.hasMember(targetFd))
@@ -53,18 +64,9 @@ void Server::invite(int clientFd, std::string& targetNick, std::string& channelN
 		return ;
 	}
 
-	// Verify if target exist
+	// If target is Bot
 	if (targetFd == -1)
 	{
-		Client* target = getClientbyName(targetNick);
-		// Verify if target is Bot
-		if (!target)
-		{
-			std::string msg = numRepChannel(441, clientName, targetNick, "");
-			send(clientFd, msg.c_str(), msg.size(), 0);
-			return ;
-		}
-
 		ch.addMember(targetFd);
 		std::cout << "Bot joined" << channelName << std::endl;
 		sendNames(*client, ch, channelName);

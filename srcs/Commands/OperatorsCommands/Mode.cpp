@@ -139,13 +139,18 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 				send(clientFd, msg.c_str(), msg.size(), 0);
 				break;
 			}
-			int targetFd = getClientFdByName(targetName);
-			if (targetFd == -1)
+
+			// verify if targetName exist
+			std::vector<Client>::iterator ite;
+			printComparativeClient(targetName, ite, _clients);
+			if (ite == _clients.end())
 			{
 				std::string msg = numRepChannel(401, clientName, targetName, "");
 				send(clientFd, msg.c_str(), msg.size(), 0);
 				break;
 			}
+
+			int targetFd = getClientFdByName(targetName);
 			if (sign == true)
 				ch.addOperator(targetFd);
 			else

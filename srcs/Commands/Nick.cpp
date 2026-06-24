@@ -40,6 +40,8 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 	size_t j = -1;
 	while (++j < _clients.size())
 	{
+		std::vector<Client>::iterator it;
+		printComparativeClient(nick, it, _clients);
 		if (_clients[j].getName() == nick && _clients[j].getFD() != clientFd)
 		{
 			std::cerr << "nickname already used !" << std::endl;
