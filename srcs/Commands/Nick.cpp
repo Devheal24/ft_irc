@@ -49,12 +49,6 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 		}
 	}
 
-	if (_clients[selfIdx].getFirstRegistered() == false && nick != _clients[selfIdx].getName())
-	{
-		std::string msg = ":" + _clients[selfIdx].getName() + "!" + _clients[selfIdx].getUsername() + " NICK " + nick + "\r\n";
-		send(clientFd, msg.c_str(), msg.size(), 0);
-	}
-
 	std::string old_name = _clients[selfIdx].getName();
 	_clients[selfIdx].setNick(nick);
 	if (_clients[selfIdx].getHasName() && _clients[selfIdx].getHasNick() && (_clients[selfIdx].getHasPass() || _pwd.empty()))
@@ -71,30 +65,15 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 		_clients[selfIdx].setFirstRegistered(false);
 	}
 
-	std::string msg =":server NOTICE :You are now known as " + nick + "\r\n";
-	send(clientFd, msg.c_str(), msg.size(), 0);
-	
-	for (std::set<std::string>::const_iterator it = _clients[selfIdx].getJoinedChannels().begin(); it != _clients[selfIdx].getJoinedChannels().end() ; it ++)
-    {
-	// 	std::cout << "nickname changed from" << _clients[selfIdx].getName() << "to -> " << nick << std::endl;
-		// std::string msg =":server NOTICE : user:" + _clients[selfIdx].getName() + "to " + nick + "\r\n";
-	// 	//_clients[selfIdx].getName()
-	// 	//broadcast..
-	// 	_channels[*it].broadcast(msg);
-	// 	//ii.broadcast
-		std::string bmsg = ":server NOTICE " + *it + " :" + old_name + " is now known as " + nick + "\r\n";
-		_channels.find(*it)->second.broadcast(bmsg);
-		for (std::vector<Client>::iterator ite = _clients.begin(); ite != _clients.end(); ite++)
+	if (_clients[selfIdx].getFirstRegistered() == false && nick != old_name)
+	{
+		std::string msg = ":" + old_name + "!" + _clients[selfIdx].getUsername() + " NICK " + nick + "\r\n";
+		for (std::set<std::string>::const_iterator it = _clients[selfIdx].getJoinedChannels().begin(); it != _clients[selfIdx].getJoinedChannels().end() ; it ++)
 		{
-			// std::string msg =":server NOTICE : user:" + old_name + "to " + nick + "\r\n";
-			// send(ite->getFD(), msg.c_str(), msg.size(), 0);
-			sendNames(*ite, _channels.find(*it)->second, *it);
+			for (std::vector<Client>::iterator ite = _clients.begin(); ite != _clients.end(); ite++)
+				send(ite->getFD(), msg.c_str(), msg.size(), 0);
 		}
-		// sendNames(_clients[selfIdx], it->second, it->first);
-	// 	//ii.sendname
-
-    //     return false ;
-    }
+	}
 
 	std::cout << "NICK fd=" << clientFd << " nick=[" << nick << "] registered=" << _clients[selfIdx].isRegistered() << std::endl;
 	return true;
