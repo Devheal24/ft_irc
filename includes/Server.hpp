@@ -57,6 +57,7 @@ private:
 	// Utilities functions
 	std::vector<std::string> splitComma(const std::string &name);
 	static char	normalize(char s);
+	static int set_nonblocking(int fd);
 
 public:
 	Server() {};
