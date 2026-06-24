@@ -70,13 +70,8 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 		_clients[selfIdx].setFirstRegistered(false);
 	}
 
-	// for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
-	// {
-	// 	std::string msg =":server NOTICE : user: " + old_name + " to " + nick + "\r\n";
-	// 	send(it->getFD(), msg.c_str(), msg.size(), 0);
-	// }
-	// std::string msg =":server NOTICE :You are now known as " + nick + "\r\n";
-	// send(clientFd, msg.c_str(), msg.size(), 0);
+	std::string msg =":server NOTICE :You are now known as " + nick + "\r\n";
+	send(clientFd, msg.c_str(), msg.size(), 0);
 	
 	for (std::set<std::string>::const_iterator it = _clients[selfIdx].getJoinedChannels().begin(); it != _clients[selfIdx].getJoinedChannels().end() ; it ++)
     {

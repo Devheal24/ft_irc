@@ -12,8 +12,8 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 
 	iss >> channel;
 	iss >> mode;
-
-	//verify if channel exist
+	
+	// verify if channel exist
 	std::map<std::string, Channel>::iterator it = _channels.find(channel);
 	if (it == _channels.end())
 	{
@@ -23,12 +23,36 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 	}
 	Channel& ch = it->second;
 
-	//verify is client is operator
+	// verify is client is operator
 	if (!ch.isOperator(clientFd))
 	{
 		std::string msg = numRepChannel(482, clientName, channel, "");
 		send(clientFd, msg.c_str(), msg.size(), 0);
-		return ;
+		return;
+	}
+
+	// if no mode given
+	if (mode.empty())
+	{
+		std::ostringstream oss;
+		oss << ":server NOTICE " << channel << " :Channel " << channel << " modes: +";
+		if (ch.isInviteOnly())
+			oss << "i";
+		if (ch.isTopicRestricted())
+			oss << "t";
+		if (ch.hasLimit())
+			oss << "l";
+		if (ch.hasKey())
+			oss << "k";
+		if (ch.hasLimit())
+			oss << " " << ch.getLimit();
+		if (ch.hasKey())
+			oss << " " << ch.getKey();
+		oss << "\r\n";
+
+		std::string msg = oss.str();
+		send(clientFd, msg.c_str(), msg.size(), 0);
+		return;
 	}
 
 	int		count[3] = {0, 0, 0};
@@ -42,7 +66,6 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 		sign = false;
 		break;
 	default:
-		std::cout << "tetwagawsdfgasdfgasdfwasfas" << std::endl;
 		std::string msg = numRepChannel(472, clientName, mode, "");
 		send(clientFd, msg.c_str(), msg.size(), 0);
 		return;
@@ -158,7 +181,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 			}
 			else
 			{
-				if (ch.haslimit())
+				if (ch.hasLimit())
 				{
 					ch.removeLimit();
 					ch.broadcast(":" + getClientPrefix(clientFd) + " MODE " + channel + " " + mode[0] + mode[i] + "\r\n");	
