@@ -12,7 +12,9 @@ void Server::CommandPart(std::string chan, int clientFd, bool sigquit)
 		++j;
 	if (j == _clients.size())
 		return;
-	std::map<std::string, Channel>::iterator cit = _channels.find(chan);
+	
+	std::map<std::string, Channel>::iterator cit;
+	printComparativeChannel(chan, cit, _channels);
 	if (cit == _channels.end())
 	{
 		std::string msg = numRepChannel(403, _clients[j].getName(), chan, "");
