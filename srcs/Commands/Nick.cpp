@@ -55,21 +55,21 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 	}
 
 
-	std::set<std::string>::const_iterator it = _clients[selfIdx].getJoinedChannels().begin();
-	for (it; it != _clients[selfIdx].getJoinedChannels().end() ; it ++)
-    {
-		std::cout << "nickname changed from" << _clients[selfIdx].getName() << "to -> " << nick << std::endl;
-		std::string msg =":server NOTICE : user:" + _clients[selfIdx].getName() + "to " + nick + "\r\n";
-		//_clients[selfIdx].getName()
-		//broadcast..
-		_channels[*it].broadcast(msg);
-		//ii.broadcast
+	// std::set<std::string>::const_iterator it = _clients[selfIdx].getJoinedChannels().begin();
+	// for (it; it != _clients[selfIdx].getJoinedChannels().end() ; it ++)
+    // {
+	// 	std::cout << "nickname changed from" << _clients[selfIdx].getName() << "to -> " << nick << std::endl;
+	// 	std::string msg =":server NOTICE : user:" + _clients[selfIdx].getName() + "to " + nick + "\r\n";
+	// 	//_clients[selfIdx].getName()
+	// 	//broadcast..
+	// 	_channels[*it].broadcast(msg);
+	// 	//ii.broadcast
 
-		sendNames(_clients[selfIdx],_channels[*it], *it);
-		//ii.sendname
+	// 	sendNames(_clients[selfIdx],_channels[*it], *it);
+	// 	//ii.sendname
 
-        return false ;
-    }
+    //     return false ;
+    // }
 
 
 	_clients[selfIdx].setNick(nick);

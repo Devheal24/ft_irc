@@ -6,6 +6,20 @@
  * @brief handler for JOIN cmd recv() from hexchat.
  * JOIN -> let you join or set as active a new channel
  */
+std::vector<std::string> splitComma(const std::string &name)
+{
+	std::vector<std::string> tmp;
+	std::stringstream iss(name);
+	std::string buf;
+	while (getline(iss, buf, ','))
+	{
+		tmp.push_back(buf);
+	}
+	for (size_t i = 0; i < tmp.size(); ++i)
+		std::cout << "tmp[i]= " << tmp[i] << std::endl;
+	return (tmp);
+}
+
 void Server::CommandJoin(std::istringstream &iss, int clientFd)
 {
 	Client* client = getClientByFd(clientFd);
@@ -21,31 +35,35 @@ void Server::CommandJoin(std::istringstream &iss, int clientFd)
 			(chan[chan.size() - 1] == '\r' || chan[chan.size() - 1] == '\n')) 
 		chan.resize(chan.size() - 1);
 
+	std::vector<std::string> tmp = splitComma(chan);
 
-
-	if (!chan.empty() && chan[0] == '#')
+	for (size_t i = 0; i < tmp.size(); ++i)
 	{
-		if (chan.length() >= CHNL_MAXL || chan.length() < CHNL_MINL)
+		chan = tmp[i];
+		if (!chan.empty() && chan[0] == '#')
 		{
-			std::cout << "invalid length of channel name (>20)" << chan << std::endl;
-			std::string msg =":server NOTICE :invalid length of channel name (20> x <1)\r\n";
-			send(clientFd, msg.c_str(), msg.length(), 0);
-			return;
-		}
-		for (size_t i = 1; i < chan.length(); i++)
-		{
-			if (!isdigit(chan[i]) && !isalnum(chan[i]) && chan[i] != '_' && chan[i] != '-')
+			if (chan.length() >= CHNL_MAXL || chan.length() < CHNL_MINL)
 			{
-				std::cout << "invalid character in channel name" << chan << std::endl;
-				return;
+				std::cout << "invalid length of channel name (>20)" << chan << std::endl;
+				std::string msg =":server NOTICE :invalid length of channel name (20> x <1)\r\n";
+				send(clientFd, msg.c_str(), msg.length(), 0);
+				continue;
 			}
+			for (size_t i = 1; i < chan.length(); i++)
+			{
+				if (!isdigit(chan[i]) && !isalnum(chan[i]) && chan[i] != '_' && chan[i] != '-')
+				{
+					std::cout << "invalid character in channel name" << chan << std::endl;
+					continue;
+				}
+			}
+			joinChannel(clientFd, chan, key);
 		}
-		joinChannel(clientFd, chan, key);
-	}
-	else
-	{
-		std::string msg = numRepChannel(403, client->getName(), chan, "");
-		send(clientFd, msg.c_str(), msg.size(), 0);
+		else
+		{
+			std::string msg = numRepChannel(403, client->getName(), chan, "");
+			send(clientFd, msg.c_str(), msg.size(), 0);
+		}
 	}
 	return;
 }
