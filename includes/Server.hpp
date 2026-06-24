@@ -53,6 +53,8 @@ private:
 	void kick(int clientFd, std::string& channelName, std::string& targetName, const std::string& reason);
 	void invite(int clientFd, std::string& targetNick, std::string& channelName);
 	void topic(int clientFd, std::string& channelName, std::string& newTopic);
+	// Utilities functions
+	std::vector<std::string> splitComma(const std::string &name);
 
 public:
 	Server() {};

@@ -516,3 +516,13 @@ void Server::sendNames(Client& client, Channel& channel, const std::string& chan
 	std::string r366s = numRepChannel(366, client.getName(), channelName, "");
 	send(client.getFD(), r366s.c_str(), r366s.size(), 0);	
 }
+
+// std::string normalize(std::string s)
+// {
+// 	for (size_t i = 0; i < s.size(); ++i)
+// 	{
+// 		if (isdigit(s[i]))
+// 			s[i] = std::tolower(s[i]);
+// 		else if (s[i] == )
+// 	}
+// }
