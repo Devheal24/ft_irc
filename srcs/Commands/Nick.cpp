@@ -21,7 +21,7 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 	if (nick.length() >= NICK_MAXL || nick.length() < NICK_MINL)
 	{
 		std::cout << "invalid length of nickname (>10)" << nick << std::endl;
-		std::string msg =":server NOTICE :invalid length of nickname (>10)\r\n";
+		std::string msg =":server NOTICE :invalid length of nickname (10> x <1)\r\n";
 		send(clientFd, msg.c_str(), msg.length(), 0);
 		return (true);
 	}
