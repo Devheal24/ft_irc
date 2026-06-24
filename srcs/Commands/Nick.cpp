@@ -71,7 +71,7 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 		//ii.sendname
 
     //     return false ;
-    // }
+    }
 
 
 	_clients[selfIdx].setNick(nick);
