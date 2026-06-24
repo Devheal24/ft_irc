@@ -49,7 +49,6 @@ bool Server::handleClientInput(int clientFd)
 		std::istringstream iss(line);
 		std::string token;
 		iss >> token;
-		std::cout << "li = " << line << std::endl;
 		if (token == "PASS" || token == "/PASS")
 		{
 			CommandPass(iss, selfIdx, clientFd);

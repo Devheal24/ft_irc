@@ -74,7 +74,8 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 
 	if (_clients[selfIdx].getFirstRegistered() == false && nick != old_name)
 	{
-		std::string msg = ":" + old_name + "!" + _clients[selfIdx].getUsername() + " NICK " + nick + "\r\n";
+		std::string msg = ":" + old_name + "!" + _clients[selfIdx].getUsername() + " NICK :" + nick + "\r\n";
+		send(clientFd, msg.c_str(), msg.size(), 0);
 		for (std::set<std::string>::const_iterator it = _clients[selfIdx].getJoinedChannels().begin(); it != _clients[selfIdx].getJoinedChannels().end() ; it ++)
 		{
 			for (std::vector<Client>::iterator ite = _clients.begin(); ite != _clients.end(); ite++)
