@@ -169,9 +169,14 @@ bool Channel::isFull() const
 	return _hasUserLimit && _members.size() >= _userLimit;
 }
 
-bool Channel::haslimit() const
+bool Channel::hasLimit() const
 {
 	return _hasUserLimit;
+}
+
+size_t Channel::getLimit() const
+{
+	return _userLimit;
 }
 
 //BOT

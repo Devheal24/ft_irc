@@ -80,6 +80,9 @@ std::string numRepChannel(int code, const std::string& nick, const std::string& 
 	std::string msg = oss.str();
 	switch (code)
 	{
+	case 324:
+		msg = msg + addon + "\r\n";
+		break;
 	case 331:
 		msg = msg + " :No topic is set\r\n";
 		break;
