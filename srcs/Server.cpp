@@ -300,8 +300,7 @@ bool Server::handleClientInput(int clientFd)
 		}
 		if (token == "NICK" || token == "/NICK")
 		{
-			if (CommandNick(iss, selfIdx, clientFd) == false)
-				return false;
+			CommandNick(iss, selfIdx, clientFd);
 			continue;
 		}
 		if (token == "USER" || token == "/USER")
