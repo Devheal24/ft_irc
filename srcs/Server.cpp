@@ -305,8 +305,7 @@ bool Server::handleClientInput(int clientFd)
 		}
 		if (token == "USER" || token == "/USER")
 		{
-			if (CommandUser(iss, selfIdx, clientFd) == false)
-				return false;
+			CommandUser(iss, selfIdx, clientFd);
 			continue;
         }
         if (token == "QUIT" || token == "/QUIT")
@@ -517,12 +516,24 @@ void Server::sendNames(Client& client, Channel& channel, const std::string& chan
 	send(client.getFD(), r366s.c_str(), r366s.size(), 0);	
 }
 
-// std::string normalize(std::string s)
-// {
-// 	for (size_t i = 0; i < s.size(); ++i)
-// 	{
-// 		if (isdigit(s[i]))
-// 			s[i] = std::tolower(s[i]);
-// 		else if (s[i] == )
-// 	}
-// }
+std::vector<std::string> Server::splitComma(const std::string &name)
+{
+	std::vector<std::string> tmp;
+	std::stringstream iss(name);
+	std::string buf;
+	while (getline(iss, buf, ','))
+		tmp.push_back(buf);
+	return (tmp);
+}
+
+char Server::normalize(char s)
+{
+	s = std::tolower(static_cast<unsigned char>(s));
+	if (s == '{')
+		s = '[';
+	else if (s == '}')
+		s = ']';
+	else if (s == '|')
+		s = '\\';
+	return (s);
+}

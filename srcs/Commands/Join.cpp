@@ -6,15 +6,6 @@
  * @brief handler for JOIN cmd recv() from hexchat.
  * JOIN -> let you join or set as active a new channel
  */
-std::vector<std::string> Server::splitComma(const std::string &name)
-{
-	std::vector<std::string> tmp;
-	std::stringstream iss(name);
-	std::string buf;
-	while (getline(iss, buf, ','))
-		tmp.push_back(buf);
-	return (tmp);
-}
 
 void Server::CommandJoin(std::istringstream &iss, int clientFd)
 {
