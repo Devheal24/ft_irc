@@ -44,8 +44,13 @@ bool Server::CommandNick(std::istringstream &iss, size_t selfIdx, int clientFd)
 		printComparativeClient(nick, it, _clients);
 		if (_clients[j].getName() == nick && _clients[j].getFD() != clientFd)
 		{
-			std::cerr << "nickname already used !" << std::endl;
-			std::string msg = numRep(433, nick);
+			std::cout << "nickname already used !" << std::endl;
+			std::string msg;
+			if (!_clients[selfIdx].isRegistered())
+				msg = numRep(433, _clients[j].getName());
+			else
+				msg = numRepChannel(433, _clients[selfIdx].getName(), nick, "");
+			std::cout << "SEND=[" << msg << "]" << std::endl;
 			send(clientFd, msg.c_str(), msg.size(), 0);
 			return false;
 		}

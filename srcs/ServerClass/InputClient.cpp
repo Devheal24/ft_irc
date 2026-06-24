@@ -49,7 +49,7 @@ bool Server::handleClientInput(int clientFd)
 		std::istringstream iss(line);
 		std::string token;
 		iss >> token;
-
+		std::cout << "li = " << line << std::endl;
 		if (token == "PASS" || token == "/PASS")
 		{
 			CommandPass(iss, selfIdx, clientFd);
@@ -82,7 +82,7 @@ bool Server::handleClientInput(int clientFd)
 		{
 			std::cout << _clients[i].getName() << std::endl;
 			std::cout << _clients[i].getUsername() << std::endl;
-			std::cerr << "client is not fully logged-in" << std::endl;
+			std::cout << "client is not fully logged-in" << std::endl;
             std::string msg =":server NOTICE :you are not fully logged in (PASS/USER/NICK)\r\n";
 			send(clientFd, msg.c_str(), msg.length(), 0);
 			continue;

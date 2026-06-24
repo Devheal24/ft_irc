@@ -56,7 +56,7 @@ std::string numRep(int code, const std::string& nick)
 		msg = msg + "No text to send\r\n";
 		break;
 	case 433:
-		msg = msg + "Nickname is already in use\r\n";
+		msg = msg + nick + " is already in use\r\n";
 		break;
 	case 461:
 		msg = msg + "Not enough parameters\r\n";
@@ -109,6 +109,9 @@ std::string numRepChannel(int code, const std::string& nick, const std::string& 
 		break;
 	case 417:
 		msg = msg + " :Input line was too long\r\n";
+		break;
+	case 433:
+		msg = msg + " :Nickname is already in use\r\n";
 		break;
 	case 441:
 		msg = msg + " :No such nick on that channel\r\n";

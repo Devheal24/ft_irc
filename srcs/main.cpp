@@ -19,13 +19,25 @@ void handler(sig_atomic_t signal)
 
 int main (int ac, char **av)
 {
-	if (ac != 3) {std::cerr << "Error\n -> expected ./irc <port> <password>" << std::endl; return (1);}
+	if (ac != 3) 
+	{
+		std::cerr << "Error\n -> expected ./irc <port> <password>" << std::endl;
+		return 1;
+	}
 	
 	signal(SIGINT, handler);
 
 	Server serv;
-	if (!serv.parse_data(av)) {return 1;};
-	if (serv.init_server() == 1) {return 1;};
+	if (!serv.parse_data(av)) 
+	{
+		return 1;
+	}
+
+	if (serv.init_server() == 1)
+	{
+		return 1;
+	}
+	
 	serv.createBot();
 	serv.run_event_loop();
 	return (g_sig);
