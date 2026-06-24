@@ -65,6 +65,7 @@ bool Server::CommandUser(std::istringstream &iss, size_t selfIdx, int clientFd)
 			std::cerr << "Username already used !" << std::endl; return false;
 			std::string msg =":server NOTICE :username already used !\r\n";
 			send(clientFd, msg.c_str(), msg.length(), 0);
+			return true;
 		}
 	}
 
