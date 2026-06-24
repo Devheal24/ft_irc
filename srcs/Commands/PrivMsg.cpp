@@ -35,7 +35,7 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
 	if (nick.empty())
 		nick = "client";
 
-	if (!target.empty() && (target[0] == '#' || target[0] == '&'))
+	if (!target.empty() && target[0] == '#')
 	{
 		std::map<std::string, Channel>::iterator it;
 		printComparativeChannel(target, it, _channels);
@@ -58,6 +58,9 @@ void Server::CommandPrivMsg(std::istringstream &iss, std::string &token, size_t 
 
 	for (size_t k = 0; k < _clients.size(); ++k)
 	{
+		std::vector<Client>::iterator it;
+		printComparativeClient(target, it, _clients);
+
 		if (_clients[k].getName() == target)
 		{
 			std::ostringstream prefixMsg;

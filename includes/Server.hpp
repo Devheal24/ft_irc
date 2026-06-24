@@ -85,6 +85,7 @@ public:
 
 	void			sendNames(Client& client, Channel& channel, const std::string & channelName);
 
+
 	template<typename T, typename L>
 	void printComparativeChannel(std::string& name, T& it, L& list)
 	{
@@ -103,6 +104,32 @@ public:
 			{
 				it = lower_target;
 				name = lower_target->first;
+				return;
+			}
+		}
+		it = lower_target;
+		return;
+	}
+
+
+	template<typename T, typename L>
+	void printComparativeClient(std::string& name, T& it, L& list)
+	{
+		std::string lower_name = name;
+		std::string lower_name_target;
+		std::transform(lower_name.begin(), lower_name.end(), lower_name.begin(), ::tolower);
+
+		T lower_target;
+
+		for (lower_target = list.begin(); lower_target !=  list.end(); ++lower_target)
+		{
+			lower_name_target = lower_target->getName();
+			std::transform(lower_name_target.begin(), lower_name_target.end(), lower_name_target.begin(), ::tolower);
+
+			if (lower_name == lower_name_target)
+			{
+				it = lower_target;
+				name = lower_target->getName();
 				return;
 			}
 		}
