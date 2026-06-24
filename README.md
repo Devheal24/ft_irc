@@ -25,11 +25,7 @@ This project is to create a server while the purpose is to allow a text-based ch
 
 - `/nick <new nickname>` to change your nickname.
 
-- `/user <new username>` to change your username.
-
-- `/user <username> 0 * :<new realname>` to set your realname.
-
-- `/msg <nickname> :<message>` to send a private message to a user.
+- `/msg <nickname> <message>` to send a private message to a user.
 
 - `/topic exemple` to change the channel's topic. Only possible if operator remove the limitation.
 

@@ -481,7 +481,6 @@ void Server::sendNames(Client& client, Channel& channel, const std::string & cha
 	{
 		int memberFd = _clients[kk].getFD();
 	
-		std::cout << "fd= " << memberFd << std::endl;
 		if (!channel.hasMember(memberFd))
 			continue;
 		

@@ -57,18 +57,17 @@ void Server::invite(int clientFd, const std::string& targetNick, const std::stri
 	if (targetFd == -1)
 	{
 		Client* target = getClientbyName(targetNick);
-
 		// Verify if target is Bot
-		if (target->getIsBot())
+		if (!target)
 		{
-			ch.addMember(targetFd);
-			std::cout << "Bot joined" << channelName << std::endl;
-			sendNames(*client, ch, channelName);
+			std::string msg = numRepChannel(441, clientName, targetNick, "");
+			send(clientFd, msg.c_str(), msg.size(), 0);
 			return ;
 		}
 
-		std::string msg = numRepChannel(441, clientName, targetNick, "");
-		send(clientFd, msg.c_str(), msg.size(), 0);
+		ch.addMember(targetFd);
+		std::cout << "Bot joined" << channelName << std::endl;
+		sendNames(*client, ch, channelName);
 		return ;
 	}
 

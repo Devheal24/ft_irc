@@ -76,7 +76,7 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 			{
 				std::string msg = numRep(461, clientName);
 				send(clientFd, msg.c_str(), msg.size(), 0);
-				return ;
+				break;
 			}
 			if (sign == true)
 			{
@@ -112,14 +112,14 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 			{
 				std::string msg = numRep(461, clientName);
 				send(clientFd, msg.c_str(), msg.size(), 0);
-				return ;
+				break;
 			}
 			int targetFd = getClientFdByName(targetName);
 			if (targetFd == -1)
 			{
 				std::string msg = numRepChannel(401, clientName, targetName, "");
 				send(clientFd, msg.c_str(), msg.size(), 0);
-				return ;
+				break;
 			}
 			if (sign == true)
 				ch.addOperator(targetFd);
@@ -142,13 +142,13 @@ void Server::CommandMode(std::istringstream &iss, int clientFd)
 				{
 					std::string msg = numRep(461, clientName);
 					send(clientFd, msg.c_str(), msg.size(), 0);
-					return ;
+					break;
 				}
 				char *end;
 				long limit = std::strtol(param.c_str(), &end, 10);
 				
 				if (*end != '\0' || limit <= 0 || limit > 50)
-					return ;
+					break;
 				ch.setLimit(static_cast<size_t>(limit));
 				std::ostringstream oss;
 				oss << ":" << getClientPrefix(clientFd) << " MODE " << channel << " " << mode[0] << mode[i] << " " << limit << "\r\n";

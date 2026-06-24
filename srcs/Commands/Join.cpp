@@ -87,9 +87,11 @@ void Server::joinChannel(int clientFd, const std::string& name, const std::strin
 		if (!it->second.isInvited(clientFd))
 		{
 			std::string msg = numRepChannel(473, clientName, name, "");
+			send(clientFd, msg.c_str(), msg.size(), 0);
 			return ;
 		}
 	}
+	it->second.removeInvite(clientFd);
 
 	// Check if channel has key and if key is matching
 	if (it->second.hasKey())
