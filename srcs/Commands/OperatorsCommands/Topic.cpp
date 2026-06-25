@@ -70,6 +70,6 @@ void Server::topic(int clientFd, std::string& channelName, std::string& newTopic
 		return ;
 	}
 	ch.setTopic(newTopic);
-	std::string msg = ":" + getClientPrefix(clientFd) + " TOPIC " + channelName + " :" + newTopic + "\r\n";
+	std::string msg = ": " + getClientPrefix(clientFd) + " TOPIC " + channelName + " :" + newTopic + "\r\n";
 	ch.broadcast(msg);
 }

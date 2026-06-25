@@ -87,7 +87,7 @@ std::string numRepChannel(int code, const std::string& nick, const std::string& 
 		msg = msg + " :No topic is set\r\n";
 		break;
 	case 332:
-		msg = msg + ":" + addon + "\r\n";
+		msg = msg + " :" + addon + "\r\n";
 		break;
 	case 341:
 		msg = msg + " " + addon + "\r\n";

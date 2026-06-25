@@ -26,6 +26,7 @@ int main (int ac, char **av)
 	}
 	
 	signal(SIGINT, handler);
+	signal(SIGQUIT, handler);
 
 	Server serv;
 	if (!serv.parse_data(av)) 

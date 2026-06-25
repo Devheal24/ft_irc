@@ -107,7 +107,6 @@ public:
 			{
 				it = lower_target;
 				name = lower_target->first;
-				std::cout << name << std::endl;
 				return;
 			}
 		}
